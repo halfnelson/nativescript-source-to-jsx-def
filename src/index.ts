@@ -1,12 +1,35 @@
 import { Project, ts, SourceFile, ClassDeclaration, Scope, ClassElement, Type, Node, PropertyAccessExpression } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
+import { type } from 'os';
+import { nodeModuleNameResolver } from 'typescript';
+const walkSync = require('walk-sync');
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
 const project = new Project({
     tsConfigFilePath: nativescriptSourcePath + "/tsconfig.json",
+    addFilesFromTsConfig: false,
+    skipFileDependencyResolution: true,
 });
+
+var files = walkSync(nativescriptSourcePath, {
+    directories: false,
+    includeBasePath: true
+})
+
+for (var f of files) {
+    if (f.endsWith(".d.ts")) continue;
+    
+    if (f.endsWith(".android.ts")) {
+    //    console.log(f.replace(".android.ts",".ts"));
+        project.createSourceFile(f.replace(".android.ts", ".ts"), fs.readFileSync(f, 'utf8'), { overwrite: true}); 
+    } else {
+        project.addSourceFileAtPath(f)
+    }
+}
+
+//project.resolveSourceFileDependencies();
 
 function getUISourceFiles() {
     return project.getSourceFiles()
@@ -14,7 +37,7 @@ function getUISourceFiles() {
         .filter(f => {
             let folder_name = path.basename(f.getDirectoryPath())
             let file_name = path.basename(f.getFilePath())
-            return file_name == `${folder_name}.ts` && file_name == `${folder_name}.android.ts`
+            return file_name == `${folder_name}.ts` || file_name == `${folder_name}.android.ts`
         })
 }
 
@@ -64,7 +87,8 @@ function getUIClasses() {
 type propertyRegistration = {
     propertyName: string,
     targetClassName: string,
-    propertyType: Type
+    propertyType: Type,
+    propertyNode: Node
 }
 
 
@@ -85,6 +109,7 @@ function getPropertyRegistrations() {
                         statements.push({
                             propertyName: propExpr.getText().replace(/Property$/,""),
                             propertyType: propExpr.getType().getTypeArguments()[1], //Property<Target, valueType>
+                            propertyNode: propExpr,
                             targetClassName: target.getText()
                         })
                     }
@@ -102,11 +127,12 @@ const propertyRegistrations = getPropertyRegistrations()
 
 type ClassProp = {
     name: string,
-    type: Type
+    type: Type,
+    typeNode: Node
 }
 
 function propertyRegistrationsForClass(c: string): ClassProp[] {
-    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, type: r.propertyType }))
+    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, type: r.propertyType, typeNode: r.propertyNode }))
 }
 
 function error(message: string): never {
@@ -123,6 +149,9 @@ function uiClassDefs() {
                 classes.push(current);
             }
             current = current.getBaseClass();
+            if (current?.getSourceFile().getFilePath().endsWith(".d.ts")) {
+                current = undefined;
+            }
         }
     }
     return classes;
@@ -130,21 +159,29 @@ function uiClassDefs() {
 
 function getClassProperties(c: ClassDeclaration): ClassProp[] {
     
-    var props: Map<string, Type> = new Map()
+    var props: Map<string, { type: Type, node: Node}> = new Map()
     for (var p of c.getInstanceProperties()) {
-        if (p.getScope() == Scope.Public && !p.getName().startsWith("_")) {
-            props.set(p.getName(), p.getType());
+        if (p.getScope() == Scope.Public && !p.getName().startsWith("_") && !p.getName().endsWith("Protected")) {
+            var typ = p.getType();
+            
+            if (!typ.isClassOrInterface()) {
+                console.log(typ.getText(p, ts.TypeFormatFlags.InArrayType | ts.TypeFormatFlags.InArrayType | ts.TypeFormatFlags.InTypeAlias), typ.getApparentType().getText());
+            }
+            
+            
+            props.set(p.getName(), { type: p.getType(), node: p });
         }
     }
     var className: string = c.getName() ?? "";
     //patch in any dynamic properties
     for (var r of propertyRegistrationsForClass(className)) {
         if (props.has(r.name)) {
-            console.log("replacing ",r.name,":", props.get(r.name)?.getText(), "with", r.type.getText() );
+       //     console.log("replacing ",r.name,":", props.get(r.name)?.getText(), "with", r.type.getText() );
         } else {
-            console.log("adding ",r.name,":",r.type.getText() ," to ", className)
+       //     console.log("adding ",r.name,":",r.type.getText() ," to ", className)
         }
-        props.set(r.name, r.type)
+        //TODO: inject "string" type here.
+        props.set(r.name, { type: r.type, node: r.typeNode })
     }
 
     //todo find any registered props
@@ -152,19 +189,20 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     for( var key of props.keys()) {
         allProps.push({
             name: key,
-            type: props.get(key)!
+            type: props.get(key)!.type,
+            typeNode: props.get(key)!.node
         })
     }
     allProps.sort((a,b) => a.name < b.name ? -1 : 1)
     return allProps;
 }
 
-function typeDef(t: Type<ts.Type>): string {
-    return t.getText();
+function typeDef(t: ClassProp): string {
+    return t.type.getText(t.typeNode, ts.TypeFormatFlags.InTypeAlias);
 }
 
 function getClassTypeDef(c: ClassDeclaration): string {
-    var defLines = getClassProperties(c).map(x => `    ${x.name}: ${typeDef(x.type)}`);
+    var defLines = getClassProperties(c).map(x => `    ${x.name}: ${typeDef(x)}`);
     return `//${c.getSourceFile().getFilePath()}\ntype ${c.getName()} = {\n${defLines.join("\n")}\n};`;
 }
 
@@ -187,6 +225,7 @@ while (view) {
 
 */
 fs.writeFileSync("./sveltenative-jsx.d.ts", getClassTypeDefs());
+//console.log(project.getSourceFiles().map(s => s.getFilePath()))
 
 
 /*
