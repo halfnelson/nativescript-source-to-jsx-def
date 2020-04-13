@@ -1,0 +1,4 @@
+dist/
+nativescript_src/
+node_modules/
+tsconfig.tsbuildinfo

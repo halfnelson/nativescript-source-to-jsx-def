@@ -1,0 +1,20 @@
+{
+  "name": "nativescript-source-to-jsx-def",
+  "version": "1.0.0",
+  "description": "Introspect the NativeScript source to generate JSX definitions for `svelte-type-checker`",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node dist/index.js",
+    "getsource": "git clone --branch 6.5.0 --depth 1 https://github.com/NativeScript/NativeScript.git nativescript_src"
+  },
+  "author": "David Pershouse",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^13.11.1",
+    "ts-morph": "^7.0.2",
+    "typescript": "^3.8.3"
+  }
+}
