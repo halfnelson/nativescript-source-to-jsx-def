@@ -1,6 +1,6 @@
 import { Project, ts, SourceFile, ClassDeclaration, Scope, ClassElement, Type, Node, PropertyAccessExpression } from 'ts-morph'
 import * as path from 'path'
-
+import * as fs from 'fs'
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
@@ -14,7 +14,7 @@ function getUISourceFiles() {
         .filter(f => {
             let folder_name = path.basename(f.getDirectoryPath())
             let file_name = path.basename(f.getFilePath())
-            return file_name == `${folder_name}.ts` || file_name == `${folder_name}.android.ts`
+            return file_name == `${folder_name}.ts` && file_name == `${folder_name}.android.ts`
         })
 }
 
@@ -98,6 +98,16 @@ function getPropertyRegistrations() {
 
 
 const uiClasses = getUIClasses()
+const propertyRegistrations = getPropertyRegistrations()
+
+type ClassProp = {
+    name: string,
+    type: Type
+}
+
+function propertyRegistrationsForClass(c: string): ClassProp[] {
+    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, type: r.propertyType }))
+}
 
 function error(message: string): never {
     throw new Error(message);
@@ -118,40 +128,49 @@ function uiClassDefs() {
     return classes;
 }
 
-type ClassProp = {
-    name: string,
-    type: Type
-}
-
-function getClassProperties(c: ClassDeclaration) {
-    var props: ClassProp[] = []
+function getClassProperties(c: ClassDeclaration): ClassProp[] {
+    
+    var props: Map<string, Type> = new Map()
     for (var p of c.getInstanceProperties()) {
         if (p.getScope() == Scope.Public && !p.getName().startsWith("_")) {
-            props.push({
-                name: p.getName(),
-                type: p.getType()
-            });
+            props.set(p.getName(), p.getType());
         }
     }
-
-   /* for (var s of c.getSetAccessors()) {
-        if (s.getScope() == Scope.Public && !s.getName().startsWith("_")) {
-            props.push({
-                name: s.getName(),
-                type: s.getType()
-            });
+    var className: string = c.getName() ?? "";
+    //patch in any dynamic properties
+    for (var r of propertyRegistrationsForClass(className)) {
+        if (props.has(r.name)) {
+            console.log("replacing ",r.name,":", props.get(r.name)?.getText(), "with", r.type.getText() );
+        } else {
+            console.log("adding ",r.name,":",r.type.getText() ," to ", className)
         }
-    }*/
+        props.set(r.name, r.type)
+    }
 
     //todo find any registered props
-    return props;
+    var allProps:ClassProp[] = []
+    for( var key of props.keys()) {
+        allProps.push({
+            name: key,
+            type: props.get(key)!
+        })
+    }
+    allProps.sort((a,b) => a.name < b.name ? -1 : 1)
+    return allProps;
+}
+
+function typeDef(t: Type<ts.Type>): string {
+    return t.getText();
+}
+
+function getClassTypeDef(c: ClassDeclaration): string {
+    var defLines = getClassProperties(c).map(x => `    ${x.name}: ${typeDef(x.type)}`);
+    return `//${c.getSourceFile().getFilePath()}\ntype ${c.getName()} = {\n${defLines.join("\n")}\n};`;
 }
 
 
 function getClassTypeDefs() {
-    for (var c of uiClassDefs()) {
-        console.log(c.getName());
-    }
+    return uiClassDefs().map(c => getClassTypeDef(c)).join("\n\n");
 }
 
 /*
@@ -167,18 +186,11 @@ while (view) {
 }
 
 */
-var view: ClassDeclaration | undefined = uiClasses.find(x => x.getName() == "GridLayout") || error("message");
+fs.writeFileSync("./sveltenative-jsx.d.ts", getClassTypeDefs());
+
+
 /*
-while (view) {
-    console.log("\n----" + view.getName() + "-----")
-    for (var p of getClassProperties(view)) {
-        console.log(p.name, p.type.getText())
-    }
-    view = view.getBaseClass();
-}
-*/
-
-
 for (var reg of getPropertyRegistrations()) {
     console.log(reg.propertyName,": ", reg.propertyType.getText(), " on ",reg.targetClassName);
 }
+*/
