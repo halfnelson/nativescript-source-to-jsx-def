@@ -1,4 +1,4 @@
-import { Project, ts, SourceFile, ClassDeclaration, Scope, ClassElement, Type, Node, PropertyAccessExpression } from 'ts-morph'
+import { Project, ts, SourceFile, ClassDeclaration, Scope, ClassElement, Type, Node, PropertyAccessExpression, Program } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 import { type } from 'os';
@@ -7,27 +7,31 @@ const walkSync = require('walk-sync');
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
-const project = new Project({
-    tsConfigFilePath: nativescriptSourcePath + "/tsconfig.json",
-    addFilesFromTsConfig: false,
-    skipFileDependencyResolution: true,
-});
-
+/*
+// We need to rename *.android.ts to *.ts
+// and remove any .d.ts files since they lie!
 var files = walkSync(nativescriptSourcePath, {
     directories: false,
     includeBasePath: true
 })
 
 for (var f of files) {
-    if (f.endsWith(".d.ts")) continue;
+    if (f.endsWith(".d.ts")) {
+        fs.unlinkSync(f);
+    }
     
     if (f.endsWith(".android.ts")) {
-    //    console.log(f.replace(".android.ts",".ts"));
-        project.createSourceFile(f.replace(".android.ts", ".ts"), fs.readFileSync(f, 'utf8'), { overwrite: true}); 
-    } else {
-        project.addSourceFileAtPath(f)
+        // copy .android.ts to index.ts
+        fs.copyFileSync(f, path.dirname(f)+"/index.ts");
+        // remove .android.ts
+        fs.unlinkSync(f);
     }
 }
+*/
+
+const project = new Project({
+    tsConfigFilePath: nativescriptSourcePath + "/tsconfig.json",
+});
 
 //project.resolveSourceFileDependencies();
 
@@ -37,7 +41,7 @@ function getUISourceFiles() {
         .filter(f => {
             let folder_name = path.basename(f.getDirectoryPath())
             let file_name = path.basename(f.getFilePath())
-            return file_name == `${folder_name}.ts` || file_name == `${folder_name}.android.ts`
+            return file_name == `${folder_name}.d.ts` && folder_name != 'repeater'
         })
 }
 
@@ -120,26 +124,6 @@ function getPropertyRegistrations() {
     return statements;
 }
 
-
-
-const uiClasses = getUIClasses()
-const propertyRegistrations = getPropertyRegistrations()
-
-type ClassProp = {
-    name: string,
-    type: Type,
-    typeNode: Node
-}
-
-function propertyRegistrationsForClass(c: string): ClassProp[] {
-    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, type: r.propertyType, typeNode: r.propertyNode }))
-}
-
-function error(message: string): never {
-    throw new Error(message);
-}
-
-
 function uiClassDefs() {
     var classes: ClassDeclaration[] = []
     for (var c of uiClasses) {
@@ -149,26 +133,46 @@ function uiClassDefs() {
                 classes.push(current);
             }
             current = current.getBaseClass();
-            if (current?.getSourceFile().getFilePath().endsWith(".d.ts")) {
-                current = undefined;
-            }
         }
     }
     return classes;
 }
 
+
+const uiClasses = getUIClasses()
+const classNames = new Set(uiClassDefs().map(u => u.getName()));
+const propertyRegistrations = getPropertyRegistrations().map(x => { 
+    var targetClassName = classNames.has(x.targetClassName) ? x.targetClassName : x.targetClassName.replace("Base", "")
+    targetClassName = classNames.has(targetClassName) ? targetClassName : x.targetClassName.replace("Common", "");
+    return {
+        ...x,
+        targetClassName: targetClassName
+    }
+})
+
+type ClassProp = {
+    name: string,
+    type: Type,
+    typeNode: Node,
+    isProperty?: boolean
+}
+
+
+function propertyRegistrationsForClass(c: string): ClassProp[] {
+    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, type: r.propertyType, typeNode: r.propertyNode, isProperty: true }))
+}
+
+function error(message: string): never {
+    throw new Error(message);
+}
+
+
+
 function getClassProperties(c: ClassDeclaration): ClassProp[] {
     
-    var props: Map<string, { type: Type, node: Node}> = new Map()
+    var props: Map<string, { type: Type, node: Node, isProperty?: boolean}> = new Map()
     for (var p of c.getInstanceProperties()) {
         if (p.getScope() == Scope.Public && !p.getName().startsWith("_") && !p.getName().endsWith("Protected")) {
-            var typ = p.getType();
-            
-            if (!typ.isClassOrInterface()) {
-                console.log(typ.getText(p, ts.TypeFormatFlags.InArrayType | ts.TypeFormatFlags.InArrayType | ts.TypeFormatFlags.InTypeAlias), typ.getApparentType().getText());
-            }
-            
-            
             props.set(p.getName(), { type: p.getType(), node: p });
         }
     }
@@ -176,12 +180,10 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     //patch in any dynamic properties
     for (var r of propertyRegistrationsForClass(className)) {
         if (props.has(r.name)) {
-       //     console.log("replacing ",r.name,":", props.get(r.name)?.getText(), "with", r.type.getText() );
-        } else {
-       //     console.log("adding ",r.name,":",r.type.getText() ," to ", className)
+           console.log("adding ",r.name,":",r.type.getText() ," to ", className)
         }
         //TODO: inject "string" type here.
-        props.set(r.name, { type: r.type, node: r.typeNode })
+        props.set(r.name, { type: r.type, node: r.typeNode, isProperty: true })
     }
 
     //todo find any registered props
@@ -190,25 +192,102 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
         allProps.push({
             name: key,
             type: props.get(key)!.type,
-            typeNode: props.get(key)!.node
+            typeNode: props.get(key)!.node,
+            isProperty: props.get(key)!.isProperty
         })
     }
     allProps.sort((a,b) => a.name < b.name ? -1 : 1)
     return allProps;
 }
 
-function typeDef(t: ClassProp): string {
-    return t.type.getText(t.typeNode, ts.TypeFormatFlags.InTypeAlias);
+type TypeImports = {[index: string]: string}
+
+function mergeTypeImports(a: TypeImports, b: TypeImports): TypeImports {
+    var dest = { ... a};
+    //A little bit of safety mixed with a little laziness :)
+    for (var alias in b) {
+        if (dest[alias] && dest[alias] != b[alias]) {
+            console.log("collision", alias, dest[alias], b[alias]);
+            throw Error("Time for the developer to stop being lazy and handle import collisions")
+        }
+        dest[alias] = b[alias]
+    }
+    return dest;
 }
 
-function getClassTypeDef(c: ClassDeclaration): string {
-    var defLines = getClassProperties(c).map(x => `    ${x.name}: ${typeDef(x)}`);
-    return `//${c.getSourceFile().getFilePath()}\ntype ${c.getName()} = {\n${defLines.join("\n")}\n};`;
+type DefWithImports = {
+    definition: string;
+    typeImports: TypeImports
+}
+
+function getTypeDef(t: Type, node?:Node, isProperty?: boolean ): DefWithImports {
+    var typeText 
+    var imports: TypeImports = {};
+   
+
+    if (t.isClassOrInterface() || t.isArray() || !node) {
+        typeText = t.getText();
+    }  else {
+        //collect imports for class types
+        if (t.isUnion()) {
+            let unionImports = t.getUnionTypes().filter(ut => ut.isClassOrInterface() || ut.isArray()).map(ut => getTypeDef(ut).typeImports);
+            imports = unionImports.reduce((p,c)=> mergeTypeImports(p,c), imports);
+        }
+
+        typeText = t.getText(node, ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation)
+    }
+    //if (typeText.includes("Template")) 
+    //    debugger;
+    typeText = typeText.replace(/import\("(.*)"\)\.([a-zA-Z_0-9\[\]]+)/g, (match:string, importPath: string, importName:string) => {;
+        let importAlias = importName.replace("[]","");
+        imports[importAlias] = importPath;  // importPath.replace(nativescriptSourcePath, "@nativescript_core")
+        return importName;
+    });
+
+    if (isProperty) {
+        typeText = "string | "+typeText;
+    }
+
+    return { 
+        definition: typeText,
+        typeImports: imports
+    }
+}
+
+
+function classPropDef(t: ClassProp): DefWithImports {
+    var typedef = getTypeDef(t.type, t.typeNode, t.isProperty);
+
+    return {
+        definition: `${t.name}: ${typedef.definition};`,
+        typeImports: typedef.typeImports
+    }
+}
+
+function getClassTypeDef(c: ClassDeclaration): DefWithImports {
+    
+    var propDefs = getClassProperties(c).map(x =>classPropDef(x));
+
+    var baseclass = c.getBaseClass();
+    var classDef = `//${c.getSourceFile().getFilePath()}\ntype ${c.getName()}Attributes =  ${baseclass ? `${baseclass.getName()}Attributes & ` : '' }{\n${propDefs.map(d => "    " + d.definition).join("\n")}\n};`;
+    var classImports: TypeImports = { }
+    for (let propImports of propDefs.map(d => d.typeImports)) {
+        classImports = mergeTypeImports(classImports, propImports);
+    }
+    return {
+        definition: classDef,
+        typeImports: classImports
+    }
 }
 
 
 function getClassTypeDefs() {
-    return uiClassDefs().map(c => getClassTypeDef(c)).join("\n\n");
+    let classDefs = uiClassDefs().map(getClassTypeDef);
+    let classImports = classDefs.reduce((p: TypeImports, c: DefWithImports) =>  mergeTypeImports(p, c.typeImports), {} as TypeImports)
+
+    let classImportStatements = Object.keys(classImports).map(c => `type ${c} = import("${classImports[c]}").${c};`).join("\n");
+    let classTypeDefs = classDefs.map(c => c.definition).join("\n\n");
+    return `${classImportStatements}\n\n${classTypeDefs}`;
 }
 
 /*
@@ -227,6 +306,11 @@ while (view) {
 fs.writeFileSync("./sveltenative-jsx.d.ts", getClassTypeDefs());
 //console.log(project.getSourceFiles().map(s => s.getFilePath()))
 
+let propClasses = new Set(propertyRegistrations.map(p=>p.targetClassName))
+
+//console.log("promises: ", propClasses.keys())
+//console.log("classes: ", classNames.keys())
+//console.log("missing classes", [...propClasses.keys()].filter(k => !classNames.has(k)))
 
 /*
 for (var reg of getPropertyRegistrations()) {
