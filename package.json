@@ -14,8 +14,11 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^13.11.1",
+    "@types/uppercamelcase": "^3.0.0",
     "ts-morph": "^7.0.2",
-    "typescript": "^3.8.3",
-    "walk-sync": "^2.0.2"
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "uppercamelcase": "^3.0.0"
   }
 }
