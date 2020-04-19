@@ -322,12 +322,16 @@ function classPropDef(t: ClassProp): string {
     return `${t.name}: ${t.typeDef};`
 }
 
+function getClassAttributesName(c: ClassDeclaration) {
+    return `${c.getName()}Attributes`
+}
+
 function getClassTypeDef(c: ClassDeclaration): string {
 
     var propDefs = getClassProperties(c).map(x => classPropDef(x));
 
     var baseclass = c.getBaseClass();
-    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${c.getName()}Attributes =  ${baseclass ? `${baseclass.getName()}Attributes & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
+    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${getClassAttributesName(c)} =  ${baseclass ? `${baseclass.getName()}Attributes & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
     return classDef;
 }
 
@@ -340,34 +344,39 @@ function getClassTypeDefs() {
     return `${classImportStatements}\n\n${classTypeDefs}`;
 }
 
-/*
 
-var view: ClassDeclaration | undefined = uiClasses.find(x => x.getName() == "GridLayout") || error("message");
-while (view) {
-    for( var p of view.getSetAccessors()) {
-       // if (p.getName().startsWith(" ")) {
-            console.log(p.getName(), p.getType().getText());
-       // }
+function getIntrinsicElementDef(classDec: ClassDeclaration): string {
+    let name = classDec.getName()!;
+    return `${name.toLowerCase()}: ${getClassAttributesName(classDec)};`
+}
+
+
+function getJSXNamespaceDef() {
+    return `
+declare namespace svelteNative.JSX {
+    /* svelte2tsx JSX */
+    interface ElementClass {
+      $$prop_def: any;
     }
-    //view = view.getBaseClass();
+  
+    interface ElementAttributesProperty {
+      $$prop_def: any; // specify the property name to use
+    }
+  
+    interface IntrinsicAttributes {}
+
+    interface IntrinsicElements {
+${uiClasses.map(c => getIntrinsicElementDef(c)).map(d => `        ${d}`).join("\n")}
+        [name: string]: { [name: string]: any };
+    }
+}
+`
 }
 
-*/
-fs.writeFileSync("./sveltenative-jsx.d.ts", getClassTypeDefs());
-
-//console.log(project.getSourceFiles().map(s => s.getFilePath()))
-
-//let propClasses = new Set(propertyRegistrations.map(p=>p.targetClassName))
-
-//propertyRegistrations.sort((a,b) => a.propertyName < b.propertyName ? -1 : a.propertyName == b.propertyName  ? 0 : 1 )
-
-//console.log(propertyRegistrations.map(r => `${r.propertyName} on ${r.targetClassName}`))
-//console.log("props: ", propClasses.keys())
-//console.log("classes: ", classNames.keys())
-//console.log("missing classes", [...propClasses.keys()].filter(k => !classNames.has(k)))
-
-/*
-for (var reg of getPropertyRegistrations()) {
-    console.log(reg.propertyName,": ", reg.propertyType.getText(), " on ",reg.targetClassName);
+function getFullJSXDef(): string {
+    return `${getClassTypeDefs()}\n\n${getJSXNamespaceDef()}`
 }
-*/
+
+
+fs.writeFileSync("./sveltenative-jsx.d.ts", getFullJSXDef());
+

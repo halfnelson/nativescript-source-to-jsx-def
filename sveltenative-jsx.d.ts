@@ -772,3 +772,65 @@ type TabStripItemAttributes =  ViewAttributes & {
     onTap: (args: EventData) => void;
     title: string;
 };
+
+
+declare namespace svelteNative.JSX {
+    /* svelte2tsx JSX */
+    interface ElementClass {
+      $$prop_def: any;
+    }
+  
+    interface ElementAttributesProperty {
+      $$prop_def: any; // specify the property name to use
+    }
+  
+    interface IntrinsicAttributes {}
+
+    interface IntrinsicElements {
+        actionbar: ActionBarAttributes;
+        actionitem: ActionItemAttributes;
+        navigationbutton: NavigationButtonAttributes;
+        activityindicator: ActivityIndicatorAttributes;
+        border: BorderAttributes;
+        bottomnavigation: BottomNavigationAttributes;
+        button: ButtonAttributes;
+        contentview: ContentViewAttributes;
+        datepicker: DatePickerAttributes;
+        frame: FrameAttributes;
+        htmlview: HtmlViewAttributes;
+        image: ImageAttributes;
+        label: LabelAttributes;
+        listpicker: ListPickerAttributes;
+        listview: ListViewAttributes;
+        page: PageAttributes;
+        placeholder: PlaceholderAttributes;
+        progress: ProgressAttributes;
+        proxyviewcontainer: ProxyViewContainerAttributes;
+        scrollview: ScrollViewAttributes;
+        searchbar: SearchBarAttributes;
+        segmentedbaritem: SegmentedBarItemAttributes;
+        segmentedbar: SegmentedBarAttributes;
+        slider: SliderAttributes;
+        switch: SwitchAttributes;
+        tabviewitem: TabViewItemAttributes;
+        tabview: TabViewAttributes;
+        tabs: TabsAttributes;
+        textfield: TextFieldAttributes;
+        textview: TextViewAttributes;
+        timepicker: TimePickerAttributes;
+        webview: WebViewAttributes;
+        view: ViewAttributes;
+        containerview: ContainerViewAttributes;
+        customlayoutview: CustomLayoutViewAttributes;
+        absolutelayout: AbsoluteLayoutAttributes;
+        docklayout: DockLayoutAttributes;
+        flexboxlayout: FlexboxLayoutAttributes;
+        gridlayout: GridLayoutAttributes;
+        stacklayout: StackLayoutAttributes;
+        wraplayout: WrapLayoutAttributes;
+        tabcontentitem: TabContentItemAttributes;
+        tabstrip: TabStripAttributes;
+        tabstripitem: TabStripItemAttributes;
+        [name: string]: { [name: string]: any };
+    }
+}
