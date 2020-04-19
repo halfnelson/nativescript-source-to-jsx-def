@@ -211,6 +211,7 @@ function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
 
 }
 
+var propertyChangeDataType = project.getSourceFileOrThrow(nativescriptSourcePath+ "/data/observable/observable.d.ts").getInterfaceOrThrow("PropertyChangeData");
 
 function getClassProperties(c: ClassDeclaration): ClassProp[] {
 
@@ -232,6 +233,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     //patch in any dynamic properties 
     for (var r of propertyRegistrationsForClass(className)) {
         props.set(r.name, r.typeDef)
+        props.set('on'+ pascalCase(r.name)+"Change", `(args: ${getTypeDef(propertyChangeDataType.getType())}) => void`)
     }
 
     //combine
@@ -273,9 +275,6 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
         }
     }
 
-    if (typeText.includes("=>")) {
-        debugger;
-    }
 
 
     typeText = typeText.replace(/import\("(.*)"\)\.([a-zA-Z_0-9\[\]]+)/g, (match: string, importPath: string, importName: string) => {
