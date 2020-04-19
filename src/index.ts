@@ -243,7 +243,7 @@ function getClassTypeDef(c: ClassDeclaration): string {
     var propDefs = getClassProperties(c).map(x =>classPropDef(x));
 
     var baseclass = c.getBaseClass();
-    var classDef = `//${c.getSourceFile().getFilePath()}\ntype ${c.getName()}Attributes =  ${baseclass ? `${baseclass.getName()}Attributes & ` : '' }{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
+    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${c.getName()}Attributes =  ${baseclass ? `${baseclass.getName()}Attributes & ` : '' }{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
     return classDef;
 }   
 

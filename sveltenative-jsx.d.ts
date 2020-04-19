@@ -34,7 +34,7 @@ type TabStripItem = import("@nativescript/core/ui/tab-navigation-base/tab-strip-
 type Image = import("@nativescript/core/ui/image/image").Image;
 type Label = import("@nativescript/core/ui/label/label").Label;
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/action-bar/action-bar.d.ts
+// ui/action-bar/action-bar.d.ts
 type ActionBarAttributes =  ViewAttributes & {
     actionItems: ActionItems;
     android: AndroidActionBarSettings;
@@ -48,7 +48,7 @@ type ActionBarAttributes =  ViewAttributes & {
     titleView: View;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/core/view/view.d.ts
+// ui/core/view/view.d.ts
 type ViewAttributes =  ViewBaseAttributes & {
     android: any;
     androidDynamicElevationOffset: number;
@@ -118,7 +118,7 @@ type ViewAttributes =  ViewBaseAttributes & {
     width: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/core/view-base/view-base.d.ts
+// ui/core/view-base/view-base.d.ts
 type ViewBaseAttributes =  ObservableAttributes & {
     alignSelf: "auto" | "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
     android: any;
@@ -179,12 +179,12 @@ type ViewBaseAttributes =  ObservableAttributes & {
     viewController: any;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/data/observable/observable.d.ts
+// data/observable/observable.d.ts
 type ObservableAttributes =  {
 
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/action-bar/action-bar.d.ts
+// ui/action-bar/action-bar.d.ts
 type ActionItemAttributes =  ViewBaseAttributes & {
     actionBar: ActionBar;
     actionView: View;
@@ -195,30 +195,30 @@ type ActionItemAttributes =  ViewBaseAttributes & {
     visibility: string;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/action-bar/action-bar.d.ts
+// ui/action-bar/action-bar.d.ts
 type NavigationButtonAttributes =  ActionItemAttributes & {
 
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/activity-indicator/activity-indicator.d.ts
+// ui/activity-indicator/activity-indicator.d.ts
 type ActivityIndicatorAttributes =  ViewAttributes & {
     android: any;
     busy: string | false | true;
     ios: any;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/border/border.d.ts
+// ui/border/border.d.ts
 type BorderAttributes =  ContentViewAttributes & {
     cornerRadius: number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/content-view/content-view.d.ts
+// ui/content-view/content-view.d.ts
 type ContentViewAttributes =  ViewAttributes & {
     content: View;
     layoutView: View;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/bottom-navigation/bottom-navigation.d.ts
+// ui/bottom-navigation/bottom-navigation.d.ts
 type BottomNavigationAttributes =  TabNavigationBaseAttributes & {
     android: any;
     ios: any;
@@ -227,7 +227,7 @@ type BottomNavigationAttributes =  TabNavigationBaseAttributes & {
     tabStrip: TabStrip;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/tab-navigation-base/tab-navigation-base/tab-navigation-base.d.ts
+// ui/tab-navigation-base/tab-navigation-base/tab-navigation-base.d.ts
 type TabNavigationBaseAttributes =  ViewAttributes & {
     android: any;
     ios: any;
@@ -236,14 +236,14 @@ type TabNavigationBaseAttributes =  ViewAttributes & {
     tabStrip: string | TabStrip;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/button/button.d.ts
+// ui/button/button.d.ts
 type ButtonAttributes =  TextBaseAttributes & {
     android: any;
     ios: any;
     textWrap: false | true;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/text-base/text-base.d.ts
+// ui/text-base/text-base.d.ts
 type TextBaseAttributes =  ViewAttributes & {
     fontSize: number;
     formattedText: string | FormattedString;
@@ -261,7 +261,7 @@ type TextBaseAttributes =  ViewAttributes & {
     whiteSpace: "initial" | "normal" | "nowrap";
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/date-picker/date-picker.d.ts
+// ui/date-picker/date-picker.d.ts
 type DatePickerAttributes =  ViewAttributes & {
     android: any;
     date: string | Date;
@@ -273,7 +273,7 @@ type DatePickerAttributes =  ViewAttributes & {
     year: string | number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/frame/frame.d.ts
+// ui/frame/frame.d.ts
 type FrameAttributes =  ViewAttributes & {
     actionBarVisibility: "always" | "never" | "auto";
     android: AndroidFrame;
@@ -287,14 +287,14 @@ type FrameAttributes =  ViewAttributes & {
     transition: NavigationTransition;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/html-view/html-view.d.ts
+// ui/html-view/html-view.d.ts
 type HtmlViewAttributes =  ViewAttributes & {
     android: any;
     html: string;
     ios: any;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/image/image.d.ts
+// ui/image/image.d.ts
 type ImageAttributes =  ViewAttributes & {
     android: any;
     decodeHeight: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -308,14 +308,14 @@ type ImageAttributes =  ViewAttributes & {
     tintColor: Color;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/label/label.d.ts
+// ui/label/label.d.ts
 type LabelAttributes =  TextBaseAttributes & {
     android: any;
     ios: any;
     textWrap: false | true;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/list-picker/list-picker.d.ts
+// ui/list-picker/list-picker.d.ts
 type ListPickerAttributes =  ViewAttributes & {
     android: any;
     ios: any;
@@ -326,7 +326,7 @@ type ListPickerAttributes =  ViewAttributes & {
     valueField: string;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/list-view/list-view.d.ts
+// ui/list-view/list-view.d.ts
 type ListViewAttributes =  ViewAttributes & {
     android: any;
     ios: any;
@@ -340,7 +340,7 @@ type ListViewAttributes =  ViewAttributes & {
     separatorColor: Color;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/page/page.d.ts
+// ui/page/page.d.ts
 type PageAttributes =  ContentViewAttributes & {
     actionBar: ActionBar;
     actionBarHidden: string | false | true;
@@ -353,12 +353,12 @@ type PageAttributes =  ContentViewAttributes & {
     statusBarStyle: "light" | "dark";
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/placeholder/placeholder.d.ts
+// ui/placeholder/placeholder.d.ts
 type PlaceholderAttributes =  ViewAttributes & {
 
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/progress/progress.d.ts
+// ui/progress/progress.d.ts
 type ProgressAttributes =  ViewAttributes & {
     android: any;
     ios: any;
@@ -366,12 +366,12 @@ type ProgressAttributes =  ViewAttributes & {
     value: string | number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/proxy-view-container/proxy-view-container.d.ts
+// ui/proxy-view-container/proxy-view-container.d.ts
 type ProxyViewContainerAttributes =  LayoutBaseAttributes & {
     proxy: string;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/layouts/layout-base.d.ts
+// ui/layouts/layout-base.d.ts
 type LayoutBaseAttributes =  CustomLayoutViewAttributes & {
     clipToBounds: string | false | true;
     isPassThroughParentEnabled: string | false | true;
@@ -382,17 +382,17 @@ type LayoutBaseAttributes =  CustomLayoutViewAttributes & {
     paddingTop: number | "auto" | LengthDipUnit | LengthPxUnit;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/core/view/view.d.ts
+// ui/core/view/view.d.ts
 type CustomLayoutViewAttributes =  ContainerViewAttributes & {
 
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/core/view/view.d.ts
+// ui/core/view/view.d.ts
 type ContainerViewAttributes =  ViewAttributes & {
     iosOverflowSafeArea: false | true;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/scroll-view/scroll-view.d.ts
+// ui/scroll-view/scroll-view.d.ts
 type ScrollViewAttributes =  ContentViewAttributes & {
     horizontalOffset: number;
     isScrollEnabled: string | false | true;
@@ -403,7 +403,7 @@ type ScrollViewAttributes =  ContentViewAttributes & {
     verticalOffset: number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/search-bar/search-bar.d.ts
+// ui/search-bar/search-bar.d.ts
 type SearchBarAttributes =  ViewAttributes & {
     android: any;
     hint: string;
@@ -413,19 +413,19 @@ type SearchBarAttributes =  ViewAttributes & {
     textFieldHintColor: string | Color;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/segmented-bar/segmented-bar.d.ts
+// ui/segmented-bar/segmented-bar.d.ts
 type SegmentedBarItemAttributes =  ViewBaseAttributes & {
     title: string;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/segmented-bar/segmented-bar.d.ts
+// ui/segmented-bar/segmented-bar.d.ts
 type SegmentedBarAttributes =  ViewAttributes & {
     items: string | SegmentedBarItem[];
     selectedBackgroundColor: Color;
     selectedIndex: string | number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/slider/slider.d.ts
+// ui/slider/slider.d.ts
 type SliderAttributes =  ViewAttributes & {
     android: any;
     ios: any;
@@ -434,7 +434,7 @@ type SliderAttributes =  ViewAttributes & {
     value: string | number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/switch/switch.d.ts
+// ui/switch/switch.d.ts
 type SwitchAttributes =  ViewAttributes & {
     android: any;
     checked: string | false | true;
@@ -442,7 +442,7 @@ type SwitchAttributes =  ViewAttributes & {
     offBackgroundColor: string | Color;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/tab-view/tab-view.d.ts
+// ui/tab-view/tab-view.d.ts
 type TabViewItemAttributes =  ViewBaseAttributes & {
     canBeLoaded: false | true;
     iconSource: string;
@@ -451,7 +451,7 @@ type TabViewItemAttributes =  ViewBaseAttributes & {
     view: View;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/tab-view/tab-view.d.ts
+// ui/tab-view/tab-view.d.ts
 type TabViewAttributes =  ViewAttributes & {
     android: any;
     androidOffscreenTabLimit: string | number;
@@ -468,7 +468,7 @@ type TabViewAttributes =  ViewAttributes & {
     tabTextFontSize: number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/tabs/tabs.d.ts
+// ui/tabs/tabs.d.ts
 type TabsAttributes =  TabNavigationBaseAttributes & {
     android: any;
     iOSTabBarItemsAlignment: "center" | "leading" | "justified" | "centerSelected";
@@ -481,14 +481,14 @@ type TabsAttributes =  TabNavigationBaseAttributes & {
     tabsPosition: "top" | "bottom";
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/text-field/text-field.d.ts
+// ui/text-field/text-field.d.ts
 type TextFieldAttributes =  EditableTextBaseAttributes & {
     android: any;
     ios: any;
     secure: string | false | true;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/editable-text-base/editable-text-base.d.ts
+// ui/editable-text-base/editable-text-base.d.ts
 type EditableTextBaseAttributes =  TextBaseAttributes & {
     autocapitalizationType: "none" | "words" | "sentences" | "allcharacters";
     autocorrect: string | false | true;
@@ -501,14 +501,14 @@ type EditableTextBaseAttributes =  TextBaseAttributes & {
     updateTextTrigger: "focusLost" | "textChanged";
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/text-view/text-view.d.ts
+// ui/text-view/text-view.d.ts
 type TextViewAttributes =  EditableTextBaseAttributes & {
     android: any;
     ios: any;
     maxLines: number;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/time-picker/time-picker.d.ts
+// ui/time-picker/time-picker.d.ts
 type TimePickerAttributes =  ViewAttributes & {
     android: any;
     hour: string | number;
@@ -522,7 +522,7 @@ type TimePickerAttributes =  ViewAttributes & {
     time: string | Date;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/web-view/web-view.d.ts
+// ui/web-view/web-view.d.ts
 type WebViewAttributes =  ViewAttributes & {
     android: any;
     canGoBack: false | true;
@@ -531,17 +531,17 @@ type WebViewAttributes =  ViewAttributes & {
     src: string;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/layouts/absolute-layout/absolute-layout.d.ts
+// ui/layouts/absolute-layout/absolute-layout.d.ts
 type AbsoluteLayoutAttributes =  LayoutBaseAttributes & {
 
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/layouts/dock-layout/dock-layout.d.ts
+// ui/layouts/dock-layout/dock-layout.d.ts
 type DockLayoutAttributes =  LayoutBaseAttributes & {
     stretchLastChild: string | false | true;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/layouts/flexbox-layout/flexbox-layout.d.ts
+// ui/layouts/flexbox-layout/flexbox-layout.d.ts
 type FlexboxLayoutAttributes =  LayoutBaseAttributes & {
     alignContent: "flex-start" | "flex-end" | "center" | "stretch" | "space-between" | "space-around";
     alignItems: "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
@@ -550,29 +550,29 @@ type FlexboxLayoutAttributes =  LayoutBaseAttributes & {
     justifyContent: "flex-start" | "flex-end" | "center" | "space-between" | "space-around";
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/layouts/grid-layout/grid-layout.d.ts
+// ui/layouts/grid-layout/grid-layout.d.ts
 type GridLayoutAttributes =  LayoutBaseAttributes & {
 
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/layouts/stack-layout/stack-layout.d.ts
+// ui/layouts/stack-layout/stack-layout.d.ts
 type StackLayoutAttributes =  LayoutBaseAttributes & {
     orientation: "horizontal" | "vertical";
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/layouts/wrap-layout/wrap-layout.d.ts
+// ui/layouts/wrap-layout/wrap-layout.d.ts
 type WrapLayoutAttributes =  LayoutBaseAttributes & {
     itemHeight: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     itemWidth: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     orientation: "horizontal" | "vertical";
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/tab-navigation-base/tab-content-item/tab-content-item.d.ts
+// ui/tab-navigation-base/tab-content-item/tab-content-item.d.ts
 type TabContentItemAttributes =  ContentViewAttributes & {
     canBeLoaded: false | true;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/tab-navigation-base/tab-strip/tab-strip.d.ts
+// ui/tab-navigation-base/tab-strip/tab-strip.d.ts
 type TabStripAttributes =  ViewAttributes & {
     highlightColor: string | Color;
     iosIconRenderingMode: "automatic" | "alwaysOriginal" | "alwaysTemplate";
@@ -582,7 +582,7 @@ type TabStripAttributes =  ViewAttributes & {
     unSelectedItemColor: string | Color;
 };
 
-//C:/dev/svelte/nativescriptSourceToJsxDef/nativescript_src/nativescript-core/ui/tab-navigation-base/tab-strip-item/tab-strip-item.d.ts
+// ui/tab-navigation-base/tab-strip-item/tab-strip-item.d.ts
 type TabStripItemAttributes =  ViewAttributes & {
     iconClass: string;
     iconSource: string;
