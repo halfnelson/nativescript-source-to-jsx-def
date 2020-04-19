@@ -162,7 +162,6 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
     let baseProps = getClassProperties(baseClass);
     for (var baseProp of baseProps) {
         if (!props.find(x => x.name == baseProp.name)) {
-            console.log("Found missing property-  ", baseProp.name, ": ", baseProp.typeDef)
             props.push(baseProp);
         }
     }
@@ -211,7 +210,7 @@ function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
 
 }
 
-var propertyChangeDataType = project.getSourceFileOrThrow(nativescriptSourcePath+ "/data/observable/observable.d.ts").getInterfaceOrThrow("PropertyChangeData");
+var propertyChangeDataType = project.getSourceFileOrThrow(nativescriptSourcePath + "/data/observable/observable.d.ts").getInterfaceOrThrow("PropertyChangeData");
 
 function getClassProperties(c: ClassDeclaration): ClassProp[] {
 
@@ -222,9 +221,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
         }
     }
 
-
     for (var r of getSyntheticEventHandlers(c)) {
-        console.log(`adding ${c.getName()}.${r.name} : ${r.typeDef}`);
         props.set(r.name, r.typeDef)
     }
 
@@ -233,7 +230,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     //patch in any dynamic properties 
     for (var r of propertyRegistrationsForClass(className)) {
         props.set(r.name, r.typeDef)
-        props.set('on'+ pascalCase(r.name)+"Change", `(args: ${getTypeDef(propertyChangeDataType.getType())}) => void`)
+        props.set('on' + pascalCase(r.name) + "Change", `(args: ${getTypeDef(propertyChangeDataType.getType())}) => void`)
     }
 
     //combine
@@ -319,10 +316,10 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
 
 
 function classPropDef(t: ClassProp): string {
-    return `${t.name}: ${t.typeDef};`
+    return `${t.name.toLowerCase()}: ${t.typeDef};`
 }
 
-function getClassAttributesName(c: ClassDeclaration) {
+function getAttributesClassName(c: ClassDeclaration) {
     return `${c.getName()}Attributes`
 }
 
@@ -331,7 +328,7 @@ function getClassTypeDef(c: ClassDeclaration): string {
     var propDefs = getClassProperties(c).map(x => classPropDef(x));
 
     var baseclass = c.getBaseClass();
-    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${getClassAttributesName(c)} =  ${baseclass ? `${baseclass.getName()}Attributes & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
+    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${getAttributesClassName(c)} =  ${baseclass ? `${getAttributesClassName(baseclass)} & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
     return classDef;
 }
 
@@ -347,7 +344,7 @@ function getClassTypeDefs() {
 
 function getIntrinsicElementDef(classDec: ClassDeclaration): string {
     let name = classDec.getName()!;
-    return `${name.toLowerCase()}: ${getClassAttributesName(classDec)};`
+    return `${name.toLowerCase()}: ${getAttributesClassName(classDec)};`
 }
 
 
@@ -359,11 +356,11 @@ declare namespace svelteNative.JSX {
       $$prop_def: any;
     }
   
-    interface ElementAttributesProperty {
+    interface ElementsProperty {
       $$prop_def: any; // specify the property name to use
     }
   
-    interface IntrinsicAttributes {}
+    interface Intrinsics {}
 
     interface IntrinsicElements {
 ${uiClasses.map(c => getIntrinsicElementDef(c)).map(d => `        ${d}`).join("\n")}
