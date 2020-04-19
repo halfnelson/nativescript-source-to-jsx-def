@@ -170,11 +170,6 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
 
 var gestureTypes = project.getSourceFileOrThrow(nativescriptSourcePath + "/ui/gestures/gestures.d.ts").getEnumOrThrow("GestureTypes");
 
-var dummyDeclSource = project.createSourceFile(gestureTypes.getSourceFile().getDirectoryPath() + "/dummy.d.ts",
-    `
-    import { ${gestureTypes.getSourceFile().getInterfaces().map(i => i.getName()).join(", ")}  }  from './gestures';
-   
-`);
 
 function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
     var props: ClassProp[] = []
@@ -264,7 +259,7 @@ let imports = new Map<string, Import>();
 function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
     var typeText
 
-    if (t.isClassOrInterface() || t.isArray() || !node) {
+    if (t.isClassOrInterface() || t.isArray() || t.isObject() || !node) {
         typeText = t.getText();
     } else {
         //expand union types in-place instead of using includes, to keep the definition file easier to read
@@ -278,7 +273,7 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
         }
     }
 
-    if (typeText.includes("<<unresolved>>")) {
+    if (typeText.includes("=>")) {
         debugger;
     }
 
