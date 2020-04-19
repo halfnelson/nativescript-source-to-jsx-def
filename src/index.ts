@@ -1,4 +1,4 @@
-import { Project, ts, SourceFile, ClassDeclaration, Scope, Type, Node } from 'ts-morph'
+import { Project, ts, SourceFile, ClassDeclaration, Scope, Type, Node, createWrappedNode } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 import pascalCase from 'uppercamelcase';
@@ -69,7 +69,7 @@ type propertyRegistration = {
 
 function getPropertyRegistrations() {
     var statements: propertyRegistration[] = [];
-    var propertyfile = project.getSourceFileOrThrow(nativescriptSourcePath+"/ui/core/properties/properties.ts")
+    var propertyfile = project.getSourceFileOrThrow(nativescriptSourcePath + "/ui/core/properties/properties.ts")
     var property = propertyfile.getClassOrThrow("Property");
     var refs = property.getMethod("register")?.findReferencesAsNodes() ?? []
     for (var ref of refs) {
@@ -82,7 +82,7 @@ function getPropertyRegistrations() {
                     var target = callExpr.getArguments()[0];
                     if (Node.isIdentifier(target)) {
                         statements.push({
-                            propertyName: propExpr.getText().replace(/Property$/,""),
+                            propertyName: propExpr.getText().replace(/Property$/, ""),
                             propertyType: propExpr.getType().getTypeArguments()[1], //Property<Target, valueType>
                             propertyNode: propExpr,
                             targetClassName: target.getText()
@@ -112,7 +112,7 @@ function uiClassDefs() {
 
 const uiClasses = getUIClasses()
 const classNames = new Set(uiClassDefs().map(u => u.getName()));
-const propertyRegistrations = getPropertyRegistrations().map(x => { 
+const propertyRegistrations = getPropertyRegistrations().map(x => {
     //The propertie registrations refer to classes from the TS files, but these do not match the ones from the .d.t files.
     //we use the discovered convention that common classes are exposed as "Base" and where some base classes are not exposed
     //to try and find a class to pin our property on.
@@ -126,14 +126,12 @@ const propertyRegistrations = getPropertyRegistrations().map(x => {
 
 type ClassProp = {
     name: string,
-    type: Type,
-    typeNode: Node,
-    isProperty?: boolean
+    typeDef: string,
 }
 
 
 function propertyRegistrationsForClass(c: string): ClassProp[] {
-    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, type: r.propertyType, typeNode: r.propertyNode, isProperty: true }))
+    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, typeDef: getTypeDef(r.propertyType, r.propertyNode, true) }))
 }
 
 
@@ -144,61 +142,115 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
     if (!currentFile.endsWith(".d.ts")) return;
     let declaredBaseClass = c.getBaseClass();
     if (!declaredBaseClass) return;
-    if (declaredBaseClass.getName() == c.getName()+"Base") return;
+    if (declaredBaseClass.getName() == c.getName() + "Base") return;
 
     //find our base class:
-    
+
     //look for a -common file
     let filename = path.basename(currentFile, ".d.ts");
-    let commonFilename = path.dirname(currentFile) +"/" + filename + "-common.ts";
+    let commonFilename = path.dirname(currentFile) + "/" + filename + "-common.ts";
     let commonSource = project.getSourceFile(commonFilename);
-    
+
     //if there is no -common, then give up
     if (!commonSource) return;
 
     //find the class declaration
-    let baseClass = commonSource.getClass(c.getName()+"Base");
+    let baseClass = commonSource.getClass(c.getName() + "Base");
     if (!baseClass) return;
 
     //get the props
     let baseProps = getClassProperties(baseClass);
     for (var baseProp of baseProps) {
         if (!props.find(x => x.name == baseProp.name)) {
-            console.log("Found missing property-  ", baseProp.name, ": ", baseProp.type.getText(baseProp.typeNode))
+            console.log("Found missing property-  ", baseProp.name, ": ", baseProp.typeDef)
             props.push(baseProp);
         }
     }
 }
 
+var gestureTypes = project.getSourceFileOrThrow(nativescriptSourcePath + "/ui/gestures/gestures.d.ts").getEnumOrThrow("GestureTypes");
 
-function getClassProperties(c: ClassDeclaration): ClassProp[] {
-    
-    var props: Map<string, { type: Type, node: Node, isProperty?: boolean}> = new Map()
-    for (var p of c.getInstanceProperties()) {
-        if (p.getScope() == Scope.Public && !p.getName().startsWith("_") && !p.getName().endsWith("Protected")) {
-            props.set(p.getName(), { type: p.getType(), node: p });
+var dummyDeclSource = project.createSourceFile(gestureTypes.getSourceFile().getDirectoryPath() + "/dummy.d.ts",
+    `
+    import { ${gestureTypes.getSourceFile().getInterfaces().map(i => i.getName()).join(", ")}  }  from './gestures';
+   
+`);
+
+function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
+    var props: ClassProp[] = []
+
+    for (var m of c.getInstanceMethods().filter(m => m.getName() == "on")) {
+
+
+        let params = m.getParameters();
+        if (!params || params.length < 2) continue;
+
+        let [eventParam, callbackParam] = params;
+
+        //explicitly defined event
+        if (eventParam.getType().isStringLiteral()) {
+            var propname = "on" + pascalCase(eventParam.getType().getText().replace(/"/g, ""));
+            props.push({
+                name: propname,
+                typeDef: getTypeDef(callbackParam.getType(), callbackParam),
+            })
+        }
+
+        //add gesture type events to this class if it supports it
+        if (eventParam.getType().isUnion() && eventParam.getType().getUnionTypes().find(ut => ut.getText(eventParam) == "GestureTypes")) {
+            let gestureSource = gestureTypes.getSourceFile();
+            let defaultEventType = gestureSource.getInterfaceOrThrow("GestureEventData");
+            for (var gesture of gestureTypes.getMembers().map(m => m.getName())) {
+                let name = "on" + pascalCase(gesture);
+                let expectedEventDataTypeName = gesture == "tap" ? "DoubleTapGestureEventData" : pascalCase(gesture) + "GestureEventData";
+                let eventType = gestureSource.getInterface(expectedEventDataTypeName) || defaultEventType;
+
+                props.push({
+                    name: name,
+                    typeDef: `(arg: ${getTypeDef(eventType.getType(), eventType)}) => any`
+                })
+            }
         }
     }
+    return props;
+
+}
+
+
+function getClassProperties(c: ClassDeclaration): ClassProp[] {
+
+    var props: Map<string, string> = new Map()
+    for (var p of c.getInstanceProperties()) {
+        if (p.getScope() == Scope.Public && !p.getName().startsWith("_") && !p.getName().endsWith("Protected")) {
+            props.set(p.getName(), getTypeDef(p.getType(), p));
+        }
+    }
+
+
+    for (var r of getSyntheticEventHandlers(c)) {
+        console.log(`adding ${c.getName()}.${r.name} : ${r.typeDef}`);
+        props.set(r.name, r.typeDef)
+    }
+
     var className: string = c.getName() ?? "";
 
     //patch in any dynamic properties 
     for (var r of propertyRegistrationsForClass(className)) {
-        props.set(r.name, { type: r.type, node: r.typeNode, isProperty: true })
+        props.set(r.name, r.typeDef)
     }
 
     //combine
-    var allProps:ClassProp[] = []
-    for( var key of props.keys()) {
+    var allProps: ClassProp[] = []
+    for (var key of props.keys()) {
         allProps.push({
             name: key,
-            type: props.get(key)!.type,
-            typeNode: props.get(key)!.node,
-            isProperty: props.get(key)!.isProperty
+            typeDef: props.get(key)!
         })
     }
+
     patchMissingProperties(c, allProps);
 
-    allProps.sort((a,b) => a.name < b.name ? -1 : 1)
+    allProps.sort((a, b) => a.name < b.name ? -1 : 1)
     return allProps;
 }
 
@@ -209,80 +261,81 @@ type Import = {
 
 let imports = new Map<string, Import>();
 
-function getTypeDef(t: Type, node?:Node, isProperty?: boolean ): String {
-    var typeText 
+function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
+    var typeText
 
-    if (t.isClassOrInterface() || t.isArray() ||  !node) {
+    if (t.isClassOrInterface() || t.isArray() || !node) {
         typeText = t.getText();
-    }  else {
+    } else {
         //expand union types in-place instead of using includes, to keep the definition file easier to read
         if (t.isUnion()) {
             typeText = t.getUnionTypes()
-                        .map(ut => getTypeDef(ut))
-                        .map( i => i.includes('=>') ? `(${i})` : i) //arrow functions should be wrapped in braces when in union literal
-                        .join(" | ");
+                .map(ut => getTypeDef(ut))
+                .map(i => i.includes('=>') ? `(${i})` : i) //arrow functions should be wrapped in braces when in union literal
+                .join(" | ");
         } else {
             typeText = t.getText(node, ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation)
         }
     }
 
-    typeText = typeText.replace(/import\("(.*)"\)\.([a-zA-Z_0-9\[\]]+)/g, (match:string, importPath: string, importName:string) => {
-        let importAlias = importName.replace("[]","");
-        importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g,'/');
+    if (typeText.includes("<<unresolved>>")) {
+        debugger;
+    }
+
+
+    typeText = typeText.replace(/import\("(.*)"\)\.([a-zA-Z_0-9\[\]]+)/g, (match: string, importPath: string, importName: string) => {
+        let importAlias = importName.replace("[]", "");
+        importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
 
         //do we have an alias for this already?
-        let existingImportAlias =  [...imports.entries()].find( e => e[1].name == importAlias && e[1].path == importPath);
-        if (existingImportAlias)  
+        let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias && e[1].path == importPath);
+        if (existingImportAlias)
             return importName.replace(importAlias, existingImportAlias?.[0])
-        
+
         //no existing import
         //is our alias free?
         if (imports.get(importAlias)) {
             let oldAlias = importAlias;
-            importAlias = pascalCase(path.basename(importPath))+importAlias;
+            importAlias = pascalCase(path.basename(importPath)) + importAlias;
             imports.set(importAlias, { name: oldAlias, path: importPath });
             return importName.replace(oldAlias, importAlias);
         }
 
         imports.set(importAlias, { path: importPath, name: importAlias });
-        
+
         return importName;
     });
 
     //"properties" have a value converter from string, so we need to add the "string" as valid type (if not present)
     if (isProperty) {
         if (t.isUnion()) {
-            if (!t.getUnionTypes().reduce<boolean>((p:boolean, c: Type) => p && (c.isStringLiteral() || c.isString()), true )) {
+            if (!t.getUnionTypes().reduce<boolean>((p: boolean, c: Type) => p && (c.isStringLiteral() || c.isString()), true)) {
                 typeText = "string | " + typeText
-            } 
+            }
         } else {
             if (!t.isString() && !t.isStringLiteral()) {
-                typeText = "string | "+typeText;
-            } 
+                typeText = "string | " + typeText;
+            }
         }
     }
-  
+
 
     return typeText
 }
 
 
 function classPropDef(t: ClassProp): string {
-    if (t.name == "itemTemplateSelector") {
-        debugger;
-    }
-    var typedef = getTypeDef(t.type, t.typeNode, t.isProperty);
-    return `${t.name}: ${typedef};`
+    return `${t.name}: ${t.typeDef};`
 }
 
 function getClassTypeDef(c: ClassDeclaration): string {
-    
-    var propDefs = getClassProperties(c).map(x =>classPropDef(x));
+
+    var propDefs = getClassProperties(c).map(x => classPropDef(x));
 
     var baseclass = c.getBaseClass();
-    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${c.getName()}Attributes =  ${baseclass ? `${baseclass.getName()}Attributes & ` : '' }{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
+    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${c.getName()}Attributes =  ${baseclass ? `${baseclass.getName()}Attributes & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
     return classDef;
-}   
+}
 
 
 function getClassTypeDefs() {
@@ -307,6 +360,7 @@ while (view) {
 
 */
 fs.writeFileSync("./sveltenative-jsx.d.ts", getClassTypeDefs());
+
 //console.log(project.getSourceFiles().map(s => s.getFilePath()))
 
 //let propClasses = new Set(propertyRegistrations.map(p=>p.targetClassName))

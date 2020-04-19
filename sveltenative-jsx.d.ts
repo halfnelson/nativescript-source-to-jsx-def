@@ -1,38 +1,49 @@
+type View = import("@nativescript/core/ui/core/view/view").View;
+type NavigationButton = import("@nativescript/core/ui/action-bar/action-bar").NavigationButton;
 type ActionItems = import("@nativescript/core/ui/action-bar/action-bar").ActionItems;
 type AndroidActionBarSettings = import("@nativescript/core/ui/action-bar/action-bar").AndroidActionBarSettings;
+type ActionBarCommonActionItems = import("@nativescript/core/ui/action-bar/action-bar-common").ActionItems;
 type LengthDipUnit = import("@nativescript/core/ui/styling/style-properties").LengthDipUnit;
 type LengthPxUnit = import("@nativescript/core/ui/styling/style-properties").LengthPxUnit;
-type NavigationButton = import("@nativescript/core/ui/action-bar/action-bar").NavigationButton;
-type View = import("@nativescript/core/ui/core/view/view").View;
 type Color = import("@nativescript/core/color/color").Color;
 type LinearGradient = import("@nativescript/core/ui/styling/gradient").LinearGradient;
 type LengthPercentUnit = import("@nativescript/core/ui/styling/style-properties").LengthPercentUnit;
+type DoubleTapGestureEventData = import("@nativescript/core/ui/gestures/gestures").DoubleTapGestureEventData;
+type PinchGestureEventData = import("@nativescript/core/ui/gestures/gestures").PinchGestureEventData;
+type PanGestureEventData = import("@nativescript/core/ui/gestures/gestures").PanGestureEventData;
+type SwipeGestureEventData = import("@nativescript/core/ui/gestures/gestures").SwipeGestureEventData;
+type RotationGestureEventData = import("@nativescript/core/ui/gestures/gestures").RotationGestureEventData;
+type GestureEventData = import("@nativescript/core/ui/gestures/gestures").GestureEventData;
+type TouchGestureEventData = import("@nativescript/core/ui/gestures/gestures").TouchGestureEventData;
 type DOMNode = import("@nativescript/core/debugger/dom-node").DOMNode;
-type Page = import("@nativescript/core/ui/page/page").Page;
 type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBase;
+type Page = import("@nativescript/core/ui/page/page").Page;
 type Style = import("@nativescript/core/ui/styling/style/style").Style;
 type ActionBar = import("@nativescript/core/ui/action-bar/action-bar").ActionBar;
-type AndroidActionItemSettings = import("@nativescript/core/ui/action-bar/action-bar").AndroidActionItemSettings;
 type IOSActionItemSettings = import("@nativescript/core/ui/action-bar/action-bar").IOSActionItemSettings;
+type AndroidActionItemSettings = import("@nativescript/core/ui/action-bar/action-bar").AndroidActionItemSettings;
 type TabContentItem = import("@nativescript/core/ui/tab-navigation-base/tab-content-item/tab-content-item").TabContentItem;
 type TabStrip = import("@nativescript/core/ui/tab-navigation-base/tab-strip/tab-strip").TabStrip;
 type FormattedString = import("@nativescript/core/ui/text-base/formatted-string").FormattedString;
-type AndroidFrame = import("@nativescript/core/ui/frame/frame").AndroidFrame;
 type BackstackEntry = import("@nativescript/core/ui/frame/frame").BackstackEntry;
 type NavigationEntry = import("@nativescript/core/ui/frame/frame").NavigationEntry;
-type iOSFrame = import("@nativescript/core/ui/frame/frame").iOSFrame;
 type NavigationTransition = import("@nativescript/core/ui/frame/frame").NavigationTransition;
+type AndroidFrame = import("@nativescript/core/ui/frame/frame").AndroidFrame;
+type iOSFrame = import("@nativescript/core/ui/frame/frame").iOSFrame;
+type FrameInterfacesNavigationTransition = import("@nativescript/core/ui/frame/frame-interfaces").NavigationTransition;
+type FrameInterfacesBackstackEntry = import("@nativescript/core/ui/frame/frame-interfaces").BackstackEntry;
+type FrameInterfacesNavigationEntry = import("@nativescript/core/ui/frame/frame-interfaces").NavigationEntry;
 type ImageSource = import("@nativescript/core/image-source/image-source").ImageSource;
 type ItemsSource = import("@nativescript/core/ui/list-picker/list-picker").ItemsSource;
+type ListViewItemsSource = import("@nativescript/core/ui/list-view/list-view").ItemsSource;
 type Template = import("@nativescript/core/ui/core/view/view").Template;
 type KeyedTemplate = import("@nativescript/core/ui/core/view/view").KeyedTemplate;
-type ListViewItemsSource = import("@nativescript/core/ui/list-view/list-view").ItemsSource;
 type Frame = import("@nativescript/core/ui/frame/frame").Frame;
 type SegmentedBarItem = import("@nativescript/core/ui/segmented-bar/segmented-bar").SegmentedBarItem;
 type TabViewItem = import("@nativescript/core/ui/tab-view/tab-view").TabViewItem;
 type TabStripItem = import("@nativescript/core/ui/tab-navigation-base/tab-strip-item/tab-strip-item").TabStripItem;
-type Image = import("@nativescript/core/ui/image/image").Image;
 type Label = import("@nativescript/core/ui/label/label").Label;
+type Image = import("@nativescript/core/ui/image/image").Image;
 
 // ui/action-bar/action-bar.d.ts
 type ActionBarAttributes =  ViewAttributes & {
@@ -85,7 +96,7 @@ type ViewAttributes =  ViewBaseAttributes & {
     cssType: string;
     dock: "left" | "top" | "right" | "bottom";
     height: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    horizontalAlignment: "left" | "right" | "center" | "stretch";
+    horizontalAlignment: "left" | "center" | "right" | "stretch";
     ios: any;
     iosOverflowSafeArea: false | true;
     iosOverflowSafeAreaEnabled: false | true;
@@ -102,6 +113,19 @@ type ViewAttributes =  ViewBaseAttributes & {
     minHeight: number | "auto" | LengthDipUnit | LengthPxUnit;
     minWidth: number | "auto" | LengthDipUnit | LengthPxUnit;
     modal: View;
+    onAndroidBackPressed: (args: EventData) => void;
+    onDoubleTap: (arg: DoubleTapGestureEventData) => any;
+    onLoaded: (args: EventData) => void;
+    onLongPress: (arg: GestureEventData) => any;
+    onPan: (arg: PanGestureEventData) => any;
+    onPinch: (arg: PinchGestureEventData) => any;
+    onRotation: (arg: RotationGestureEventData) => any;
+    onShowingModally: (args: ShownModallyData) => void;
+    onShownModally: (args: ShownModallyData) => void;
+    onSwipe: (arg: SwipeGestureEventData) => any;
+    onTap: (arg: DoubleTapGestureEventData) => any;
+    onTouch: (arg: TouchGestureEventData) => any;
+    onUnloaded: (args: EventData) => void;
     opacity: number;
     originX: number;
     originY: number;
@@ -116,14 +140,14 @@ type ViewAttributes =  ViewBaseAttributes & {
     top: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     translateX: number;
     translateY: number;
-    verticalAlignment: "top" | "bottom" | "stretch" | "middle";
+    verticalAlignment: "stretch" | "top" | "middle" | "bottom";
     visibility: "visible" | "hidden" | "collapse";
     width: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
 };
 
 // ui/core/view-base/view-base.d.ts
 type ViewBaseAttributes =  ObservableAttributes & {
-    alignSelf: "auto" | "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
+    alignSelf: "auto" | "center" | "stretch" | "flex-start" | "flex-end" | "baseline";
     android: any;
     automationText: string;
     bindingContext: string | any;
@@ -134,7 +158,7 @@ type ViewBaseAttributes =  ObservableAttributes & {
     columnSpan: number;
     cssClasses: Set<string>;
     cssPseudoClasses: Set<string>;
-    dock: "left" | "top" | "right" | "bottom";
+    dock: "left" | "right" | "top" | "bottom";
     domNode: DOMNode;
     effectiveBorderBottomWidth: number;
     effectiveBorderLeftWidth: number;
@@ -173,7 +197,7 @@ type ViewBaseAttributes =  ObservableAttributes & {
     page: Page;
     parent: ViewBase;
     parentNode: ViewBase;
-    recycleNativeView: "always" | "never" | "auto";
+    recycleNativeView: "auto" | "always" | "never";
     row: number;
     rowSpan: number;
     style: Style;
@@ -184,7 +208,7 @@ type ViewBaseAttributes =  ObservableAttributes & {
 
 // data/observable/observable.d.ts
 type ObservableAttributes =  {
-
+    onPropertyChange: (data: EventData) => void;
 };
 
 // ui/action-bar/action-bar.d.ts
@@ -194,6 +218,7 @@ type ActionItemAttributes =  ViewBaseAttributes & {
     android: AndroidActionItemSettings;
     icon: string;
     ios: IOSActionItemSettings;
+    onTap: (args: EventData) => void;
     text: string;
     visibility: string;
 };
@@ -226,6 +251,7 @@ type BottomNavigationAttributes =  TabNavigationBaseAttributes & {
     android: any;
     ios: any;
     items: TabContentItem[];
+    onSelectedIndexChanged: (args: SelectedIndexChangedEventData) => void;
     selectedIndex: number;
     tabStrip: TabStrip;
 };
@@ -234,7 +260,8 @@ type BottomNavigationAttributes =  TabNavigationBaseAttributes & {
 type TabNavigationBaseAttributes =  ViewAttributes & {
     android: any;
     ios: any;
-    items: string | TabContentItem[];
+    items: string | Array<TabContentItem>;
+    onSelectedIndexChanged: (args: SelectedIndexChangedEventData) => void;
     selectedIndex: string | number;
     tabStrip: string | TabStrip;
 };
@@ -243,6 +270,7 @@ type TabNavigationBaseAttributes =  ViewAttributes & {
 type ButtonAttributes =  TextBaseAttributes & {
     android: any;
     ios: any;
+    onTap: (args: EventData) => void;
     textWrap: false | true;
 };
 
@@ -258,9 +286,9 @@ type TextBaseAttributes =  ViewAttributes & {
     paddingRight: number | "auto" | LengthDipUnit | LengthPxUnit;
     paddingTop: number | "auto" | LengthDipUnit | LengthPxUnit;
     text: string;
-    textAlignment: "left" | "right" | "center" | "initial";
+    textAlignment: "left" | "center" | "right" | "initial";
     textDecoration: "none" | "underline" | "line-through" | "underline line-through";
-    textTransform: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
+    textTransform: "initial" | "none" | "capitalize" | "uppercase" | "lowercase";
     whiteSpace: "initial" | "normal" | "nowrap";
 };
 
@@ -323,7 +351,7 @@ type ListPickerAttributes =  ViewAttributes & {
     android: any;
     ios: any;
     isItemsSource: false | true;
-    items: string | any[] | ItemsSource;
+    items: string | Array<any> | ItemsSource;
     selectedIndex: string | number;
     selectedValue: string;
     textField: string;
@@ -338,8 +366,11 @@ type ListViewAttributes =  ViewAttributes & {
     itemIdGenerator: (item: any, index: number, items: any) => number;
     itemTemplate: string | string | Template;
     itemTemplateSelector: string | ((item: any, index: number, items: any) => string);
-    itemTemplates: string | string | KeyedTemplate[];
-    items: string | any[] | ListViewItemsSource;
+    itemTemplates: string | string | Array<KeyedTemplate>;
+    items: string | Array<any> | ListViewItemsSource;
+    onItemLoading: (args: ItemEventData) => void;
+    onItemTap: (args: ItemEventData) => void;
+    onLoadMoreItems: (args: EventData) => void;
     rowHeight: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     separatorColor: Color;
 };
@@ -354,13 +385,17 @@ type PageAttributes =  ContentViewAttributes & {
     frame: Frame;
     hasActionBar: false | true;
     navigationContext: any;
+    onNavigatedFrom: (args: NavigatedData) => void;
+    onNavigatedTo: (args: NavigatedData) => void;
+    onNavigatingFrom: (args: NavigatedData) => void;
+    onNavigatingTo: (args: NavigatedData) => void;
     page: Page;
     statusBarStyle: "light" | "dark";
 };
 
 // ui/placeholder/placeholder.d.ts
 type PlaceholderAttributes =  ViewAttributes & {
-
+    onCreatingView: (args: CreateViewEventData) => void;
 };
 
 // ui/progress/progress.d.ts
@@ -401,6 +436,7 @@ type ContainerViewAttributes =  ViewAttributes & {
 type ScrollViewAttributes =  ContentViewAttributes & {
     horizontalOffset: number;
     isScrollEnabled: string | false | true;
+    onScroll: (args: ScrollEventData) => void;
     orientation: "horizontal" | "vertical";
     scrollBarIndicatorVisible: string | false | true;
     scrollableHeight: number;
@@ -413,6 +449,8 @@ type SearchBarAttributes =  ViewAttributes & {
     android: any;
     hint: string;
     ios: any;
+    onClose: (args: EventData) => void;
+    onSubmit: (args: EventData) => void;
     text: string;
     textFieldBackgroundColor: string | Color;
     textFieldHintColor: string | Color;
@@ -425,7 +463,8 @@ type SegmentedBarItemAttributes =  ViewBaseAttributes & {
 
 // ui/segmented-bar/segmented-bar.d.ts
 type SegmentedBarAttributes =  ViewAttributes & {
-    items: string | SegmentedBarItem[];
+    items: string | Array<SegmentedBarItem>;
+    onSelectedIndexChanged: (args: SelectedIndexChangedEventData) => void;
     selectedBackgroundColor: Color;
     selectedIndex: string | number;
 };
@@ -451,7 +490,7 @@ type SwitchAttributes =  ViewAttributes & {
 type TabViewItemAttributes =  ViewBaseAttributes & {
     canBeLoaded: false | true;
     iconSource: string;
-    textTransform: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
+    textTransform: "initial" | "none" | "capitalize" | "uppercase" | "lowercase";
     title: string;
     view: View;
 };
@@ -465,7 +504,8 @@ type TabViewAttributes =  ViewAttributes & {
     androidTabsPosition: "top" | "bottom";
     ios: any;
     iosIconRenderingMode: "automatic" | "alwaysOriginal" | "alwaysTemplate";
-    items: string | TabViewItem[];
+    items: string | Array<TabViewItem>;
+    onSelectedIndexChanged: (args: SelectedIndexChangedEventData) => void;
     selectedIndex: string | number;
     selectedTabTextColor: Color;
     tabBackgroundColor: Color;
@@ -480,6 +520,7 @@ type TabsAttributes =  TabNavigationBaseAttributes & {
     ios: any;
     items: TabContentItem[];
     offscreenTabLimit: string | number;
+    onSelectedIndexChanged: (args: SelectedIndexChangedEventData) => void;
     selectedIndex: number;
     swipeEnabled: string | false | true;
     tabStrip: TabStrip;
@@ -533,6 +574,8 @@ type WebViewAttributes =  ViewAttributes & {
     canGoBack: false | true;
     canGoForward: false | true;
     ios: any;
+    onLoadFinished: (args: LoadEventData) => void;
+    onLoadStarted: (args: LoadEventData) => void;
     src: string;
 };
 
@@ -548,11 +591,11 @@ type DockLayoutAttributes =  LayoutBaseAttributes & {
 
 // ui/layouts/flexbox-layout/flexbox-layout.d.ts
 type FlexboxLayoutAttributes =  LayoutBaseAttributes & {
-    alignContent: "flex-start" | "flex-end" | "center" | "stretch" | "space-between" | "space-around";
-    alignItems: "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
-    flexDirection: "row" | "column" | "row-reverse" | "column-reverse";
+    alignContent: "center" | "stretch" | "flex-start" | "flex-end" | "space-between" | "space-around";
+    alignItems: "center" | "stretch" | "flex-start" | "flex-end" | "baseline";
+    flexDirection: "row" | "row-reverse" | "column" | "column-reverse";
     flexWrap: "nowrap" | "wrap" | "wrap-reverse";
-    justifyContent: "flex-start" | "flex-end" | "center" | "space-between" | "space-around";
+    justifyContent: "center" | "flex-start" | "flex-end" | "space-between" | "space-around";
 };
 
 // ui/layouts/grid-layout/grid-layout.d.ts
@@ -585,7 +628,8 @@ type TabStripAttributes =  ViewAttributes & {
     highlightColor: string | Color;
     iosIconRenderingMode: "automatic" | "alwaysOriginal" | "alwaysTemplate";
     isIconSizeFixed: string | false | true;
-    items: string | TabStripItem[];
+    items: string | Array<TabStripItem>;
+    onItemTap: (args: TabStripItemEventData) => void;
     selectedItemColor: string | Color;
     unSelectedItemColor: string | Color;
 };
@@ -596,5 +640,6 @@ type TabStripItemAttributes =  ViewAttributes & {
     iconSource: string;
     image: Image;
     label: Label;
+    onTap: (args: EventData) => void;
     title: string;
 };
