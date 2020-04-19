@@ -136,6 +136,41 @@ function propertyRegistrationsForClass(c: string): ClassProp[] {
     return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, type: r.propertyType, typeNode: r.propertyNode, isProperty: true }))
 }
 
+
+// some of the .d.ts files neglect to mention some properties so we will inspect the base class
+function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
+    // patch missing properties if we have skipped a base class in our .d.ts file
+    let currentFile = c.getSourceFile().getFilePath();
+    if (!currentFile.endsWith(".d.ts")) return;
+    let declaredBaseClass = c.getBaseClass();
+    if (!declaredBaseClass) return;
+    if (declaredBaseClass.getName() == c.getName()+"Base") return;
+
+    //find our base class:
+    
+    //look for a -common file
+    let filename = path.basename(currentFile, ".d.ts");
+    let commonFilename = path.dirname(currentFile) +"/" + filename + "-common.ts";
+    let commonSource = project.getSourceFile(commonFilename);
+    
+    //if there is no -common, then give up
+    if (!commonSource) return;
+
+    //find the class declaration
+    let baseClass = commonSource.getClass(c.getName()+"Base");
+    if (!baseClass) return;
+
+    //get the props
+    let baseProps = getClassProperties(baseClass);
+    for (var baseProp of baseProps) {
+        if (!props.find(x => x.name == baseProp.name)) {
+            console.log("Found missing property-  ", baseProp.name, ": ", baseProp.type.getText(baseProp.typeNode))
+            props.push(baseProp);
+        }
+    }
+}
+
+
 function getClassProperties(c: ClassDeclaration): ClassProp[] {
     
     var props: Map<string, { type: Type, node: Node, isProperty?: boolean}> = new Map()
@@ -161,6 +196,8 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
             isProperty: props.get(key)!.isProperty
         })
     }
+    patchMissingProperties(c, allProps);
+
     allProps.sort((a,b) => a.name < b.name ? -1 : 1)
     return allProps;
 }
@@ -261,7 +298,7 @@ function getClassTypeDefs() {
 var view: ClassDeclaration | undefined = uiClasses.find(x => x.getName() == "GridLayout") || error("message");
 while (view) {
     for( var p of view.getSetAccessors()) {
-       // if (p.getName().startsWith("rows")) {
+       // if (p.getName().startsWith(" ")) {
             console.log(p.getName(), p.getType().getText());
        // }
     }

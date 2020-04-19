@@ -1,11 +1,11 @@
 type ActionItems = import("@nativescript/core/ui/action-bar/action-bar").ActionItems;
 type AndroidActionBarSettings = import("@nativescript/core/ui/action-bar/action-bar").AndroidActionBarSettings;
+type LengthDipUnit = import("@nativescript/core/ui/styling/style-properties").LengthDipUnit;
+type LengthPxUnit = import("@nativescript/core/ui/styling/style-properties").LengthPxUnit;
 type NavigationButton = import("@nativescript/core/ui/action-bar/action-bar").NavigationButton;
 type View = import("@nativescript/core/ui/core/view/view").View;
 type Color = import("@nativescript/core/color/color").Color;
 type LinearGradient = import("@nativescript/core/ui/styling/gradient").LinearGradient;
-type LengthDipUnit = import("@nativescript/core/ui/styling/style-properties").LengthDipUnit;
-type LengthPxUnit = import("@nativescript/core/ui/styling/style-properties").LengthPxUnit;
 type LengthPercentUnit = import("@nativescript/core/ui/styling/style-properties").LengthPercentUnit;
 type DOMNode = import("@nativescript/core/debugger/dom-node").DOMNode;
 type Page = import("@nativescript/core/ui/page/page").Page;
@@ -38,6 +38,9 @@ type Label = import("@nativescript/core/ui/label/label").Label;
 type ActionBarAttributes =  ViewAttributes & {
     actionItems: ActionItems;
     android: AndroidActionBarSettings;
+    androidContentInset: string | number | LengthDipUnit | LengthPxUnit;
+    androidContentInsetLeft: number | "auto" | LengthDipUnit | LengthPxUnit;
+    androidContentInsetRight: number | "auto" | LengthDipUnit | LengthPxUnit;
     effectiveContentInsetLeft: number;
     effectiveContentInsetRight: number;
     flat: string | false | true;
@@ -319,6 +322,7 @@ type LabelAttributes =  TextBaseAttributes & {
 type ListPickerAttributes =  ViewAttributes & {
     android: any;
     ios: any;
+    isItemsSource: false | true;
     items: string | any[] | ItemsSource;
     selectedIndex: string | number;
     selectedValue: string;
@@ -350,6 +354,7 @@ type PageAttributes =  ContentViewAttributes & {
     frame: Frame;
     hasActionBar: false | true;
     navigationContext: any;
+    page: Page;
     statusBarStyle: "light" | "dark";
 };
 
@@ -552,7 +557,8 @@ type FlexboxLayoutAttributes =  LayoutBaseAttributes & {
 
 // ui/layouts/grid-layout/grid-layout.d.ts
 type GridLayoutAttributes =  LayoutBaseAttributes & {
-
+    columns: string;
+    rows: string;
 };
 
 // ui/layouts/stack-layout/stack-layout.d.ts
@@ -562,6 +568,8 @@ type StackLayoutAttributes =  LayoutBaseAttributes & {
 
 // ui/layouts/wrap-layout/wrap-layout.d.ts
 type WrapLayoutAttributes =  LayoutBaseAttributes & {
+    effectiveItemHeight: number;
+    effectiveItemWidth: number;
     itemHeight: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     itemWidth: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     orientation: "horizontal" | "vertical";
