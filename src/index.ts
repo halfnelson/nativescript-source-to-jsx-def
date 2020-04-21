@@ -266,7 +266,7 @@ function getClassSetterProperties(c: ClassDeclaration): ClassProp[] {
 
 
 function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions): ClassProp[] {
-    const { eventNameCasing } = options;
+    const { eventNameCasing, allowStringStyles } = options;
 
     var props: Map<string, string> = new Map()
     for (var p of c.getInstanceProperties()) {
@@ -317,7 +317,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     if (c.getName() == "ViewBase") {
         let p = props.get("style");
         if (p) {
-            props.set("style", "string | " + p)
+            props.set("style", (allowStringStyles ? "string | " : "") + p)
         }
     }
 
@@ -494,6 +494,7 @@ interface ClassPropertiesOptions {
      * Limitation: if propsDefCasing is "lowercase", in practice it will override the chosen eventName casing to "lowercase".
      */
     eventNameCasing: EventNameCasing,
+    allowStringStyles: boolean,
 }
 
 interface TypingsOptions extends ClassTypeDefsOptions, ClassPropertiesOptions {
@@ -506,6 +507,7 @@ function getFullJSXDef(flavour: "svelte"|"react"): string {
             eventNameCasing: "camelcase",
             exportAttributes: false,
             reExportImports: false,
+            allowStringStyles: true,
         };
 
         return `${getClassTypeDefs(options)}\n\n${getJSXNamespaceDef()}`
@@ -515,6 +517,7 @@ function getFullJSXDef(flavour: "svelte"|"react"): string {
             eventNameCasing: "camelcase",
             exportAttributes: true,
             reExportImports: false,
+            allowStringStyles: false,
         };
 
         return `${getClassTypeDefs(options)}`
