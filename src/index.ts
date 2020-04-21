@@ -155,12 +155,6 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
         }
     }
 
-
-    if (c.getName() == "View") {
-        debugger;
-    }
-
-
     // patch missing properties if we have skipped a base class in our .d.ts file
     let currentFile = c.getSourceFile().getFilePath();
     if (!currentFile.endsWith(".d.ts")) return;
@@ -193,55 +187,26 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
     //get the props
     let baseProps = getClassProperties(baseClass!);
     for (var baseProp of baseProps) {
-        if (!props.find(x => x.name == baseProp.name)) {
+        let existing = props.find(x => x.name == baseProp.name);
+        if (!existing) {
             props.push(baseProp);
         }
     }
 
-    //get any setters that proxy through to style
-    // they look like this
-    // set borderTopWidth(value: Length) {
-    //    this.style.borderTopWidth = value;
-    let setters = baseClass.getSetAccessors();
-    for (const setter of setters) {
-        if (Node.isSetAccessorDeclaration(setter)) {
-            let setterArg = setter.getParameters()[0].getName();
-            let setterName = setter.getName()
-            let body = setter.getBody();
-            if (body) {
-                for (const stmt of body.getDescendantStatements()) {
-                    if (Node.isExpressionStatement(stmt)) {
-                        let expr = stmt.getExpression();
-                        if (Node.isBinaryExpression(expr)) {
-                            let propAccess = expr.getLeft();
-                            let equal = expr.getOperatorToken();
-                            let right = expr.getRight();
-                            if (equal.getText() == "=" && Node.isPropertyAccessExpression(propAccess) && Node.isIdentifier(right)) {
-                                if (right.getText() == setterArg) {
-                                    if (propAccess.getExpression().getType().getText().endsWith("Style")) {
-                                        
-                                        let existingProp = props.find(p => p.name == setterName)
-                                        let newType = getTypeDef(setter.getType(), setter, true);
-                                        if (!existingProp) {
-                                            console.log("Found new style proxy", baseClass.getName(), setter.getName(), newType)
-                                            props.push({
-                                                name: setterName,
-                                                typeDef: newType
-                                            })
-                                        } else {
-                                            console.log("Found existing proxy property", baseClass.getName(), setter.getName(), existingProp.typeDef, '->', newType);
-                                            existingProp.typeDef = newType;                                            
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    //add in setter props
+    for (let s of getClassSetterProperties(baseClass)) {
+        let existing = props.find(x => x.name == s.name);
+        if (existing) {
+            console.log("patching existing prop ", c.getName(), s.name, existing.typeDef, '->', s.typeDef)
+            existing.typeDef = s.typeDef;
+        } else {
+            console.log("adding  prop ", c.getName(), s.name, s.typeDef)
+            props.push({
+                name: s.name,
+                typeDef: s.typeDef
+            })
         }
     }
-
 
 }
 
@@ -290,6 +255,47 @@ function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
 
 var propertyChangeDataType = project.getSourceFileOrThrow(nativescriptSourcePath + "/data/observable/observable.d.ts").getInterfaceOrThrow("PropertyChangeData");
 
+function getClassSetterProperties(c: ClassDeclaration): ClassProp[] {
+    let setterProps: ClassProp[] = []
+    //get any setters that proxy through to style
+    // they look like this
+    // set borderTopWidth(value: Length) {
+    //    this.style.borderTopWidth = value;
+    let setters = c.getSetAccessors();
+    for (const setter of setters) {
+        if (Node.isSetAccessorDeclaration(setter)) {
+            let setterArg = setter.getParameters()[0].getName();
+            let setterName = setter.getName()
+            let body = setter.getBody();
+            if (body) {
+                for (const stmt of body.getDescendantStatements()) {
+                    if (Node.isExpressionStatement(stmt)) {
+                        let expr = stmt.getExpression();
+                        if (Node.isBinaryExpression(expr)) {
+                            let propAccess = expr.getLeft();
+                            let equal = expr.getOperatorToken();
+                            let right = expr.getRight();
+                            if (equal.getText() == "=" && Node.isPropertyAccessExpression(propAccess) && Node.isIdentifier(right)) {
+                                if (right.getText() == setterArg) {
+                                    if (propAccess.getExpression().getType().getText().endsWith("Style")) {
+                                        let newType = getTypeDef(setter.getType(), setter, true);
+                                        setterProps.push({
+                                            name: setterName,
+                                            typeDef: newType
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return setterProps;
+}
+
+
 function getClassProperties(c: ClassDeclaration): ClassProp[] {
 
     var props: Map<string, string> = new Map()
@@ -321,7 +327,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     }
 
     patchMissingProperties(c, allProps);
-
+   
     allProps.sort((a, b) => a.name < b.name ? -1 : 1)
     return allProps;
 }
@@ -357,7 +363,7 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
         importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
 
         //do we have an alias for this already?
-        let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias && e[1].path == importPath);
+        let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias && (e[1].path.startsWith(importPath) || importPath.startsWith(e[1].path)));
         if (existingImportAlias)
             return importName.replace(importAlias, existingImportAlias?.[0])
 
@@ -378,7 +384,7 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
     //"properties" have a value converter from string, so we need to add the "string" as valid type (if not present)
     if (isProperty) {
         if (t.isUnion()) {
-            if ( t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString()) ) {
+            if (t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString())) {
                 typeText = "string | " + typeText
             }
         } else {
