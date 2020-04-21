@@ -11,13 +11,20 @@ const project = new Project({
 
 
 function getUISourceFiles() {
-    return project.getSourceFiles()
+    let ui = project.getSourceFiles()
         .filter(d => /\/ui\//.test(d.getDirectoryPath()))
         .filter(f => {
             let folder_name = path.basename(f.getDirectoryPath())
             let file_name = path.basename(f.getFilePath())
             return file_name == `${folder_name}.d.ts` && folder_name != 'repeater'
         })
+
+    let text = [
+        project.getSourceFile(nativescriptSourcePath + "/ui/text-base/formatted-string.ts")!,
+        project.getSourceFile(nativescriptSourcePath + "/ui/text-base/span.ts")!
+    ]
+
+    return ui.concat(text);
 }
 
 function getClasses(sf: SourceFile): ClassDeclaration[] {
@@ -137,29 +144,13 @@ function propertyRegistrationsForClass(c: string): ClassProp[] {
 
 
 // some of the .d.ts files neglect to mention some properties so we will inspect the base class
-function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
+function getPropertiesFromSkippedParent(c: ClassDeclaration): ClassProp[] {
 
-    //there are some setters that act like properties at runtime using a (if typeof value === "string") pattern
-    //which are a pain to find in the ast for now so we just patch them in here
-    if (c.getName() == "ViewBase") {
-        let p = props.find(p => p.name == "style");
-        if (p) {
-            p.typeDef = "string | " + p.typeDef
-        }
-    }
-
-    if (c.getName() == "Label") {
-        let p = props.find(p => p.name == "textWrap");
-        if (p) {
-            p.typeDef = "string | " + p.typeDef
-        }
-    }
-
-    // patch missing properties if we have skipped a base class in our .d.ts file
+     // patch missing properties if we have skipped a base class in our .d.ts file
     let currentFile = c.getSourceFile().getFilePath();
-    if (!currentFile.endsWith(".d.ts")) return;
+    if (!currentFile.endsWith(".d.ts")) return []
     let declaredBaseClass = c.getBaseClass();
-    if (!declaredBaseClass) return;
+    if (!declaredBaseClass) return []
 
 
     //find our base class:
@@ -170,7 +161,7 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
     let commonSource = project.getSourceFile(commonFilename);
 
     //if there is no -common, then give up
-    if (!commonSource) return;
+    if (!commonSource) return []
 
     //find the class declaration
     let baseClass = commonSource.getClass(c.getName() + "Base");
@@ -179,35 +170,13 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
     }
 
     if (!baseClass) {
-        return;
+        return []
     }
 
-    if (declaredBaseClass.getName() == baseClass.getName()) return;
+    if (declaredBaseClass.getName() == baseClass.getName()) return [];
 
     //get the props
-    let baseProps = getClassProperties(baseClass!);
-    for (var baseProp of baseProps) {
-        let existing = props.find(x => x.name == baseProp.name);
-        if (!existing) {
-            props.push(baseProp);
-        }
-    }
-
-    //add in setter props
-    for (let s of getClassSetterProperties(baseClass)) {
-        let existing = props.find(x => x.name == s.name);
-        if (existing) {
-            console.log("patching existing prop ", c.getName(), s.name, existing.typeDef, '->', s.typeDef)
-            existing.typeDef = s.typeDef;
-        } else {
-            console.log("adding  prop ", c.getName(), s.name, s.typeDef)
-            props.push({
-                name: s.name,
-                typeDef: s.typeDef
-            })
-        }
-    }
-
+    return getClassProperties(baseClass);
 }
 
 var gestureTypes = project.getSourceFileOrThrow(nativescriptSourcePath + "/ui/gestures/gestures.d.ts").getEnumOrThrow("GestureTypes");
@@ -305,8 +274,26 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
         }
     }
 
+     //add in setter props
+     for (let s of getClassSetterProperties(c)) {
+        let existing = props.get(s.name);
+        if (existing) {
+            console.log("patching existing prop ", c.getName(), s.name, existing, '->', s.typeDef)
+            props.set(s.name, s.typeDef);
+        } else {
+            console.log("adding  prop ", c.getName(), s.name, s.typeDef)
+            props.set(name, s.typeDef)
+        }
+    }
+
     for (var r of getSyntheticEventHandlers(c)) {
         props.set(r.name, r.typeDef)
+    }
+
+    for (var s of getPropertiesFromSkippedParent(c)) {
+        if (s.typeDef != 'ViewCommon') {
+            props.set(s.name, s.typeDef)
+        }
     }
 
     var className: string = c.getName() ?? "";
@@ -315,6 +302,23 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     for (var r of propertyRegistrationsForClass(className)) {
         props.set(r.name, r.typeDef)
         props.set('on' + pascalCase(r.name) + "Change", `(args: ${getTypeDef(propertyChangeDataType.getType())}) => void`)
+    }
+
+
+    //there are some setters that act like properties at runtime using a (if typeof value === "string") pattern
+    //which are a pain to find in the ast for now so we just patch them in here
+    if (c.getName() == "ViewBase") {
+        let p = props.get("style");
+        if (p) {
+            props.set("style", "string | " + p)
+        }
+    }
+
+    if (c.getName() == "Label") {
+        let p = props.get("textWrap");
+        if (p) {
+            props.set("textWrap", "string | " + p)
+        }
     }
 
     //combine
@@ -326,7 +330,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
         })
     }
 
-    patchMissingProperties(c, allProps);
+    
 
     allProps.sort((a, b) => a.name < b.name ? -1 : 1)
     return allProps;
@@ -356,33 +360,43 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
         }
     }
 
+    let replaceImports = (text: string) => {
+        return text.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPath: string, importName: string) => {
+            let importAlias = importName.replace("[]", "");
+            importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
+    
+            //do we have an alias for this already?
+            let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias
+                    && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
+                );
+    
+            if (existingImportAlias)
+                return importName.replace(importAlias, existingImportAlias?.[0])
+    
+            //no existing import
+            //is our alias free?
+            if (imports.get(importAlias)) {
+                let oldAlias = importAlias;
+                importAlias = pascalCase(path.basename(importPath)) + importAlias;
+                imports.set(importAlias, { name: oldAlias, path: importPath });
+                return importName.replace(oldAlias, importAlias);
+            }
+    
+            imports.set(importAlias, { path: importPath, name: importAlias });
+    
+            return importName;
+        });
+    }
+
+    let replaceGenericImports = (text: string) => {
+        return text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
+           return `<${replaceImports(genericType)}>`;
+        });
+    }
 
 
-    typeText = typeText.replace(/import\("(.*)"\)\.([a-zA-Z_0-9\[\]]+)/g, (match: string, importPath: string, importName: string) => {
-        let importAlias = importName.replace("[]", "");
-        importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
+    typeText =  replaceImports(replaceGenericImports(typeText));
 
-        //do we have an alias for this already?
-        let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias
-                && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
-            );
-
-        if (existingImportAlias)
-            return importName.replace(importAlias, existingImportAlias?.[0])
-
-        //no existing import
-        //is our alias free?
-        if (imports.get(importAlias)) {
-            let oldAlias = importAlias;
-            importAlias = pascalCase(path.basename(importPath)) + importAlias;
-            imports.set(importAlias, { name: oldAlias, path: importPath });
-            return importName.replace(oldAlias, importAlias);
-        }
-
-        imports.set(importAlias, { path: importPath, name: importAlias });
-
-        return importName;
-    });
 
     //"properties" have a value converter from string, so we need to add the "string" as valid type (if not present)
     if (isProperty) {
@@ -463,4 +477,9 @@ function getFullJSXDef(): string {
 
 
 fs.writeFileSync("./sveltenative-jsx.d.ts", getFullJSXDef());
+
+
+
+//console.log(getUISourceFiles().map(s => s.getFilePath()).join("\n"));
+
 

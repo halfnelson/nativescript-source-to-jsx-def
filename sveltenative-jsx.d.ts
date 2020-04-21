@@ -2,9 +2,9 @@ type View = import("@nativescript/core/ui/core/view/view").View;
 type NavigationButton = import("@nativescript/core/ui/action-bar/action-bar").NavigationButton;
 type ActionItems = import("@nativescript/core/ui/action-bar/action-bar").ActionItems;
 type AndroidActionBarSettings = import("@nativescript/core/ui/action-bar/action-bar").AndroidActionBarSettings;
-type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
 type LengthDipUnit = import("@nativescript/core/ui/styling/style-properties").LengthDipUnit;
 type LengthPxUnit = import("@nativescript/core/ui/styling/style-properties").LengthPxUnit;
+type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
 type Color = import("@nativescript/core/color/color").Color;
 type LinearGradient = import("@nativescript/core/ui/styling/gradient").LinearGradient;
 type LengthPercentUnit = import("@nativescript/core/ui/styling/style-properties").LengthPercentUnit;
@@ -54,6 +54,8 @@ type TabStripItem = import("@nativescript/core/ui/tab-navigation-base/tab-strip-
 type TabStripItemEventData = import("@nativescript/core/ui/tab-navigation-base/tab-strip/tab-strip").TabStripItemEventData;
 type Label = import("@nativescript/core/ui/label/label").Label;
 type Image = import("@nativescript/core/ui/image/image").Image;
+type Span = import("@nativescript/core/ui/text-base/span").Span;
+type ObservableArray<Span> = import("@nativescript/core/data/observable-array/observable-array").ObservableArray<Span>;
 
 // ui/action-bar/action-bar.d.ts
 type ActionBarAttributes =  ViewAttributes & {
@@ -777,6 +779,30 @@ type TabStripItemAttributes =  ViewAttributes & {
     title: string;
 };
 
+// ui/text-base/formatted-string.ts
+type FormattedStringAttributes =  ViewBaseAttributes & {
+    backgroundcolor: string | Color;
+    color: string | Color;
+    fontfamily: string;
+    fontsize: string | number;
+    fontstyle: "normal" | "italic";
+    fontweight: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
+    spans: ObservableArray<Span>;
+    textdecoration: "none" | "underline" | "line-through" | "underline line-through";
+};
+
+// ui/text-base/span.ts
+type SpanAttributes =  ViewBaseAttributes & {
+    backgroundcolor: string | Color;
+    color: string | Color;
+    fontfamily: string;
+    fontsize: string | number;
+    fontstyle: "normal" | "italic";
+    fontweight: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
+    text: string;
+    textdecoration: "none" | "underline" | "line-through" | "underline line-through";
+};
+
 
 declare namespace svelteNative.JSX {
     /* svelte2tsx JSX */
@@ -835,6 +861,8 @@ declare namespace svelteNative.JSX {
         tabcontentitem: TabContentItemAttributes;
         tabstrip: TabStripAttributes;
         tabstripitem: TabStripItemAttributes;
+        formattedstring: FormattedStringAttributes;
+        span: SpanAttributes;
         [name: string]: { [name: string]: any };
     }
 }
