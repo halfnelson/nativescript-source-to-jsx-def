@@ -417,7 +417,7 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
 
 
 function classPropDef(t: ClassProp): string {
-    return `${t.name.toLowerCase()}: ${t.typeDef};`
+    return `${t.name.toLowerCase()}?: ${t.typeDef};`
 }
 
 function getAttributesClassName(c: ClassDeclaration) {
