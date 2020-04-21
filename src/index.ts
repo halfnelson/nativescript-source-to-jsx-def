@@ -266,7 +266,7 @@ function getClassSetterProperties(c: ClassDeclaration): ClassProp[] {
 
 
 function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions): ClassProp[] {
-    const { eventNameCasing, allowStringStyles } = options;
+    const { eventNameCasing, allowStringStyles, omitStyleFromViewBase } = options;
 
     var props: Map<string, string> = new Map()
     for (var p of c.getInstanceProperties()) {
@@ -317,7 +317,11 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     if (c.getName() == "ViewBase") {
         let p = props.get("style");
         if (p) {
-            props.set("style", (allowStringStyles ? "string | " : "") + p)
+            if(omitStyleFromViewBase){
+                props.delete("style");
+            } else {
+                props.set("style", (allowStringStyles ? "string | " : "") + p)
+            }
         }
     }
 
@@ -495,6 +499,7 @@ interface ClassPropertiesOptions {
      */
     eventNameCasing: EventNameCasing,
     allowStringStyles: boolean,
+    omitStyleFromViewBase: boolean,
 }
 
 interface TypingsOptions extends ClassTypeDefsOptions, ClassPropertiesOptions {
@@ -508,6 +513,7 @@ function getFullJSXDef(flavour: "svelte"|"react"): string {
             exportAttributes: false,
             reExportImports: false,
             allowStringStyles: true,
+            omitStyleFromViewBase: false,
         };
 
         return `${getClassTypeDefs(options)}\n\n${getJSXNamespaceDef()}`
@@ -518,6 +524,7 @@ function getFullJSXDef(flavour: "svelte"|"react"): string {
             exportAttributes: true,
             reExportImports: false,
             allowStringStyles: false,
+            omitStyleFromViewBase: true,
         };
 
         return `${getClassTypeDefs(options)}`
