@@ -92,6 +92,7 @@ function getPropertyRegistrations() {
             }
         }
     }
+
     return statements;
 }
 
@@ -137,6 +138,25 @@ function propertyRegistrationsForClass(c: string): ClassProp[] {
 
 // some of the .d.ts files neglect to mention some properties so we will inspect the base class
 function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
+    
+    //there are some setters that act like properties at runtime using a (if typeof value === "string") pattern
+    //which are a pain to find in the ast for now so we just patch them in here
+    if (c.getName() == "ViewBase") {
+        let p = props.find(p => p.name == "style");
+        if (p) {
+            p.typeDef = "string | " + p.typeDef
+        }
+    }
+
+    if (c.getName() == "Label") {
+        let p = props.find(p => p.name == "textWrap");
+        if (p) {
+            p.typeDef = "string | " + p.typeDef
+        }
+    }
+
+    
+    
     // patch missing properties if we have skipped a base class in our .d.ts file
     let currentFile = c.getSourceFile().getFilePath();
     if (!currentFile.endsWith(".d.ts")) return;

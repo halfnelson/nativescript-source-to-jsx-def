@@ -233,7 +233,7 @@ type ViewBaseAttributes =  ObservableAttributes & {
     recyclenativeview: "always" | "never" | "auto";
     row: number;
     rowspan: number;
-    style: Style;
+    style: string | Style;
     top: number | "auto" | LengthDipUnit | LengthPxUnit;
     typename: string;
     viewcontroller: any;
@@ -401,7 +401,7 @@ type ImageAttributes =  ViewAttributes & {
 type LabelAttributes =  TextBaseAttributes & {
     android: any;
     ios: any;
-    textwrap: false | true;
+    textwrap: string | false | true;
 };
 
 // ui/list-picker/list-picker.d.ts
