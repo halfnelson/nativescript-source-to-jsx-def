@@ -327,7 +327,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     }
 
     patchMissingProperties(c, allProps);
-   
+
     allProps.sort((a, b) => a.name < b.name ? -1 : 1)
     return allProps;
 }
@@ -363,7 +363,10 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
         importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
 
         //do we have an alias for this already?
-        let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias && (e[1].path.startsWith(importPath) || importPath.startsWith(e[1].path)));
+        let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias
+                && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
+            );
+
         if (existingImportAlias)
             return importName.replace(importAlias, existingImportAlias?.[0])
 

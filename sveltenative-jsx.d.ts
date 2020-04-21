@@ -18,7 +18,6 @@ type TouchGestureEventData = import("@nativescript/core/ui/gestures/gestures").T
 type EventData = import("@nativescript/core/data/observable/observable").EventData;
 type ShownModallyData = import("@nativescript/core/ui/core/view/view").ShownModallyData;
 type ViewCommon = import("@nativescript/core/ui/core/view/view-common").ViewCommon;
-type LinearGradientLinearGradient = import("@nativescript/core/ui/styling/linear-gradient").LinearGradient;
 type DOMNode = import("@nativescript/core/debugger/dom-node").DOMNode;
 type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBase;
 type Page = import("@nativescript/core/ui/page/page").Page;
@@ -84,7 +83,7 @@ type ViewAttributes =  ViewBaseAttributes & {
     automationtext: string;
     background: string;
     backgroundcolor: string | Color;
-    backgroundimage: string | LinearGradientLinearGradient;
+    backgroundimage: string | LinearGradient;
     backgroundposition: string;
     backgroundrepeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat";
     backgroundsize: string;
