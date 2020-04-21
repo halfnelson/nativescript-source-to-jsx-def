@@ -1,4 +1,4 @@
-import { Project, ts, SourceFile, ClassDeclaration, Scope, Type, Node, createWrappedNode } from 'ts-morph'
+import { Project, ts, SourceFile, ClassDeclaration, Scope, Type, Node } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 import pascalCase from 'uppercamelcase';
@@ -138,7 +138,7 @@ function propertyRegistrationsForClass(c: string): ClassProp[] {
 
 // some of the .d.ts files neglect to mention some properties so we will inspect the base class
 function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
-    
+
     //there are some setters that act like properties at runtime using a (if typeof value === "string") pattern
     //which are a pain to find in the ast for now so we just patch them in here
     if (c.getName() == "ViewBase") {
@@ -155,14 +155,18 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
         }
     }
 
-    
-    
+
+    if (c.getName() == "View") {
+        debugger;
+    }
+
+
     // patch missing properties if we have skipped a base class in our .d.ts file
     let currentFile = c.getSourceFile().getFilePath();
     if (!currentFile.endsWith(".d.ts")) return;
     let declaredBaseClass = c.getBaseClass();
     if (!declaredBaseClass) return;
-    if (declaredBaseClass.getName() == c.getName() + "Base") return;
+
 
     //find our base class:
 
@@ -176,15 +180,69 @@ function patchMissingProperties(c: ClassDeclaration, props: ClassProp[]) {
 
     //find the class declaration
     let baseClass = commonSource.getClass(c.getName() + "Base");
-    if (!baseClass) return;
+    if (!baseClass) {
+        baseClass = commonSource.getClass(c.getName() + "Common")
+    }
+
+    if (!baseClass) {
+        return;
+    }
+
+    if (declaredBaseClass.getName() == baseClass.getName()) return;
 
     //get the props
-    let baseProps = getClassProperties(baseClass);
+    let baseProps = getClassProperties(baseClass!);
     for (var baseProp of baseProps) {
         if (!props.find(x => x.name == baseProp.name)) {
             props.push(baseProp);
         }
     }
+
+    //get any setters that proxy through to style
+    // they look like this
+    // set borderTopWidth(value: Length) {
+    //    this.style.borderTopWidth = value;
+    let setters = baseClass.getSetAccessors();
+    for (const setter of setters) {
+        if (Node.isSetAccessorDeclaration(setter)) {
+            let setterArg = setter.getParameters()[0].getName();
+            let setterName = setter.getName()
+            let body = setter.getBody();
+            if (body) {
+                for (const stmt of body.getDescendantStatements()) {
+                    if (Node.isExpressionStatement(stmt)) {
+                        let expr = stmt.getExpression();
+                        if (Node.isBinaryExpression(expr)) {
+                            let propAccess = expr.getLeft();
+                            let equal = expr.getOperatorToken();
+                            let right = expr.getRight();
+                            if (equal.getText() == "=" && Node.isPropertyAccessExpression(propAccess) && Node.isIdentifier(right)) {
+                                if (right.getText() == setterArg) {
+                                    if (propAccess.getExpression().getType().getText().endsWith("Style")) {
+                                        
+                                        let existingProp = props.find(p => p.name == setterName)
+                                        let newType = getTypeDef(setter.getType(), setter, true);
+                                        if (!existingProp) {
+                                            console.log("Found new style proxy", baseClass.getName(), setter.getName(), newType)
+                                            props.push({
+                                                name: setterName,
+                                                typeDef: newType
+                                            })
+                                        } else {
+                                            console.log("Found existing proxy property", baseClass.getName(), setter.getName(), existingProp.typeDef, '->', newType);
+                                            existingProp.typeDef = newType;                                            
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 }
 
 var gestureTypes = project.getSourceFileOrThrow(nativescriptSourcePath + "/ui/gestures/gestures.d.ts").getEnumOrThrow("GestureTypes");
@@ -320,7 +378,7 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
     //"properties" have a value converter from string, so we need to add the "string" as valid type (if not present)
     if (isProperty) {
         if (t.isUnion()) {
-            if (!t.getUnionTypes().reduce<boolean>((p: boolean, c: Type) => p && (c.isStringLiteral() || c.isString()), true)) {
+            if ( t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString()) ) {
                 typeText = "string | " + typeText
             }
         } else {

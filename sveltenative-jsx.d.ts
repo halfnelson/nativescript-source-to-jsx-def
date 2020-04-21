@@ -18,6 +18,8 @@ type GestureEventData = import("@nativescript/core/ui/gestures/gestures").Gestur
 type TouchGestureEventData = import("@nativescript/core/ui/gestures/gestures").TouchGestureEventData;
 type EventData = import("@nativescript/core/data/observable/observable").EventData;
 type ShownModallyData = import("@nativescript/core/ui/core/view/view").ShownModallyData;
+type ViewCommon = import("@nativescript/core/ui/core/view/view-common").ViewCommon;
+type LinearGradientLinearGradient = import("@nativescript/core/ui/styling/linear-gradient").LinearGradient;
 type DOMNode = import("@nativescript/core/debugger/dom-node").DOMNode;
 type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBase;
 type Page = import("@nativescript/core/ui/page/page").Page;
@@ -63,8 +65,8 @@ type ActionBarAttributes =  ViewAttributes & {
     actionitems: ActionItems;
     android: AndroidActionBarSettings;
     androidcontentinset: string | number | LengthDipUnit | LengthPxUnit;
-    androidcontentinsetleft: number | "auto" | LengthDipUnit | LengthPxUnit;
-    androidcontentinsetright: number | "auto" | LengthDipUnit | LengthPxUnit;
+    androidcontentinsetleft: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    androidcontentinsetright: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     effectivecontentinsetleft: number;
     effectivecontentinsetright: number;
     flat: string | false | true;
@@ -81,29 +83,32 @@ type ActionBarAttributes =  ViewAttributes & {
 // ui/core/view/view.d.ts
 type ViewAttributes =  ViewBaseAttributes & {
     android: any;
-    androiddynamicelevationoffset: number;
-    androidelevation: number;
+    androiddynamicelevationoffset: string | number;
+    androidelevation: string | number;
     automationtext: string;
     background: string;
     backgroundcolor: string | Color;
-    backgroundimage: string | LinearGradient;
+    backgroundimage: string | LinearGradientLinearGradient;
+    backgroundposition: string;
+    backgroundrepeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat";
+    backgroundsize: string;
     bindingcontext: any;
-    borderbottomcolor: Color;
-    borderbottomleftradius: number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderbottomrightradius: number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderbottomwidth: number | "auto" | LengthDipUnit | LengthPxUnit;
+    borderbottomcolor: string | Color;
+    borderbottomleftradius: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    borderbottomrightradius: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    borderbottomwidth: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     bordercolor: string | Color;
-    borderleftcolor: Color;
-    borderleftwidth: number | "auto" | LengthDipUnit | LengthPxUnit;
+    borderleftcolor: string | Color;
+    borderleftwidth: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     borderradius: string | number | LengthDipUnit | LengthPxUnit;
-    borderrightcolor: Color;
-    borderrightwidth: number | "auto" | LengthDipUnit | LengthPxUnit;
-    bordertopcolor: Color;
-    bordertopleftradius: number | "auto" | LengthDipUnit | LengthPxUnit;
-    bordertoprightradius: number | "auto" | LengthDipUnit | LengthPxUnit;
-    bordertopwidth: number | "auto" | LengthDipUnit | LengthPxUnit;
+    borderrightcolor: string | Color;
+    borderrightwidth: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    bordertopcolor: string | Color;
+    bordertopleftradius: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    bordertoprightradius: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    bordertopwidth: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     borderwidth: string | number | LengthDipUnit | LengthPxUnit;
-    color: Color;
+    color: string | Color;
     column: string | number;
     columnspan: string | number;
     css: string;
@@ -111,7 +116,7 @@ type ViewAttributes =  ViewBaseAttributes & {
     csspseudoclasses: Set<string>;
     csstype: string;
     dock: "left" | "top" | "right" | "bottom";
-    height: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    height: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
     horizontalalignment: "left" | "right" | "center" | "stretch";
     ios: any;
     iosoverflowsafearea: false | true;
@@ -122,12 +127,12 @@ type ViewAttributes =  ViewBaseAttributes & {
     isuserinteractionenabled: false | true;
     left: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     margin: string | number | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    marginbottom: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    marginleft: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    marginright: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    margintop: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    minheight: number | "auto" | LengthDipUnit | LengthPxUnit;
-    minwidth: number | "auto" | LengthDipUnit | LengthPxUnit;
+    marginbottom: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    marginleft: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    marginright: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    margintop: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    minheight: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    minwidth: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     modal: View;
     onandroidbackpressed: (args: EventData) => void;
     oncolumnchange: (args: PropertyChangeData) => void;
@@ -149,23 +154,24 @@ type ViewAttributes =  ViewBaseAttributes & {
     ontopchange: (args: PropertyChangeData) => void;
     ontouch: (arg: TouchGestureEventData) => any;
     onunloaded: (args: EventData) => void;
-    opacity: number;
+    opacity: string | number;
     originx: number;
     originy: number;
-    perspective: number;
-    rotate: number;
-    rotatex: number;
-    rotatey: number;
+    perspective: string | number;
+    rotate: string | number;
+    rotatex: string | number;
+    rotatey: string | number;
     row: string | number;
     rowspan: string | number;
-    scalex: number;
-    scaley: number;
+    scalex: string | number;
+    scaley: string | number;
+    texttransform: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
     top: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    translatex: number;
-    translatey: number;
+    translatex: string | number;
+    translatey: string | number;
     verticalalignment: "top" | "bottom" | "stretch" | "middle";
     visibility: "visible" | "hidden" | "collapse";
-    width: number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    width: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
 };
 
 // ui/core/view-base/view-base.d.ts
@@ -316,17 +322,20 @@ type ButtonAttributes =  TextBaseAttributes & {
 
 // ui/text-base/text-base.d.ts
 type TextBaseAttributes =  ViewAttributes & {
-    fontsize: number;
+    fontfamily: string;
+    fontsize: string | number;
+    fontstyle: "normal" | "italic";
+    fontweight: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
     formattedtext: string | FormattedString;
-    letterspacing: number;
-    lineheight: number;
+    letterspacing: string | number;
+    lineheight: string | number;
     onformattedtextchange: (args: PropertyChangeData) => void;
     ontextchange: (args: PropertyChangeData) => void;
     padding: string | number | LengthDipUnit | LengthPxUnit;
-    paddingbottom: number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingleft: number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingright: number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingtop: number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingbottom: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingleft: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingright: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingtop: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     text: string;
     textalignment: "left" | "right" | "center" | "initial";
     textdecoration: "none" | "underline" | "line-through" | "underline line-through";
@@ -394,7 +403,7 @@ type ImageAttributes =  ViewAttributes & {
     onstretchchange: (args: PropertyChangeData) => void;
     src: string | any;
     stretch: "none" | "aspectFill" | "aspectFit" | "fill";
-    tintcolor: Color;
+    tintcolor: string | Color;
 };
 
 // ui/label/label.d.ts
@@ -427,9 +436,9 @@ type ListViewAttributes =  ViewAttributes & {
     ios: any;
     iosestimatedrowheight: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     itemidgenerator: (item: any, index: number, items: any) => number;
-    itemtemplate: string | string | Template;
+    itemtemplate: string | Template;
     itemtemplateselector: string | ((item: any, index: number, items: any) => string);
-    itemtemplates: string | string | KeyedTemplate[];
+    itemtemplates: string | KeyedTemplate[];
     items: string | any[] | ListViewItemsSource;
     oniosestimatedrowheightchange: (args: PropertyChangeData) => void;
     onitemloading: (args: ItemEventData) => void;
@@ -440,14 +449,14 @@ type ListViewAttributes =  ViewAttributes & {
     onloadmoreitems: (args: EventData) => void;
     onrowheightchange: (args: PropertyChangeData) => void;
     rowheight: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    separatorcolor: Color;
+    separatorcolor: string | Color;
 };
 
 // ui/page/page.d.ts
 type PageAttributes =  ContentViewAttributes & {
     actionbar: ActionBar;
     actionbarhidden: string | false | true;
-    androidstatusbarbackground: Color;
+    androidstatusbarbackground: string | Color;
     backgroundspanunderstatusbar: string | false | true;
     enableswipebacknavigation: string | false | true;
     frame: Frame;
@@ -492,10 +501,10 @@ type LayoutBaseAttributes =  CustomLayoutViewAttributes & {
     oncliptoboundschange: (args: PropertyChangeData) => void;
     onispassthroughparentenabledchange: (args: PropertyChangeData) => void;
     padding: string | number | LengthDipUnit | LengthPxUnit;
-    paddingbottom: number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingleft: number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingright: number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingtop: number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingbottom: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingleft: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingright: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    paddingtop: string | number | "auto" | LengthDipUnit | LengthPxUnit;
 };
 
 // ui/core/view/view.d.ts
@@ -550,7 +559,7 @@ type SegmentedBarAttributes =  ViewAttributes & {
     onitemschange: (args: PropertyChangeData) => void;
     onselectedindexchange: (args: PropertyChangeData) => void;
     onselectedindexchanged: (args: SegmentedBarSelectedIndexChangedEventData) => void;
-    selectedbackgroundcolor: Color;
+    selectedbackgroundcolor: string | Color;
     selectedindex: string | number;
 };
 
@@ -589,7 +598,7 @@ type TabViewItemAttributes =  ViewBaseAttributes & {
 type TabViewAttributes =  ViewAttributes & {
     android: any;
     androidoffscreentablimit: string | number;
-    androidselectedtabhighlightcolor: Color;
+    androidselectedtabhighlightcolor: string | Color;
     androidswipeenabled: string | false | true;
     androidtabsposition: "top" | "bottom";
     ios: any;
@@ -603,10 +612,10 @@ type TabViewAttributes =  ViewAttributes & {
     onselectedindexchange: (args: PropertyChangeData) => void;
     onselectedindexchanged: (args: TabViewSelectedIndexChangedEventData) => void;
     selectedindex: string | number;
-    selectedtabtextcolor: Color;
-    tabbackgroundcolor: Color;
-    tabtextcolor: Color;
-    tabtextfontsize: number;
+    selectedtabtextcolor: string | Color;
+    tabbackgroundcolor: string | Color;
+    tabtextcolor: string | Color;
+    tabtextfontsize: string | number;
 };
 
 // ui/tabs/tabs.d.ts
