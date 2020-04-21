@@ -144,7 +144,7 @@ function propertyRegistrationsForClass(c: string): ClassProp[] {
 
 
 // some of the .d.ts files neglect to mention some properties so we will inspect the base class
-function getPropertiesFromSkippedParent(c: ClassDeclaration): ClassProp[] {
+function getPropertiesFromSkippedParent(c: ClassDeclaration, options: ClassPropertiesOptions): ClassProp[] {
 
      // patch missing properties if we have skipped a base class in our .d.ts file
     let currentFile = c.getSourceFile().getFilePath();
@@ -176,7 +176,7 @@ function getPropertiesFromSkippedParent(c: ClassDeclaration): ClassProp[] {
     if (declaredBaseClass.getName() == baseClass.getName()) return [];
 
     //get the props
-    return getClassProperties(baseClass);
+    return getClassProperties(baseClass, options);
 }
 
 var gestureTypes = project.getSourceFileOrThrow(nativescriptSourcePath + "/ui/gestures/gestures.d.ts").getEnumOrThrow("GestureTypes");
@@ -265,7 +265,8 @@ function getClassSetterProperties(c: ClassDeclaration): ClassProp[] {
 }
 
 
-function getClassProperties(c: ClassDeclaration): ClassProp[] {
+function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions): ClassProp[] {
+    const { eventNameCasing, allowStringStyles } = options;
 
     var props: Map<string, string> = new Map()
     for (var p of c.getInstanceProperties()) {
@@ -290,7 +291,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
         props.set(r.name, r.typeDef)
     }
 
-    for (var s of getPropertiesFromSkippedParent(c)) {
+    for (var s of getPropertiesFromSkippedParent(c, options)) {
         if (s.typeDef != 'ViewCommon') {
             props.set(s.name, s.typeDef)
         }
@@ -301,7 +302,13 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     //patch in any dynamic properties 
     for (var r of propertyRegistrationsForClass(className)) {
         props.set(r.name, r.typeDef)
-        props.set('on' + pascalCase(r.name) + "Change", `(args: ${getTypeDef(propertyChangeDataType.getType())}) => void`)
+        props.set(
+            eventNameCasing === "camelcase" ? 
+                'on' + pascalCase(r.name) + "Change" :
+                'on' + r.name.toLowerCase() + "change"
+            ,
+            `(args: ${getTypeDef(propertyChangeDataType.getType())}) => void`
+        )
     }
 
 
@@ -310,7 +317,7 @@ function getClassProperties(c: ClassDeclaration): ClassProp[] {
     if (c.getName() == "ViewBase") {
         let p = props.get("style");
         if (p) {
-            props.set("style", "string | " + p)
+            props.set("style", (allowStringStyles ? "string | " : "") + p)
         }
     }
 
@@ -415,29 +422,30 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
     return typeText
 }
 
-
-function classPropDef(t: ClassProp): string {
-    return `${t.name.toLowerCase()}?: ${t.typeDef};`
+function classPropDef(t: ClassProp, casing: PropDefsCasing): string {
+    return `${casing === "lowercase" ? t.name.toLowerCase() : t.name}?: ${t.typeDef};`
 }
 
 function getAttributesClassName(c: ClassDeclaration) {
     return `${c.getName()}Attributes`
 }
 
-function getClassTypeDef(c: ClassDeclaration): string {
+function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): string {
+    const { propDefsCasing, exportAttributes } = options;
 
-    var propDefs = getClassProperties(c).map(x => classPropDef(x));
+    var propDefs = getClassProperties(c, options).map(x => classPropDef(x, propDefsCasing));
 
     var baseclass = c.getBaseClass();
-    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\ntype ${getAttributesClassName(c)} =  ${baseclass ? `${getAttributesClassName(baseclass)} & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
+    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\n${exportAttributes ? "export " : ""}type ${getAttributesClassName(c)} =  ${baseclass ? `${getAttributesClassName(baseclass)} & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
     return classDef;
 }
 
 
-function getClassTypeDefs() {
-    let classDefs = uiClassDefs().map(getClassTypeDef);
+function getClassTypeDefs(options: TypingsOptions) {
+    const { reExportImports } = options;
+    let classDefs = uiClassDefs().map(c => getClassTypeDef(c, options));
 
-    let classImportStatements = [...imports.keys()].map(c => `type ${c} = import("${imports.get(c)?.path}").${imports.get(c)?.name};`).join("\n");
+    let classImportStatements = [...imports.keys()].map(c => `${reExportImports ? "export " : ""}type ${c} = import("${imports.get(c)?.path}").${imports.get(c)?.name};`).join("\n");
     let classTypeDefs = classDefs.join("\n\n");
     return `${classImportStatements}\n\n${classTypeDefs}`;
 }
@@ -471,12 +479,56 @@ ${uiClasses.map(c => getIntrinsicElementDef(c)).map(d => `        ${d}`).join("\
 `
 }
 
-function getFullJSXDef(): string {
-    return `${getClassTypeDefs()}\n\n${getJSXNamespaceDef()}`
+type PropDefsCasing = "lowercase"|"preserve";
+
+interface ClassTypeDefsOptions {
+    propDefsCasing: PropDefsCasing,
+    exportAttributes: boolean,
+    reExportImports: boolean,
+}
+
+type EventNameCasing = "lowercase"|"camelcase";
+
+interface ClassPropertiesOptions {
+    /**
+     * Limitation: if propsDefCasing is "lowercase", in practice it will override the chosen eventName casing to "lowercase".
+     */
+    eventNameCasing: EventNameCasing,
+    allowStringStyles: boolean,
+}
+
+interface TypingsOptions extends ClassTypeDefsOptions, ClassPropertiesOptions {
+}
+
+function getFullJSXDef(flavour: "svelte"|"react"): string {
+    if(flavour === "svelte"){
+        const options: TypingsOptions = {
+            propDefsCasing: "lowercase",
+            eventNameCasing: "camelcase",
+            exportAttributes: false,
+            reExportImports: false,
+            allowStringStyles: true,
+        };
+
+        return `${getClassTypeDefs(options)}\n\n${getJSXNamespaceDef()}`
+    } else if(flavour === "react"){
+        const options: TypingsOptions = {
+            propDefsCasing: "preserve",
+            eventNameCasing: "camelcase",
+            exportAttributes: true,
+            reExportImports: false,
+            allowStringStyles: false,
+        };
+
+        return `${getClassTypeDefs(options)}`
+    }
+
+    throw Error(`Unknown flavour of NativeScript, ${flavour}`);
 }
 
 
-fs.writeFileSync("./sveltenative-jsx.d.ts", getFullJSXDef());
+fs.writeFileSync("./sveltenative-jsx.d.ts", getFullJSXDef("svelte"));
+fs.writeFileSync("./react-nativescript-jsx.ts", getFullJSXDef("react"));
 
 
 
