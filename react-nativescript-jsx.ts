@@ -44,18 +44,20 @@ type ItemEventData = import("@nativescript/core/ui/list-view/list-view").ItemEve
 type Frame = import("@nativescript/core/ui/frame/frame").Frame;
 type NavigatedData = import("@nativescript/core/ui/page/page").NavigatedData;
 type CreateViewEventData = import("@nativescript/core/ui/placeholder/placeholder").CreateViewEventData;
+type RepeaterItemsSource = import("@nativescript/core/ui/repeater/repeater").ItemsSource;
+type LayoutBase = import("@nativescript/core/ui/layouts/layout-base").LayoutBase;
 type ScrollEventData = import("@nativescript/core/ui/scroll-view/scroll-view").ScrollEventData;
 type SegmentedBarItem = import("@nativescript/core/ui/segmented-bar/segmented-bar").SegmentedBarItem;
 type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core/ui/segmented-bar/segmented-bar").SelectedIndexChangedEventData;
 type TabViewItem = import("@nativescript/core/ui/tab-view/tab-view").TabViewItem;
 type TabViewSelectedIndexChangedEventData = import("@nativescript/core/ui/tab-view/tab-view").SelectedIndexChangedEventData;
+type Span = import("@nativescript/core/ui/text-base/span").Span;
+type ObservableArray<Span> = import("@nativescript/core/data/observable-array/observable-array").ObservableArray<Span>;
 type LoadEventData = import("@nativescript/core/ui/web-view/web-view").LoadEventData;
 type TabStripItem = import("@nativescript/core/ui/tab-navigation-base/tab-strip-item/tab-strip-item").TabStripItem;
 type TabStripItemEventData = import("@nativescript/core/ui/tab-navigation-base/tab-strip/tab-strip").TabStripItemEventData;
 type Label = import("@nativescript/core/ui/label/label").Label;
 type Image = import("@nativescript/core/ui/image/image").Image;
-type Span = import("@nativescript/core/ui/text-base/span").Span;
-type ObservableArray<Span> = import("@nativescript/core/data/observable-array/observable-array").ObservableArray<Span>;
 
 // ui/action-bar/action-bar.d.ts
 export type ActionBarAttributes =  ViewAttributes & {
@@ -513,6 +515,16 @@ export type ContainerViewAttributes =  ViewAttributes & {
     iosOverflowSafeArea?: false | true;
 };
 
+// ui/repeater/repeater.d.ts
+export type RepeaterAttributes =  CustomLayoutViewAttributes & {
+    itemTemplate?: string | Template;
+    items?: string | any[] | RepeaterItemsSource;
+    itemsLayout?: string | LayoutBase;
+    onItemTemplateChange?: (args: PropertyChangeData) => void;
+    onItemsChange?: (args: PropertyChangeData) => void;
+    onItemsLayoutChange?: (args: PropertyChangeData) => void;
+};
+
 // ui/scroll-view/scroll-view.d.ts
 export type ScrollViewAttributes =  ContentViewAttributes & {
     horizontalOffset?: number;
@@ -630,6 +642,30 @@ export type TabsAttributes =  TabNavigationBaseAttributes & {
     swipeEnabled?: string | false | true;
     tabStrip?: TabStrip;
     tabsPosition?: "top" | "bottom";
+};
+
+// ui/text-base/formatted-string.ts
+export type FormattedStringAttributes =  ViewBaseAttributes & {
+    backgroundColor?: string | Color;
+    color?: string | Color;
+    fontFamily?: string;
+    fontSize?: string | number;
+    fontStyle?: "normal" | "italic";
+    fontWeight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
+    spans?: ObservableArray<Span>;
+    textDecoration?: "none" | "underline" | "line-through" | "underline line-through";
+};
+
+// ui/text-base/span.ts
+export type SpanAttributes =  ViewBaseAttributes & {
+    backgroundColor?: string | Color;
+    color?: string | Color;
+    fontFamily?: string;
+    fontSize?: string | number;
+    fontStyle?: "normal" | "italic";
+    fontWeight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
+    text?: string;
+    textDecoration?: "none" | "underline" | "line-through" | "underline line-through";
 };
 
 // ui/text-field/text-field.d.ts
@@ -776,28 +812,4 @@ export type TabStripItemAttributes =  ViewAttributes & {
     label?: Label;
     onTap?: (args: EventData) => void;
     title?: string;
-};
-
-// ui/text-base/formatted-string.ts
-export type FormattedStringAttributes =  ViewBaseAttributes & {
-    backgroundColor?: string | Color;
-    color?: string | Color;
-    fontFamily?: string;
-    fontSize?: string | number;
-    fontStyle?: "normal" | "italic";
-    fontWeight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
-    spans?: ObservableArray<Span>;
-    textDecoration?: "none" | "underline" | "line-through" | "underline line-through";
-};
-
-// ui/text-base/span.ts
-export type SpanAttributes =  ViewBaseAttributes & {
-    backgroundColor?: string | Color;
-    color?: string | Color;
-    fontFamily?: string;
-    fontSize?: string | number;
-    fontStyle?: "normal" | "italic";
-    fontWeight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
-    text?: string;
-    textDecoration?: "none" | "underline" | "line-through" | "underline line-through";
 };

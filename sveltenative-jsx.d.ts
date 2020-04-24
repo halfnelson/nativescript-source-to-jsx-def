@@ -44,18 +44,20 @@ type ItemEventData = import("@nativescript/core/ui/list-view/list-view").ItemEve
 type Frame = import("@nativescript/core/ui/frame/frame").Frame;
 type NavigatedData = import("@nativescript/core/ui/page/page").NavigatedData;
 type CreateViewEventData = import("@nativescript/core/ui/placeholder/placeholder").CreateViewEventData;
+type RepeaterItemsSource = import("@nativescript/core/ui/repeater/repeater").ItemsSource;
+type LayoutBase = import("@nativescript/core/ui/layouts/layout-base").LayoutBase;
 type ScrollEventData = import("@nativescript/core/ui/scroll-view/scroll-view").ScrollEventData;
 type SegmentedBarItem = import("@nativescript/core/ui/segmented-bar/segmented-bar").SegmentedBarItem;
 type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core/ui/segmented-bar/segmented-bar").SelectedIndexChangedEventData;
 type TabViewItem = import("@nativescript/core/ui/tab-view/tab-view").TabViewItem;
 type TabViewSelectedIndexChangedEventData = import("@nativescript/core/ui/tab-view/tab-view").SelectedIndexChangedEventData;
+type Span = import("@nativescript/core/ui/text-base/span").Span;
+type ObservableArray<Span> = import("@nativescript/core/data/observable-array/observable-array").ObservableArray<Span>;
 type LoadEventData = import("@nativescript/core/ui/web-view/web-view").LoadEventData;
 type TabStripItem = import("@nativescript/core/ui/tab-navigation-base/tab-strip-item/tab-strip-item").TabStripItem;
 type TabStripItemEventData = import("@nativescript/core/ui/tab-navigation-base/tab-strip/tab-strip").TabStripItemEventData;
 type Label = import("@nativescript/core/ui/label/label").Label;
 type Image = import("@nativescript/core/ui/image/image").Image;
-type Span = import("@nativescript/core/ui/text-base/span").Span;
-type ObservableArray<Span> = import("@nativescript/core/data/observable-array/observable-array").ObservableArray<Span>;
 
 // ui/action-bar/action-bar.d.ts
 type ActionBarAttributes =  ViewAttributes & {
@@ -514,6 +516,16 @@ type ContainerViewAttributes =  ViewAttributes & {
     iosoverflowsafearea?: false | true;
 };
 
+// ui/repeater/repeater.d.ts
+type RepeaterAttributes =  CustomLayoutViewAttributes & {
+    itemtemplate?: string | Template;
+    items?: string | any[] | RepeaterItemsSource;
+    itemslayout?: string | LayoutBase;
+    onitemtemplatechange?: (args: PropertyChangeData) => void;
+    onitemschange?: (args: PropertyChangeData) => void;
+    onitemslayoutchange?: (args: PropertyChangeData) => void;
+};
+
 // ui/scroll-view/scroll-view.d.ts
 type ScrollViewAttributes =  ContentViewAttributes & {
     horizontaloffset?: number;
@@ -631,6 +643,30 @@ type TabsAttributes =  TabNavigationBaseAttributes & {
     swipeenabled?: string | false | true;
     tabstrip?: TabStrip;
     tabsposition?: "top" | "bottom";
+};
+
+// ui/text-base/formatted-string.ts
+type FormattedStringAttributes =  ViewBaseAttributes & {
+    backgroundcolor?: string | Color;
+    color?: string | Color;
+    fontfamily?: string;
+    fontsize?: string | number;
+    fontstyle?: "normal" | "italic";
+    fontweight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
+    spans?: ObservableArray<Span>;
+    textdecoration?: "none" | "underline" | "line-through" | "underline line-through";
+};
+
+// ui/text-base/span.ts
+type SpanAttributes =  ViewBaseAttributes & {
+    backgroundcolor?: string | Color;
+    color?: string | Color;
+    fontfamily?: string;
+    fontsize?: string | number;
+    fontstyle?: "normal" | "italic";
+    fontweight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
+    text?: string;
+    textdecoration?: "none" | "underline" | "line-through" | "underline line-through";
 };
 
 // ui/text-field/text-field.d.ts
@@ -779,30 +815,6 @@ type TabStripItemAttributes =  ViewAttributes & {
     title?: string;
 };
 
-// ui/text-base/formatted-string.ts
-type FormattedStringAttributes =  ViewBaseAttributes & {
-    backgroundcolor?: string | Color;
-    color?: string | Color;
-    fontfamily?: string;
-    fontsize?: string | number;
-    fontstyle?: "normal" | "italic";
-    fontweight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
-    spans?: ObservableArray<Span>;
-    textdecoration?: "none" | "underline" | "line-through" | "underline line-through";
-};
-
-// ui/text-base/span.ts
-type SpanAttributes =  ViewBaseAttributes & {
-    backgroundcolor?: string | Color;
-    color?: string | Color;
-    fontfamily?: string;
-    fontsize?: string | number;
-    fontstyle?: "normal" | "italic";
-    fontweight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
-    text?: string;
-    textdecoration?: "none" | "underline" | "line-through" | "underline line-through";
-};
-
 
 declare namespace svelteNative.JSX {
     /* svelte2tsx JSX */
@@ -836,6 +848,7 @@ declare namespace svelteNative.JSX {
         placeholder: PlaceholderAttributes;
         progress: ProgressAttributes;
         proxyviewcontainer: ProxyViewContainerAttributes;
+        repeater: RepeaterAttributes;
         scrollview: ScrollViewAttributes;
         searchbar: SearchBarAttributes;
         segmentedbaritem: SegmentedBarItemAttributes;
@@ -845,6 +858,8 @@ declare namespace svelteNative.JSX {
         tabviewitem: TabViewItemAttributes;
         tabview: TabViewAttributes;
         tabs: TabsAttributes;
+        formattedstring: FormattedStringAttributes;
+        span: SpanAttributes;
         textfield: TextFieldAttributes;
         textview: TextViewAttributes;
         timepicker: TimePickerAttributes;
@@ -861,8 +876,6 @@ declare namespace svelteNative.JSX {
         tabcontentitem: TabContentItemAttributes;
         tabstrip: TabStripAttributes;
         tabstripitem: TabStripItemAttributes;
-        formattedstring: FormattedStringAttributes;
-        span: SpanAttributes;
         [name: string]: { [name: string]: any };
     }
 }

@@ -2,6 +2,7 @@ import { Project, ts, SourceFile, ClassDeclaration, Scope, Type, Node } from 'ts
 import * as path from 'path'
 import * as fs from 'fs'
 import pascalCase from 'uppercamelcase';
+import JSXExporter from './JSXExporter';
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
@@ -10,6 +11,44 @@ const project = new Project({
 });
 
 
+function inheritsFromViewBase(cl: ClassDeclaration): boolean {
+    var parents = getParentClasses(cl);
+    //we must inherit from ViewBase
+    return parents.find(p => p.getName() == "ViewBase") ? true : false;
+}
+
+function isUIClass(cl: ClassDeclaration) {
+    return inheritsFromViewBase(cl) && (!cl.getName()?.endsWith("Base"))
+}
+
+
+function isElementClass(c: ClassDeclaration) {
+    // nativescript can have multiple definitions of a class, one in the .d.ts file and the other in .android/.ios file (or even in -common) file
+    // so as well as ensuring it inherits from viewbase, we should also prefer the ones defined in the .d.ts files where available
+    const fp = c.getSourceFile().getFilePath();
+
+    //only consider files in /ui/*
+    if (! /\/ui\//.test(fp)) return false
+
+    //prefer .d.ts versions where possible (except for formatted-string and span where ts-morph won't load their .d.ts files)
+    const isValidFile = (fp.endsWith('text-base/formatted-string.ts')
+        || fp.endsWith('text-base/span.ts')
+        || path.basename(fp) == `${path.basename(path.dirname(fp))}.d.ts`
+    )
+
+    if (!isValidFile) return false;
+
+    return isUIClass(c);
+}
+
+
+const jsxExporter = new JSXExporter({
+    project,
+    isElementClass: isElementClass
+})
+
+
+/*
 function getUISourceFiles() {
     let ui = project.getSourceFiles()
         .filter(d => /\/ui\//.test(d.getDirectoryPath()))
@@ -31,28 +70,6 @@ function getClasses(sf: SourceFile): ClassDeclaration[] {
     return sf.getClasses()
 }
 
-function getParentClasses(cl: ClassDeclaration): ClassDeclaration[] {
-    var parents = [];
-    var tip: ClassDeclaration | undefined = cl;
-    while (tip) {
-        tip = tip.getBaseClass();
-        if (tip) {
-            parents.push(tip)
-        }
-    }
-    return parents;
-}
-
-function inheritsFromViewBase(cl: ClassDeclaration): boolean {
-    var parents = getParentClasses(cl);
-    //we must inherit from ViewBase
-    return parents.find(p => p.getName() == "ViewBase") ? true : false;
-}
-
-function isUIClass(cl: ClassDeclaration) {
-    return inheritsFromViewBase(cl) && (!cl.getName()?.endsWith("Base"))
-}
-
 function getUIClasses() {
     var uiClasses = [];
     for (var file of getUISourceFiles()) {
@@ -65,6 +82,22 @@ function getUIClasses() {
     }
     return uiClasses;
 }
+
+*/
+function getParentClasses(cl: ClassDeclaration): ClassDeclaration[] {
+    var parents = [];
+    var tip: ClassDeclaration | undefined = cl;
+    while (tip) {
+        tip = tip.getBaseClass();
+        if (tip) {
+            parents.push(tip)
+        }
+    }
+    return parents;
+}
+
+
+
 
 type propertyRegistration = {
     propertyName: string,
@@ -118,7 +151,7 @@ function uiClassDefs() {
 }
 
 
-const uiClasses = getUIClasses()
+const uiClasses = jsxExporter.getElementClasses(); //getUIClasses()
 const classNames = new Set(uiClassDefs().map(u => u.getName()));
 const propertyRegistrations = getPropertyRegistrations().map(x => {
     //The propertie registrations refer to classes from the TS files, but these do not match the ones from the .d.t files.
@@ -275,8 +308,8 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
         }
     }
 
-     //add in setter props
-     for (let s of getClassSetterProperties(c)) {
+    //add in setter props
+    for (let s of getClassSetterProperties(c)) {
         let existing = props.get(s.name);
         if (existing) {
             console.log("patching existing prop ", c.getName(), s.name, existing, '->', s.typeDef)
@@ -303,7 +336,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     for (var r of propertyRegistrationsForClass(className)) {
         props.set(r.name, r.typeDef)
         props.set(
-            eventNameCasing === "camelcase" ? 
+            eventNameCasing === "camelcase" ?
                 'on' + pascalCase(r.name) + "Change" :
                 'on' + r.name.toLowerCase() + "change"
             ,
@@ -317,7 +350,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     if (c.getName() == "ViewBase") {
         let p = props.get("style");
         if (p) {
-            if(omitStyleFromViewBase){
+            if (omitStyleFromViewBase) {
                 props.delete("style");
             } else {
                 props.set("style", (allowStringStyles ? "string | " : "") + p)
@@ -341,7 +374,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
         })
     }
 
-    
+
 
     allProps.sort((a, b) => a.name < b.name ? -1 : 1)
     return allProps;
@@ -375,15 +408,15 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
         return text.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPath: string, importName: string) => {
             let importAlias = importName.replace("[]", "");
             importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
-    
+
             //do we have an alias for this already?
             let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias
-                    && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
-                );
-    
+                && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
+            );
+
             if (existingImportAlias)
                 return importName.replace(importAlias, existingImportAlias?.[0])
-    
+
             //no existing import
             //is our alias free?
             if (imports.get(importAlias)) {
@@ -392,21 +425,21 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
                 imports.set(importAlias, { name: oldAlias, path: importPath });
                 return importName.replace(oldAlias, importAlias);
             }
-    
+
             imports.set(importAlias, { path: importPath, name: importAlias });
-    
+
             return importName;
         });
     }
 
     let replaceGenericImports = (text: string) => {
         return text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
-           return `<${replaceImports(genericType)}>`;
+            return `<${replaceImports(genericType)}>`;
         });
     }
 
 
-    typeText =  replaceImports(replaceGenericImports(typeText));
+    typeText = replaceImports(replaceGenericImports(typeText));
 
 
     //"properties" have a value converter from string, so we need to add the "string" as valid type (if not present)
@@ -483,7 +516,7 @@ ${uiClasses.map(c => getIntrinsicElementDef(c)).map(d => `        ${d}`).join("\
 `
 }
 
-type PropDefsCasing = "lowercase"|"preserve";
+type PropDefsCasing = "lowercase" | "preserve";
 
 interface ClassTypeDefsOptions {
     propDefsCasing: PropDefsCasing,
@@ -491,7 +524,7 @@ interface ClassTypeDefsOptions {
     reExportImports: boolean,
 }
 
-type EventNameCasing = "lowercase"|"camelcase";
+type EventNameCasing = "lowercase" | "camelcase";
 
 interface ClassPropertiesOptions {
     /**
@@ -505,8 +538,8 @@ interface ClassPropertiesOptions {
 interface TypingsOptions extends ClassTypeDefsOptions, ClassPropertiesOptions {
 }
 
-function getFullJSXDef(flavour: "svelte"|"react"): string {
-    if(flavour === "svelte"){
+function getFullJSXDef(flavour: "svelte" | "react"): string {
+    if (flavour === "svelte") {
         const options: TypingsOptions = {
             propDefsCasing: "lowercase",
             eventNameCasing: "camelcase",
@@ -517,7 +550,7 @@ function getFullJSXDef(flavour: "svelte"|"react"): string {
         };
 
         return `${getClassTypeDefs(options)}\n\n${getJSXNamespaceDef()}`
-    } else if(flavour === "react"){
+    } else if (flavour === "react") {
         const options: TypingsOptions = {
             propDefsCasing: "preserve",
             eventNameCasing: "camelcase",
