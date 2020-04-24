@@ -2,7 +2,7 @@ import { Project, ts, SourceFile, ClassDeclaration, Scope, Type, Node } from 'ts
 import * as path from 'path'
 import * as fs from 'fs'
 import pascalCase from 'uppercamelcase';
-import JSXExporter from './JSXExporter';
+import JSXExporter, { getAncestors, includeAncestors, orderBy } from './JSXExporter';
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
@@ -12,7 +12,7 @@ const project = new Project({
 
 
 function inheritsFromViewBase(cl: ClassDeclaration): boolean {
-    var parents = getParentClasses(cl);
+    var parents = getAncestors(cl);//  getParentClasses(cl);
     //we must inherit from ViewBase
     return parents.find(p => p.getName() == "ViewBase") ? true : false;
 }
@@ -84,6 +84,7 @@ function getUIClasses() {
 }
 
 */
+/*
 function getParentClasses(cl: ClassDeclaration): ClassDeclaration[] {
     var parents = [];
     var tip: ClassDeclaration | undefined = cl;
@@ -95,7 +96,7 @@ function getParentClasses(cl: ClassDeclaration): ClassDeclaration[] {
     }
     return parents;
 }
-
+*/
 
 
 
@@ -135,7 +136,7 @@ function getPropertyRegistrations() {
 
     return statements;
 }
-
+/*
 function uiClassDefs() {
     var classes: ClassDeclaration[] = []
     for (var c of uiClasses) {
@@ -149,10 +150,10 @@ function uiClassDefs() {
     }
     return classes;
 }
-
+*/
 
 const uiClasses = jsxExporter.getElementClasses(); //getUIClasses()
-const classNames = new Set(uiClassDefs().map(u => u.getName()));
+const classNames = new Set(includeAncestors(uiClasses).map(u => u.getName()));
 const propertyRegistrations = getPropertyRegistrations().map(x => {
     //The propertie registrations refer to classes from the TS files, but these do not match the ones from the .d.t files.
     //we use the discovered convention that common classes are exposed as "Base" and where some base classes are not exposed
@@ -374,10 +375,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
         })
     }
 
-
-
-    allProps.sort((a, b) => a.name < b.name ? -1 : 1)
-    return allProps;
+    return orderBy(allProps, p => p.name)
 }
 
 type Import = {
@@ -470,7 +468,7 @@ function getAttributesClassName(c: ClassDeclaration) {
 function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): string {
     const { propDefsCasing, exportAttributes } = options;
 
-    var propDefs = getClassProperties(c, options).map(x => classPropDef(x, propDefsCasing));
+    var propDefs = orderBy(getClassProperties(c, options), p => p.name).map(x => classPropDef(x, propDefsCasing));
 
     var baseclass = c.getBaseClass();
     var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\n${exportAttributes ? "export " : ""}type ${getAttributesClassName(c)} =  ${baseclass ? `${getAttributesClassName(baseclass)} & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
@@ -480,9 +478,9 @@ function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): string {
 
 function getClassTypeDefs(options: TypingsOptions) {
     const { reExportImports } = options;
-    let classDefs = uiClassDefs().map(c => getClassTypeDef(c, options));
+    let classDefs = orderBy(includeAncestors(uiClasses), c => getAttributesClassName(c)).map(c => getClassTypeDef(c, options));
 
-    let classImportStatements = [...imports.keys()].map(c => `${reExportImports ? "export " : ""}type ${c} = import("${imports.get(c)?.path}").${imports.get(c)?.name};`).join("\n");
+    let classImportStatements = orderBy([...imports.keys()], i => i).map(c => `${reExportImports ? "export " : ""}type ${c} = import("${imports.get(c)?.path}").${imports.get(c)?.name};`).join("\n");
     let classTypeDefs = classDefs.join("\n\n");
     return `${classImportStatements}\n\n${classTypeDefs}`;
 }
@@ -509,7 +507,7 @@ declare namespace svelteNative.JSX {
     interface Intrinsics {}
 
     interface IntrinsicElements {
-${uiClasses.map(c => getIntrinsicElementDef(c)).map(d => `        ${d}`).join("\n")}
+${orderBy(uiClasses, c => getAttributesClassName(c)).map(c => getIntrinsicElementDef(c)).map(d => `        ${d}`).join("\n")}
         [name: string]: { [name: string]: any };
     }
 }
