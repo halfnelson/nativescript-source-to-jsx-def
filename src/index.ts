@@ -1,4 +1,4 @@
-import { Project, ts, SourceFile, ClassDeclaration, Scope, Type, Node } from 'ts-morph'
+import { Project, ts, ClassDeclaration, Scope, Type, Node } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 import pascalCase from 'uppercamelcase';
@@ -168,12 +168,12 @@ const propertyRegistrations = getPropertyRegistrations().map(x => {
 
 type ClassProp = {
     name: string,
-    typeDef: TypeDef,
+    typeDef: TypeResolver,
 }
 
 
 function propertyRegistrationsForClass(c: string): ClassProp[] {
-    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, typeDef: getTypeDef(r.propertyType, r.propertyNode, true) }))
+    return propertyRegistrations.filter(r => r.targetClassName == c).map(r => ({ name: r.propertyName, typeDef: getTypeResolver(r.propertyType, r.propertyNode, true) }))
 }
 
 
@@ -232,7 +232,7 @@ function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
             var propname = "on" + pascalCase(eventParam.getType().getText().replace(/"/g, ""));
             props.push({
                 name: propname,
-                typeDef: getTypeDef(callbackParam.getType(), callbackParam),
+                typeDef: getTypeResolver(callbackParam.getType(), callbackParam),
             })
         }
 
@@ -245,10 +245,10 @@ function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
                 let expectedEventDataTypeName = gesture == "tap" ? "DoubleTapGestureEventData" : pascalCase(gesture) + "GestureEventData";
                 let eventType = gestureSource.getInterface(expectedEventDataTypeName) || defaultEventType;
 
-                let eventTypeDef = getTypeDef(eventType.getType(), eventType);
+                let eventTypeDef = getTypeResolver(eventType.getType(), eventType);
                 props.push({
                     name: name,
-                    typeDef: AugmentResolvedTypeString(eventTypeDef, d => `(arg: ${d}) => any`)
+                    typeDef: AlterResolvedTypeDef(eventTypeDef, d => `(arg: ${d}) => any`)
                 })
             }
         }
@@ -282,7 +282,7 @@ function getClassSetterProperties(c: ClassDeclaration): ClassProp[] {
                             if (equal.getText() == "=" && Node.isPropertyAccessExpression(propAccess) && Node.isIdentifier(right)) {
                                 if (right.getText() == setterArg) {
                                     if (propAccess.getExpression().getType().getText().endsWith("Style")) {
-                                        let newType = getTypeDef(setter.getType(), setter, true);
+                                        let newType = getTypeResolver(setter.getType(), setter, true);
                                         setterProps.push({
                                             name: setterName,
                                             typeDef: newType
@@ -303,10 +303,10 @@ function getClassSetterProperties(c: ClassDeclaration): ClassProp[] {
 function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions): ClassProp[] {
     const { eventNameCasing, allowStringStyles, omitStyleFromViewBase } = options;
 
-    var props: Map<string, TypeDef> = new Map()
+    var props: Map<string, TypeResolver> = new Map()
     for (var p of c.getInstanceProperties()) {
         if (p.getScope() == Scope.Public && !p.getName().startsWith("_") && !p.getName().endsWith("Protected")) {
-            props.set(p.getName(), getTypeDef(p.getType(), p));
+            props.set(p.getName(), getTypeResolver(p.getType(), p));
         }
     }
 
@@ -314,10 +314,10 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     for (let s of getClassSetterProperties(c)) {
         let existing = props.get(s.name);
         if (existing) {
-            console.log("patching existing prop ", c.getName(), s.name, existing, '->', s.typeDef)
+         //   console.log("patching existing prop ", c.getName(), s.name, existing, '->', s.typeDef)
             props.set(s.name, s.typeDef);
         } else {
-            console.log("adding  prop ", c.getName(), s.name, s.typeDef)
+         //   console.log("adding  prop ", c.getName(), s.name, s.typeDef)
             props.set(name, s.typeDef)
         }
     }
@@ -367,7 +367,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
                 'on' + pascalCase(r.name) + "Change" :
                 'on' + r.name.toLowerCase() + "change"
             ,
-            AugmentResolvedTypeString(getTypeDef(propertyChangeDataType.getType()), d => `(args: ${d}) => void`)
+            AlterResolvedTypeDef(getTypeResolver(propertyChangeDataType.getType()), d => `(args: ${d}) => void`)
         )
     }
 
@@ -380,7 +380,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
             if (omitStyleFromViewBase) {
                 props.delete("style");
             } else {
-                props.set("style", allowStringStyles ? AugmentResolvedTypeString(p, d => `string | ${d}`) : p)
+                props.set("style", allowStringStyles ? AlterResolvedTypeDef(p, d => `string | ${d}`) : p)
             }
         }
     }
@@ -388,7 +388,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     if (c.getName() == "Label") {
         let p = props.get("textWrap");
         if (p) {
-            props.set("textWrap", AugmentResolvedTypeString(p, d => `string | ${d}`))
+            props.set("textWrap", AlterResolvedTypeDef(p, d => `string | ${d}`))
         }
     }
 
@@ -411,16 +411,16 @@ type Import = {
 
 type ImportMap = Map<string, Import>;
 
-type ResolvedTypeDef = {
+type TypeDefinition = {
     def: string,
     imports: ImportMap
 }
 
-type TypeDef = {
-    resolve: (existingImports: ImportMap) => ResolvedTypeDef
+type TypeResolver = {
+    resolve: (existingImports: ImportMap) => TypeDefinition
 }
 
-function AugmentResolvedTypeString(t: TypeDef, augFn: (def: string) => string): TypeDef {
+function AlterResolvedTypeDef(t: TypeResolver, augFn: (def: string) => string): TypeResolver {
     return {
         resolve: imp => { let resolved = t.resolve(imp); resolved.def = augFn(resolved.def); return resolved }
     }
@@ -430,46 +430,58 @@ function combinedMap<K, V>(a: Map<K, V>, b: Map<K, V>): Map<K, V> {
     return new Map([...a.entries()].concat([...b.entries()]))
 }
 
-function getTypeDef(t: Type, node?: Node, isProperty?: boolean): TypeDef {
-    var typeText: string
 
-    if (t.isClassOrInterface() || t.isArray() || t.isObject() || !node) {
-        typeText = t.getText();
-    } else {
-        //expand union types in-place instead of using includes, to keep the definition file easier to read
-        if (t.isUnion()) {
-            let utDefs = t.getUnionTypes().map(ut => AugmentResolvedTypeString(getTypeDef(ut), d => d.includes('=>') ? `(${d})` : d));
+function resolveTypesUsing<T>(existingImports: ImportMap, action: (resolveFn: (def: TypeResolver) => string) => T): { imports: ImportMap, result: T } {
+    let imports: ImportMap = new Map();
 
-            let typeDef: TypeDef = {
-                resolve: (existingImports) => {
-                    let newImports: ImportMap = new Map();
-                    let utDefStrs: string[] = [];
-                    for (var utDef of utDefs) {
-                        let resolved = utDef.resolve(combinedMap(existingImports, newImports));
-                        newImports = combinedMap(newImports, resolved.imports);
-                        utDefStrs.push(resolved.def)
-                    }
-                    return {
-                        def: utDefStrs.join(" | "),
-                        imports: newImports
-                    }
-                }
-            }
+    let resolveFn = (typeDef: TypeResolver) => {
+        let resolved = typeDef.resolve(combinedMap(existingImports, imports));
+        imports = combinedMap(imports, resolved.imports);
+        return resolved.def
+    }
+    let result = action(resolveFn)
+    return { imports, result };
+}
 
-            if (isProperty && t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString())) {
-                typeDef = AugmentResolvedTypeString(typeDef, d => `string | ${d}`);
-            }
-            return typeDef;
-        } else {
-            typeText = t.getText(node, ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation)
+
+function createTypeResolver(resolveFn: (existingImports: ImportMap) => TypeDefinition) {
+    return {
+        resolve: resolveFn
+    }
+}
+
+
+function getTypeResolver(t: Type, node?: Node, isProperty: boolean = false, dereferenceUnionTypes = true): TypeResolver {
+
+    //expand union types in-place instead of using imports, to keep the definition file easier to read
+    if (dereferenceUnionTypes && t.isUnion()) {
+        let utDefs = t.getUnionTypes()
+            .map(ut => getTypeResolver(ut, undefined, false, false))
+            .map(ut => AlterResolvedTypeDef(ut, d => d.includes('=>') ? `(${d})` : d));
+
+        let unionTypeResolver = createTypeResolver((existingImports) => {
+            let { imports, result: def } = resolveTypesUsing(existingImports, resolve => utDefs.map(resolve).join(" | "));
+            return { def, imports }
+        });
+
+        if (isProperty && t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString())) {
+            unionTypeResolver = AlterResolvedTypeDef(unionTypeResolver, d => `string | ${d}`);
         }
+
+        return unionTypeResolver;
+    }
+
+    // Create a resolver
+    let defWithUnresolvedImports: string;
+    if (t.isClassOrInterface() || t.isArray() || t.isObject() || !node) {
+        defWithUnresolvedImports = t.getText();
+    } else {
+        defWithUnresolvedImports = t.getText(node, ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation);
     }
 
     //"properties" have a value converter from string, so we need to add the "string" as valid type (if not present)
-    if (isProperty) {
-        if (!t.isString() && !t.isStringLiteral()) {
-            typeText = "string | " + typeText;
-        }
+    if (isProperty && !t.isString() && !t.isStringLiteral()) {
+        defWithUnresolvedImports = `string | ${defWithUnresolvedImports}`;
     }
 
 
@@ -481,65 +493,52 @@ function getTypeDef(t: Type, node?: Node, isProperty?: boolean): TypeDef {
 
 
 
-    let resolveImports = (text: string, existingImports: ImportMap): ResolvedTypeDef => {
-        let newImports: ImportMap = new Map();
-        let def = text.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPath: string, importExpression: string) => {
+    let resolveImports = (text: string, existingImports: ImportMap): TypeDefinition => {
+        let imports: ImportMap = new Map();
+
+        //Recursively replace imports inside generic type specifiers
+        let def = text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
+            let replaced = resolveImports(genericType, combinedMap(existingImports, imports))
+            imports = combinedMap(imports, replaced.imports)
+            return `<${replaced.def}>`;
+        });
+
+        //replace the remaining 
+        def = def.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPathMatch: string, importExpression: string) => {
             let importName = importExpression.replace("[]", "");
-            importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
+            let importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPathMatch)).replace(/\\/g, '/');
 
-            //do we have an alias for this already?
-            let existingImportAlias = [...existingImports.entries()].find(e => e[1].name == importName
-                && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
-            );
-
+            let combinedImports = combinedMap(existingImports, imports);
+            let existingImportAlias = [...combinedImports.entries()].find(([_,imp]) => (imp.name == importName && imp.path == importPath))
+            
             if (existingImportAlias)
                 return importExpression.replace(importName, existingImportAlias?.[0])
 
-            //no existing import alias
-
+            //no existing import alias, create one
             let importAlias = importName;
 
-            //is our alias free?
-            if (existingImports.get(importName)) {
+            //is our alias unique?
+            if (combinedImports.get(importName)) {
                 //create a new alias
-                importAlias = createAliasForClash(combinedMap(existingImports, newImports), importPath, importName);
-                newImports.set(importAlias, { name: importName, path: importPath });
+                importAlias = createAliasForClash(imports, importPath, importName);
+                imports.set(importAlias, { name: importName, path: importPath });
                 return importExpression.replace(importName, importAlias);
             }
 
             //use name as alias
-            newImports.set(importAlias, { path: importPath, name: importName });
+            imports.set(importAlias, { path: importPath, name: importName });
             return importExpression;
         });
 
         return {
-            imports: newImports,
+            imports: imports,
             def: def
         }
     }
-
-    let resolveGenericImports = (text: string, existingImports: ImportMap): ResolvedTypeDef => {
-        let newImports: ImportMap = new Map();
-        let def = text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
-            let replaced = resolveImports(genericType, combinedMap(existingImports, newImports))
-            newImports = combinedMap(newImports, replaced.imports)
-            return `<${replaced.def}>`;
-        });
-        return {
-            imports: newImports,
-            def: def
-        }
-    }
-
 
     return {
         resolve: (existingImports: ImportMap) => {
-            let genType = resolveGenericImports(typeText, existingImports);
-            let regularType = resolveImports(genType.def, combinedMap(existingImports, genType.imports))
-            return {
-                def: regularType.def,
-                imports: combinedMap(genType.imports, regularType.imports)
-            }
+            return resolveImports(defWithUnresolvedImports, existingImports);
         }
     }
 }
@@ -552,7 +551,7 @@ function getAttributesClassName(c: ClassDeclaration) {
     return `${c.getName()}Attributes`
 }
 
-function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): TypeDef {
+function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): TypeResolver {
     return {
         resolve: (existingImports) => {
             const { propDefsCasing, exportAttributes } = options;
