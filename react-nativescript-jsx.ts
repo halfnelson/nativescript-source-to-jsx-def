@@ -43,7 +43,6 @@ type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core/ui/s
 type SelectedIndexChangedEventData = import("@nativescript/core/ui/bottom-navigation/bottom-navigation").SelectedIndexChangedEventData;
 type ShownModallyData = import("@nativescript/core/ui/core/view/view").ShownModallyData;
 type Span = import("@nativescript/core/ui/text-base/span").Span;
-type Style = import("@nativescript/core/ui/styling/style/style").Style;
 type SwipeGestureEventData = import("@nativescript/core/ui/gestures/gestures").SwipeGestureEventData;
 type TabContentItem = import("@nativescript/core/ui/tab-navigation-base/tab-content-item/tab-content-item").TabContentItem;
 type TabNavigationBaseSelectedIndexChangedEventData = import("@nativescript/core/ui/tab-navigation-base/tab-navigation-base/tab-navigation-base").SelectedIndexChangedEventData;
@@ -56,7 +55,6 @@ type Template = import("@nativescript/core/ui/core/view/view").Template;
 type TouchGestureEventData = import("@nativescript/core/ui/gestures/gestures").TouchGestureEventData;
 type View = import("@nativescript/core/ui/core/view/view").View;
 type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBase;
-type ViewCommon = import("@nativescript/core/ui/core/view/view-common").ViewCommon;
 type iOSFrame = import("@nativescript/core/ui/frame/frame").iOSFrame;
 
 // ui/layouts/absolute-layout/absolute-layout.d.ts

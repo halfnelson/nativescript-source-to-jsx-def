@@ -56,7 +56,6 @@ type Template = import("@nativescript/core/ui/core/view/view").Template;
 type TouchGestureEventData = import("@nativescript/core/ui/gestures/gestures").TouchGestureEventData;
 type View = import("@nativescript/core/ui/core/view/view").View;
 type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBase;
-type ViewCommon = import("@nativescript/core/ui/core/view/view-common").ViewCommon;
 type iOSFrame = import("@nativescript/core/ui/frame/frame").iOSFrame;
 
 // ui/layouts/absolute-layout/absolute-layout.d.ts

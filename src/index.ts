@@ -168,7 +168,7 @@ const propertyRegistrations = getPropertyRegistrations().map(x => {
 
 type ClassProp = {
     name: string,
-    typeDef: string,
+    typeDef: TypeDef,
 }
 
 
@@ -180,7 +180,7 @@ function propertyRegistrationsForClass(c: string): ClassProp[] {
 // some of the .d.ts files neglect to mention some properties so we will inspect the base class
 function getPropertiesFromSkippedParent(c: ClassDeclaration, options: ClassPropertiesOptions): ClassProp[] {
 
-     // patch missing properties if we have skipped a base class in our .d.ts file
+    // patch missing properties if we have skipped a base class in our .d.ts file
     let currentFile = c.getSourceFile().getFilePath();
     if (!currentFile.endsWith(".d.ts")) return []
     let declaredBaseClass = c.getBaseClass();
@@ -245,9 +245,10 @@ function getSyntheticEventHandlers(c: ClassDeclaration): ClassProp[] {
                 let expectedEventDataTypeName = gesture == "tap" ? "DoubleTapGestureEventData" : pascalCase(gesture) + "GestureEventData";
                 let eventType = gestureSource.getInterface(expectedEventDataTypeName) || defaultEventType;
 
+                let eventTypeDef = getTypeDef(eventType.getType(), eventType);
                 props.push({
                     name: name,
-                    typeDef: `(arg: ${getTypeDef(eventType.getType(), eventType)}) => any`
+                    typeDef: AugmentResolvedTypeString(eventTypeDef, d => `(arg: ${d}) => any`)
                 })
             }
         }
@@ -302,7 +303,7 @@ function getClassSetterProperties(c: ClassDeclaration): ClassProp[] {
 function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions): ClassProp[] {
     const { eventNameCasing, allowStringStyles, omitStyleFromViewBase } = options;
 
-    var props: Map<string, string> = new Map()
+    var props: Map<string, TypeDef> = new Map()
     for (var p of c.getInstanceProperties()) {
         if (p.getScope() == Scope.Public && !p.getName().startsWith("_") && !p.getName().endsWith("Protected")) {
             props.set(p.getName(), getTypeDef(p.getType(), p));
@@ -326,8 +327,33 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     }
 
     for (var s of getPropertiesFromSkippedParent(c, options)) {
-        if (s.typeDef != 'ViewCommon') {
+        // if (s.typeDef.resolve(new Map()).def != 'ViewCommon') {
+        const parentDef = s;
+        let existingDef = props.get(s.name);
+        if (!existingDef) {
             props.set(s.name, s.typeDef)
+        } else {
+            //when updating we want to keep the imports from the .d.ts file if they clash with the ones from viewcommon.
+            props.set(s.name, {
+                resolve: (existingImports: ImportMap) => {
+                    let mainClassImports = existingDef!.resolve(existingImports);
+                    let skippedParentImports = parentDef.typeDef.resolve(existingImports);
+                    if (skippedParentImports.def == "ViewCommon") {
+                        return mainClassImports;
+                    }
+                    for (let skippedParentImport of skippedParentImports.imports.entries()) {
+                        let [alias, importDef] = skippedParentImport;
+                        // we need to search by import name since the clashed alias generator might be non-deterministic
+                        // there is still a chance of clash if the property imports properties of the same name as part of union
+                        let matchingMainImport = [...mainClassImports.imports.values()].find(v => v.name == importDef.name)
+                        if (matchingMainImport) {
+                            skippedParentImports.imports.set(alias, matchingMainImport)
+                        }
+                    }
+                    //return the def from the skipped parent but with the imports overridden by those from the main class
+                    return skippedParentImports;
+                }
+            });
         }
     }
 
@@ -341,7 +367,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
                 'on' + pascalCase(r.name) + "Change" :
                 'on' + r.name.toLowerCase() + "change"
             ,
-            `(args: ${getTypeDef(propertyChangeDataType.getType())}) => void`
+            AugmentResolvedTypeString(getTypeDef(propertyChangeDataType.getType()), d => `(args: ${d}) => void`)
         )
     }
 
@@ -354,7 +380,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
             if (omitStyleFromViewBase) {
                 props.delete("style");
             } else {
-                props.set("style", (allowStringStyles ? "string | " : "") + p)
+                props.set("style", allowStringStyles ? AugmentResolvedTypeString(p, d => `string | ${d}`) : p)
             }
         }
     }
@@ -362,7 +388,7 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     if (c.getName() == "Label") {
         let p = props.get("textWrap");
         if (p) {
-            props.set("textWrap", "string | " + p)
+            props.set("textWrap", AugmentResolvedTypeString(p, d => `string | ${d}`))
         }
     }
 
@@ -383,105 +409,189 @@ type Import = {
     name: string
 }
 
-let imports = new Map<string, Import>();
+type ImportMap = Map<string, Import>;
 
-function getTypeDef(t: Type, node?: Node, isProperty?: boolean): string {
-    var typeText
+type ResolvedTypeDef = {
+    def: string,
+    imports: ImportMap
+}
+
+type TypeDef = {
+    resolve: (existingImports: ImportMap) => ResolvedTypeDef
+}
+
+function AugmentResolvedTypeString(t: TypeDef, augFn: (def: string) => string): TypeDef {
+    return {
+        resolve: imp => { let resolved = t.resolve(imp); resolved.def = augFn(resolved.def); return resolved }
+    }
+}
+
+function combinedMap<K, V>(a: Map<K, V>, b: Map<K, V>): Map<K, V> {
+    return new Map([...a.entries()].concat([...b.entries()]))
+}
+
+function getTypeDef(t: Type, node?: Node, isProperty?: boolean): TypeDef {
+    var typeText: string
 
     if (t.isClassOrInterface() || t.isArray() || t.isObject() || !node) {
         typeText = t.getText();
     } else {
         //expand union types in-place instead of using includes, to keep the definition file easier to read
         if (t.isUnion()) {
-            typeText = t.getUnionTypes()
-                .map(ut => getTypeDef(ut))
-                .map(i => i.includes('=>') ? `(${i})` : i) //arrow functions should be wrapped in braces when in union literal
-                .join(" | ");
+            let utDefs = t.getUnionTypes().map(ut => AugmentResolvedTypeString(getTypeDef(ut), d => d.includes('=>') ? `(${d})` : d));
+
+            let typeDef: TypeDef = {
+                resolve: (existingImports) => {
+                    let newImports: ImportMap = new Map();
+                    let utDefStrs: string[] = [];
+                    for (var utDef of utDefs) {
+                        let resolved = utDef.resolve(combinedMap(existingImports, newImports));
+                        newImports = combinedMap(newImports, resolved.imports);
+                        utDefStrs.push(resolved.def)
+                    }
+                    return {
+                        def: utDefStrs.join(" | "),
+                        imports: newImports
+                    }
+                }
+            }
+
+            if (isProperty && t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString())) {
+                typeDef = AugmentResolvedTypeString(typeDef, d => `string | ${d}`);
+            }
+            return typeDef;
         } else {
             typeText = t.getText(node, ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation)
         }
     }
 
-    let replaceImports = (text: string) => {
-        return text.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPath: string, importName: string) => {
-            let importAlias = importName.replace("[]", "");
-            importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
-
-            //do we have an alias for this already?
-            let existingImportAlias = [...imports.entries()].find(e => e[1].name == importAlias
-                && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
-            );
-
-            if (existingImportAlias)
-                return importName.replace(importAlias, existingImportAlias?.[0])
-
-            //no existing import
-            //is our alias free?
-            if (imports.get(importAlias)) {
-                let oldAlias = importAlias;
-                importAlias = pascalCase(path.basename(importPath)) + importAlias;
-                imports.set(importAlias, { name: oldAlias, path: importPath });
-                return importName.replace(oldAlias, importAlias);
-            }
-
-            imports.set(importAlias, { path: importPath, name: importAlias });
-
-            return importName;
-        });
-    }
-
-    let replaceGenericImports = (text: string) => {
-        return text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
-            return `<${replaceImports(genericType)}>`;
-        });
-    }
-
-
-    typeText = replaceImports(replaceGenericImports(typeText));
-
-
     //"properties" have a value converter from string, so we need to add the "string" as valid type (if not present)
     if (isProperty) {
-        if (t.isUnion()) {
-            if (t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString())) {
-                typeText = "string | " + typeText
-            }
-        } else {
-            if (!t.isString() && !t.isStringLiteral()) {
-                typeText = "string | " + typeText;
-            }
+        if (!t.isString() && !t.isStringLiteral()) {
+            typeText = "string | " + typeText;
         }
     }
 
 
-    return typeText
+
+    function createAliasForClash(existingImports: ImportMap, importPath: string, importName: string): string {
+        //TODO Check existing imports for clash and add a digit or something
+        return pascalCase(path.basename(importPath)) + importName;
+    }
+
+
+
+    let resolveImports = (text: string, existingImports: ImportMap): ResolvedTypeDef => {
+        let newImports: ImportMap = new Map();
+        let def = text.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPath: string, importExpression: string) => {
+            let importName = importExpression.replace("[]", "");
+            importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPath)).replace(/\\/g, '/');
+
+            //do we have an alias for this already?
+            let existingImportAlias = [...existingImports.entries()].find(e => e[1].name == importName
+                && (e[1].path == importPath || e[1].path == path.dirname(importPath) || importPath == path.dirname(e[1].path) || path.dirname(importPath) == path.dirname(e[1].path))
+            );
+
+            if (existingImportAlias)
+                return importExpression.replace(importName, existingImportAlias?.[0])
+
+            //no existing import alias
+
+            let importAlias = importName;
+
+            //is our alias free?
+            if (existingImports.get(importName)) {
+                //create a new alias
+                importAlias = createAliasForClash(combinedMap(existingImports, newImports), importPath, importName);
+                newImports.set(importAlias, { name: importName, path: importPath });
+                return importExpression.replace(importName, importAlias);
+            }
+
+            //use name as alias
+            newImports.set(importAlias, { path: importPath, name: importName });
+            return importExpression;
+        });
+
+        return {
+            imports: newImports,
+            def: def
+        }
+    }
+
+    let resolveGenericImports = (text: string, existingImports: ImportMap): ResolvedTypeDef => {
+        let newImports: ImportMap = new Map();
+        let def = text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
+            let replaced = resolveImports(genericType, combinedMap(existingImports, newImports))
+            newImports = combinedMap(newImports, replaced.imports)
+            return `<${replaced.def}>`;
+        });
+        return {
+            imports: newImports,
+            def: def
+        }
+    }
+
+
+    return {
+        resolve: (existingImports: ImportMap) => {
+            let genType = resolveGenericImports(typeText, existingImports);
+            let regularType = resolveImports(genType.def, combinedMap(existingImports, genType.imports))
+            return {
+                def: regularType.def,
+                imports: combinedMap(genType.imports, regularType.imports)
+            }
+        }
+    }
 }
 
-function classPropDef(t: ClassProp, casing: PropDefsCasing): string {
-    return `${casing === "lowercase" ? t.name.toLowerCase() : t.name}?: ${t.typeDef};`
+function formatClassPropDef(name: string, def: string, casing: PropDefsCasing): string {
+    return `${casing === "lowercase" ? name.toLowerCase() : name}?: ${def};`
 }
 
 function getAttributesClassName(c: ClassDeclaration) {
     return `${c.getName()}Attributes`
 }
 
-function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): string {
-    const { propDefsCasing, exportAttributes } = options;
+function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): TypeDef {
+    return {
+        resolve: (existingImports) => {
+            const { propDefsCasing, exportAttributes } = options;
+            let newImports: ImportMap = new Map();
 
-    var propDefs = orderBy(getClassProperties(c, options), p => p.name).map(x => classPropDef(x, propDefsCasing));
+            var propDefs: string[] = []
+            for (var prop of orderBy(getClassProperties(c, options), p => p.name)) {
+                let resolvedTypeDef = prop.typeDef.resolve(combinedMap(existingImports, newImports));
+                newImports = combinedMap(newImports, resolvedTypeDef.imports);
+                propDefs.push(formatClassPropDef(prop.name, resolvedTypeDef.def, propDefsCasing))
+            }
 
-    var baseclass = c.getBaseClass();
-    var classDef = `// ${path.relative(nativescriptSourcePath, c.getSourceFile().getFilePath()).replace(/\\/g, "/")}\n${exportAttributes ? "export " : ""}type ${getAttributesClassName(c)} =  ${baseclass ? `${getAttributesClassName(baseclass)} & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
-    return classDef;
+            var baseclass = c.getBaseClass();
+            var classDef = ` ${baseclass ? `${getAttributesClassName(baseclass)} & ` : ''}{\n${propDefs.map(d => "    " + d).join("\n")}\n};`;
+            return {
+                def: classDef,
+                imports: newImports
+            }
+        }
+    }
 }
 
 
-function getClassTypeDefs(options: TypingsOptions) {
-    const { reExportImports } = options;
-    let classDefs = orderBy(includeAncestors(uiClasses), c => getAttributesClassName(c)).map(c => getClassTypeDef(c, options));
+function getClassDefs(options: TypingsOptions) {
+    const { reExportImports, exportAttributes } = options;
 
-    let classImportStatements = orderBy([...imports.keys()], i => i).map(c => `${reExportImports ? "export " : ""}type ${c} = import("${imports.get(c)?.path}").${imports.get(c)?.name};`).join("\n");
+    let existingImports: ImportMap = new Map();
+    let classDefs: string[] = [];
+
+    for (let cl of orderBy(includeAncestors(uiClasses), c => getAttributesClassName(c))) {
+        let alias = `// ${path.relative(nativescriptSourcePath, cl.getSourceFile().getFilePath()).replace(/\\/g, "/")}\n${exportAttributes ? "export " : ""}type ${getAttributesClassName(cl)}`;
+        let classDef = getClassTypeDef(cl, options).resolve(existingImports);
+        existingImports = combinedMap(existingImports, classDef.imports);
+        classDefs.push(`${alias} = ${classDef.def}`)
+    }
+
+    let classImportStatements = orderBy([...existingImports.keys()], i => i).map(c => `${reExportImports ? "export " : ""}type ${c} = import("${existingImports.get(c)?.path}").${existingImports.get(c)?.name};`).join("\n");
     let classTypeDefs = classDefs.join("\n\n");
+
     return `${classImportStatements}\n\n${classTypeDefs}`;
 }
 
@@ -547,7 +657,7 @@ function getFullJSXDef(flavour: "svelte" | "react"): string {
             omitStyleFromViewBase: false,
         };
 
-        return `${getClassTypeDefs(options)}\n\n${getJSXNamespaceDef()}`
+        return `${getClassDefs(options)}\n\n${getJSXNamespaceDef()}`
     } else if (flavour === "react") {
         const options: TypingsOptions = {
             propDefsCasing: "preserve",
@@ -558,7 +668,7 @@ function getFullJSXDef(flavour: "svelte" | "react"): string {
             omitStyleFromViewBase: true,
         };
 
-        return `${getClassTypeDefs(options)}`
+        return `${getClassDefs(options)}`
     }
 
     throw Error(`Unknown flavour of NativeScript, ${flavour}`);
