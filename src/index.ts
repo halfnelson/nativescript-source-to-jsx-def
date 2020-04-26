@@ -2,7 +2,7 @@ import { Project, ts, ClassDeclaration, Scope, Type, Node } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 import pascalCase from 'uppercamelcase';
-import JSXExporter, { getAncestors, includeAncestors, orderBy } from './JSXExporter';
+import JSXExporter, { getAncestors, includeAncestors, orderBy, ImportMap, TypeDefinitionWithImports, TypeResolver, ClassProp, JSXDocument, ImportAlias, AttributeClassDefinition, AttributeClassPropDefinition } from './JSXExporter';
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
@@ -166,10 +166,6 @@ const propertyRegistrations = getPropertyRegistrations().map(x => {
     }
 })
 
-type ClassProp = {
-    name: string,
-    typeDef: TypeResolver,
-}
 
 
 function propertyRegistrationsForClass(c: string): ClassProp[] {
@@ -314,10 +310,10 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     for (let s of getClassSetterProperties(c)) {
         let existing = props.get(s.name);
         if (existing) {
-         //   console.log("patching existing prop ", c.getName(), s.name, existing, '->', s.typeDef)
+            //   console.log("patching existing prop ", c.getName(), s.name, existing, '->', s.typeDef)
             props.set(s.name, s.typeDef);
         } else {
-         //   console.log("adding  prop ", c.getName(), s.name, s.typeDef)
+            //   console.log("adding  prop ", c.getName(), s.name, s.typeDef)
             props.set(name, s.typeDef)
         }
     }
@@ -335,9 +331,9 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
         } else {
             //when updating we want to keep the imports from the .d.ts file if they clash with the ones from viewcommon.
             props.set(s.name, {
-                resolve: (existingImports: ImportMap) => {
-                    let mainClassImports = existingDef!.resolve(existingImports);
-                    let skippedParentImports = parentDef.typeDef.resolve(existingImports);
+                resolveImports: (existingImports: ImportMap) => {
+                    let mainClassImports = existingDef!.resolveImports(existingImports);
+                    let skippedParentImports = parentDef.typeDef.resolveImports(existingImports);
                     if (skippedParentImports.def == "ViewCommon") {
                         return mainClassImports;
                     }
@@ -404,25 +400,13 @@ function getClassProperties(c: ClassDeclaration, options: ClassPropertiesOptions
     return orderBy(allProps, p => p.name)
 }
 
-type Import = {
-    path: string,
-    name: string
-}
 
-type ImportMap = Map<string, Import>;
 
-type TypeDefinition = {
-    def: string,
-    imports: ImportMap
-}
 
-type TypeResolver = {
-    resolve: (existingImports: ImportMap) => TypeDefinition
-}
 
 function AlterResolvedTypeDef(t: TypeResolver, augFn: (def: string) => string): TypeResolver {
     return {
-        resolve: imp => { let resolved = t.resolve(imp); resolved.def = augFn(resolved.def); return resolved }
+        resolveImports: imp => { let resolved = t.resolveImports(imp); resolved.def = augFn(resolved.def); return resolved }
     }
 }
 
@@ -435,7 +419,7 @@ function resolveTypesUsing<T>(existingImports: ImportMap, action: (resolveFn: (d
     let imports: ImportMap = new Map();
 
     let resolveFn = (typeDef: TypeResolver) => {
-        let resolved = typeDef.resolve(combinedMap(existingImports, imports));
+        let resolved = typeDef.resolveImports(combinedMap(existingImports, imports));
         imports = combinedMap(imports, resolved.imports);
         return resolved.def
     }
@@ -444,12 +428,62 @@ function resolveTypesUsing<T>(existingImports: ImportMap, action: (resolveFn: (d
 }
 
 
-function createTypeResolver(resolveFn: (existingImports: ImportMap) => TypeDefinition) {
+function createTypeResolver(resolveFn: (existingImports: ImportMap) => TypeDefinitionWithImports): TypeResolver {
     return {
-        resolve: resolveFn
+        resolveImports: resolveFn
     }
 }
 
+function createAliasForClash(existingImports: ImportMap, importPath: string, importName: string): string {
+    //TODO Check existing imports for clash and add a digit or something
+    return pascalCase(path.basename(importPath)) + importName;
+}
+
+
+
+
+let resolveImports = (text: string, existingImports: ImportMap): TypeDefinitionWithImports => {
+    let imports: ImportMap = new Map();
+
+    //Recursively replace imports inside generic type specifiers
+    let def = text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
+        let replaced = resolveImports(genericType, combinedMap(existingImports, imports))
+        imports = combinedMap(imports, replaced.imports)
+        return `<${replaced.def}>`;
+    });
+
+    //replace the remaining 
+    def = def.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPathMatch: string, importExpression: string) => {
+        let importName = importExpression.replace("[]", "");
+        let importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPathMatch)).replace(/\\/g, '/');
+
+        let combinedImports = combinedMap(existingImports, imports);
+        let existingImportAlias = [...combinedImports.entries()].find(([_, imp]) => (imp.name == importName && imp.path == importPath))
+
+        if (existingImportAlias)
+            return importExpression.replace(importName, existingImportAlias?.[0])
+
+        //no existing import alias, create one
+        let importAlias = importName;
+
+        //is our alias unique?
+        if (combinedImports.get(importName)) {
+            //create a new alias
+            importAlias = createAliasForClash(imports, importPath, importName);
+            imports.set(importAlias, { name: importName, path: importPath });
+            return importExpression.replace(importName, importAlias);
+        }
+
+        //use name as alias
+        imports.set(importAlias, { path: importPath, name: importName });
+        return importExpression;
+    });
+
+    return {
+        imports: imports,
+        def: def
+    }
+}
 
 function getTypeResolver(t: Type, node?: Node, isProperty: boolean = false, dereferenceUnionTypes = true): TypeResolver {
 
@@ -484,60 +518,8 @@ function getTypeResolver(t: Type, node?: Node, isProperty: boolean = false, dere
         defWithUnresolvedImports = `string | ${defWithUnresolvedImports}`;
     }
 
-
-
-    function createAliasForClash(existingImports: ImportMap, importPath: string, importName: string): string {
-        //TODO Check existing imports for clash and add a digit or something
-        return pascalCase(path.basename(importPath)) + importName;
-    }
-
-
-
-    let resolveImports = (text: string, existingImports: ImportMap): TypeDefinition => {
-        let imports: ImportMap = new Map();
-
-        //Recursively replace imports inside generic type specifiers
-        let def = text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
-            let replaced = resolveImports(genericType, combinedMap(existingImports, imports))
-            imports = combinedMap(imports, replaced.imports)
-            return `<${replaced.def}>`;
-        });
-
-        //replace the remaining 
-        def = def.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPathMatch: string, importExpression: string) => {
-            let importName = importExpression.replace("[]", "");
-            let importPath = ('@nativescript/core/' + path.relative(nativescriptSourcePath, importPathMatch)).replace(/\\/g, '/');
-
-            let combinedImports = combinedMap(existingImports, imports);
-            let existingImportAlias = [...combinedImports.entries()].find(([_,imp]) => (imp.name == importName && imp.path == importPath))
-            
-            if (existingImportAlias)
-                return importExpression.replace(importName, existingImportAlias?.[0])
-
-            //no existing import alias, create one
-            let importAlias = importName;
-
-            //is our alias unique?
-            if (combinedImports.get(importName)) {
-                //create a new alias
-                importAlias = createAliasForClash(imports, importPath, importName);
-                imports.set(importAlias, { name: importName, path: importPath });
-                return importExpression.replace(importName, importAlias);
-            }
-
-            //use name as alias
-            imports.set(importAlias, { path: importPath, name: importName });
-            return importExpression;
-        });
-
-        return {
-            imports: imports,
-            def: def
-        }
-    }
-
     return {
-        resolve: (existingImports: ImportMap) => {
+        resolveImports: (existingImports: ImportMap) => {
             return resolveImports(defWithUnresolvedImports, existingImports);
         }
     }
@@ -553,13 +535,13 @@ function getAttributesClassName(c: ClassDeclaration) {
 
 function getClassTypeDef(c: ClassDeclaration, options: TypingsOptions): TypeResolver {
     return {
-        resolve: (existingImports) => {
+        resolveImports: (existingImports) => {
             const { propDefsCasing, exportAttributes } = options;
             let newImports: ImportMap = new Map();
 
             var propDefs: string[] = []
             for (var prop of orderBy(getClassProperties(c, options), p => p.name)) {
-                let resolvedTypeDef = prop.typeDef.resolve(combinedMap(existingImports, newImports));
+                let resolvedTypeDef = prop.typeDef.resolveImports(combinedMap(existingImports, newImports));
                 newImports = combinedMap(newImports, resolvedTypeDef.imports);
                 propDefs.push(formatClassPropDef(prop.name, resolvedTypeDef.def, propDefsCasing))
             }
@@ -583,7 +565,7 @@ function getClassDefs(options: TypingsOptions) {
 
     for (let cl of orderBy(includeAncestors(uiClasses), c => getAttributesClassName(c))) {
         let alias = `// ${path.relative(nativescriptSourcePath, cl.getSourceFile().getFilePath()).replace(/\\/g, "/")}\n${exportAttributes ? "export " : ""}type ${getAttributesClassName(cl)}`;
-        let classDef = getClassTypeDef(cl, options).resolve(existingImports);
+        let classDef = getClassTypeDef(cl, options).resolveImports(existingImports);
         existingImports = combinedMap(existingImports, classDef.imports);
         classDefs.push(`${alias} = ${classDef.def}`)
     }
@@ -593,6 +575,8 @@ function getClassDefs(options: TypingsOptions) {
 
     return `${classImportStatements}\n\n${classTypeDefs}`;
 }
+
+
 
 
 function getIntrinsicElementDef(classDec: ClassDeclaration): string {
@@ -674,11 +658,36 @@ function getFullJSXDef(flavour: "svelte" | "react"): string {
 }
 
 
-fs.writeFileSync("./sveltenative-jsx.d.ts", getFullJSXDef("svelte"));
-fs.writeFileSync("./react-nativescript-jsx.ts", getFullJSXDef("react"));
+//fs.writeFileSync("./sveltenative-jsx.d.ts", getFullJSXDef("svelte"));
+//fs.writeFileSync("./react-nativescript-jsx.ts", getFullJSXDef("react"));
 
 
 
 //console.log(getUISourceFiles().map(s => s.getFilePath()).join("\n"));
 
+let jsxDoc = jsxExporter.buildJSXDocument();
+//console.log(jsxDoc);
 
+function renderImport({ alias, path, name }: ImportAlias) {
+    return `type ${alias} = import('${path}').${name};`
+}
+
+function renderImports(imports: ImportAlias[]): string {
+    return imports.map(renderImport).join("\n");
+}
+
+function renderPropertyDefintion(propDefinition: AttributeClassPropDefinition): string {
+    return `    ${propDefinition.name}: ${propDefinition.type};`
+}
+
+function renderClass(classDefinition: AttributeClassDefinition): string {
+    let propDefs = orderBy(classDefinition.props, x => x.name).map(renderPropertyDefintion);
+    return `type ${classDefinition.className} = ${classDefinition.parentClasses.map(x => x.className).join(" & ")} & {\n${propDefs.join("\n")}\n};`;
+}
+
+function renderClasses(classDefinitions: AttributeClassDefinition[]): string {
+    return jsxDoc.classDefinitions.map(renderClass).join("\n\n");
+}
+
+console.log(renderImports(jsxDoc.imports));
+console.log(renderClasses(jsxDoc.attributeClasses));
