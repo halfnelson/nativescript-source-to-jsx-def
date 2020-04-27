@@ -4,6 +4,7 @@ type AndroidActionBarSettings = import("@nativescript/core/ui/action-bar/action-
 type AndroidActionItemSettings = import("@nativescript/core/ui/action-bar/action-bar").AndroidActionItemSettings;
 type AndroidFrame = import("@nativescript/core/ui/frame/frame").AndroidFrame;
 type BackstackEntry = import("@nativescript/core/ui/frame/frame").BackstackEntry;
+type BottomNavigationSelectedIndexChangedEventData = import("@nativescript/core/ui/bottom-navigation/bottom-navigation").SelectedIndexChangedEventData;
 type Color = import("@nativescript/core/color/color").Color;
 type CreateViewEventData = import("@nativescript/core/ui/placeholder/placeholder").CreateViewEventData;
 type DOMNode = import("@nativescript/core/debugger/dom-node").DOMNode;
@@ -40,12 +41,12 @@ type RotationGestureEventData = import("@nativescript/core/ui/gestures/gestures"
 type ScrollEventData = import("@nativescript/core/ui/scroll-view/scroll-view").ScrollEventData;
 type SegmentedBarItem = import("@nativescript/core/ui/segmented-bar/segmented-bar").SegmentedBarItem;
 type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core/ui/segmented-bar/segmented-bar").SelectedIndexChangedEventData;
-type SelectedIndexChangedEventData = import("@nativescript/core/ui/bottom-navigation/bottom-navigation").SelectedIndexChangedEventData;
+type SelectedIndexChangedEventData = import("@nativescript/core/ui/tab-navigation-base/tab-navigation-base/tab-navigation-base").SelectedIndexChangedEventData;
 type ShownModallyData = import("@nativescript/core/ui/core/view/view").ShownModallyData;
 type Span = import("@nativescript/core/ui/text-base/span").Span;
+type Style = import("@nativescript/core/ui/styling/style/style").Style;
 type SwipeGestureEventData = import("@nativescript/core/ui/gestures/gestures").SwipeGestureEventData;
 type TabContentItem = import("@nativescript/core/ui/tab-navigation-base/tab-content-item/tab-content-item").TabContentItem;
-type TabNavigationBaseSelectedIndexChangedEventData = import("@nativescript/core/ui/tab-navigation-base/tab-navigation-base/tab-navigation-base").SelectedIndexChangedEventData;
 type TabStrip = import("@nativescript/core/ui/tab-navigation-base/tab-strip/tab-strip").TabStrip;
 type TabStripItem = import("@nativescript/core/ui/tab-navigation-base/tab-strip-item/tab-strip-item").TabStripItem;
 type TabStripItemEventData = import("@nativescript/core/ui/tab-navigation-base/tab-strip/tab-strip").TabStripItemEventData;
@@ -58,12 +59,12 @@ type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBas
 type iOSFrame = import("@nativescript/core/ui/frame/frame").iOSFrame;
 
 // ui/layouts/absolute-layout/absolute-layout.d.ts
-export type AbsoluteLayoutAttributes =  LayoutBaseAttributes & {
+export type AbsoluteLayoutAttributes = LayoutBaseAttributes & {
 
 };
 
 // ui/action-bar/action-bar.d.ts
-export type ActionBarAttributes =  ViewAttributes & {
+export type ActionBarAttributes = ViewAttributes & {
     actionItems?: ActionItems;
     android?: AndroidActionBarSettings;
     androidContentInset?: string | number | LengthDipUnit | LengthPxUnit;
@@ -83,7 +84,7 @@ export type ActionBarAttributes =  ViewAttributes & {
 };
 
 // ui/action-bar/action-bar.d.ts
-export type ActionItemAttributes =  ViewBaseAttributes & {
+export type ActionItemAttributes = ViewBaseAttributes & {
     actionBar?: ActionBar;
     actionView?: View;
     android?: AndroidActionItemSettings;
@@ -98,7 +99,7 @@ export type ActionItemAttributes =  ViewBaseAttributes & {
 };
 
 // ui/activity-indicator/activity-indicator.d.ts
-export type ActivityIndicatorAttributes =  ViewAttributes & {
+export type ActivityIndicatorAttributes = ViewAttributes & {
     android?: any;
     busy?: string | false | true;
     ios?: any;
@@ -106,22 +107,22 @@ export type ActivityIndicatorAttributes =  ViewAttributes & {
 };
 
 // ui/border/border.d.ts
-export type BorderAttributes =  ContentViewAttributes & {
+export type BorderAttributes = ContentViewAttributes & {
     cornerRadius?: number;
 };
 
 // ui/bottom-navigation/bottom-navigation.d.ts
-export type BottomNavigationAttributes =  TabNavigationBaseAttributes & {
+export type BottomNavigationAttributes = TabNavigationBaseAttributes & {
     android?: any;
     ios?: any;
     items?: TabContentItem[];
-    onSelectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
+    onSelectedIndexChanged?: (args: BottomNavigationSelectedIndexChangedEventData) => void;
     selectedIndex?: number;
     tabStrip?: TabStrip;
 };
 
 // ui/button/button.d.ts
-export type ButtonAttributes =  TextBaseAttributes & {
+export type ButtonAttributes = TextBaseAttributes & {
     android?: any;
     ios?: any;
     onTap?: (args: EventData) => void;
@@ -129,23 +130,23 @@ export type ButtonAttributes =  TextBaseAttributes & {
 };
 
 // ui/core/view/view.d.ts
-export type ContainerViewAttributes =  ViewAttributes & {
+export type ContainerViewAttributes = ViewAttributes & {
     iosOverflowSafeArea?: false | true;
 };
 
 // ui/content-view/content-view.d.ts
-export type ContentViewAttributes =  ViewAttributes & {
+export type ContentViewAttributes = ViewAttributes & {
     content?: View;
     layoutView?: View;
 };
 
 // ui/core/view/view.d.ts
-export type CustomLayoutViewAttributes =  ContainerViewAttributes & {
+export type CustomLayoutViewAttributes = ContainerViewAttributes & {
 
 };
 
 // ui/date-picker/date-picker.d.ts
-export type DatePickerAttributes =  ViewAttributes & {
+export type DatePickerAttributes = ViewAttributes & {
     android?: any;
     date?: string | Date;
     day?: string | number;
@@ -163,13 +164,13 @@ export type DatePickerAttributes =  ViewAttributes & {
 };
 
 // ui/layouts/dock-layout/dock-layout.d.ts
-export type DockLayoutAttributes =  LayoutBaseAttributes & {
+export type DockLayoutAttributes = LayoutBaseAttributes & {
     onStretchLastChildChange?: (args: PropertyChangeData) => void;
     stretchLastChild?: string | false | true;
 };
 
 // ui/editable-text-base/editable-text-base.d.ts
-export type EditableTextBaseAttributes =  TextBaseAttributes & {
+export type EditableTextBaseAttributes = TextBaseAttributes & {
     autocapitalizationType?: "none" | "words" | "sentences" | "allcharacters";
     autocorrect?: string | false | true;
     editable?: string | false | true;
@@ -191,7 +192,7 @@ export type EditableTextBaseAttributes =  TextBaseAttributes & {
 };
 
 // ui/layouts/flexbox-layout/flexbox-layout.d.ts
-export type FlexboxLayoutAttributes =  LayoutBaseAttributes & {
+export type FlexboxLayoutAttributes = LayoutBaseAttributes & {
     alignContent?: "flex-start" | "flex-end" | "center" | "stretch" | "space-between" | "space-around";
     alignItems?: "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
     flexDirection?: "row" | "column" | "row-reverse" | "column-reverse";
@@ -200,7 +201,7 @@ export type FlexboxLayoutAttributes =  LayoutBaseAttributes & {
 };
 
 // ui/text-base/formatted-string.ts
-export type FormattedStringAttributes =  ViewBaseAttributes & {
+export type FormattedStringAttributes = ViewBaseAttributes & {
     backgroundColor?: string | Color;
     color?: string | Color;
     fontFamily?: string;
@@ -212,7 +213,7 @@ export type FormattedStringAttributes =  ViewBaseAttributes & {
 };
 
 // ui/frame/frame.d.ts
-export type FrameAttributes =  ViewAttributes & {
+export type FrameAttributes = ViewAttributes & {
     actionBarVisibility?: "always" | "never" | "auto";
     android?: AndroidFrame;
     animated?: false | true;
@@ -228,13 +229,13 @@ export type FrameAttributes =  ViewAttributes & {
 };
 
 // ui/layouts/grid-layout/grid-layout.d.ts
-export type GridLayoutAttributes =  LayoutBaseAttributes & {
+export type GridLayoutAttributes = LayoutBaseAttributes & {
     columns?: string;
     rows?: string;
 };
 
 // ui/html-view/html-view.d.ts
-export type HtmlViewAttributes =  ViewAttributes & {
+export type HtmlViewAttributes = ViewAttributes & {
     android?: any;
     html?: string;
     ios?: any;
@@ -242,7 +243,7 @@ export type HtmlViewAttributes =  ViewAttributes & {
 };
 
 // ui/image/image.d.ts
-export type ImageAttributes =  ViewAttributes & {
+export type ImageAttributes = ViewAttributes & {
     android?: any;
     decodeHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     decodeWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -263,14 +264,14 @@ export type ImageAttributes =  ViewAttributes & {
 };
 
 // ui/label/label.d.ts
-export type LabelAttributes =  TextBaseAttributes & {
+export type LabelAttributes = TextBaseAttributes & {
     android?: any;
     ios?: any;
     textWrap?: string | false | true;
 };
 
 // ui/layouts/layout-base.d.ts
-export type LayoutBaseAttributes =  CustomLayoutViewAttributes & {
+export type LayoutBaseAttributes = CustomLayoutViewAttributes & {
     clipToBounds?: string | false | true;
     isPassThroughParentEnabled?: string | false | true;
     onClipToBoundsChange?: (args: PropertyChangeData) => void;
@@ -283,7 +284,7 @@ export type LayoutBaseAttributes =  CustomLayoutViewAttributes & {
 };
 
 // ui/list-picker/list-picker.d.ts
-export type ListPickerAttributes =  ViewAttributes & {
+export type ListPickerAttributes = ViewAttributes & {
     android?: any;
     ios?: any;
     isItemsSource?: false | true;
@@ -300,7 +301,7 @@ export type ListPickerAttributes =  ViewAttributes & {
 };
 
 // ui/list-view/list-view.d.ts
-export type ListViewAttributes =  ViewAttributes & {
+export type ListViewAttributes = ViewAttributes & {
     android?: any;
     ios?: any;
     iosEstimatedRowHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -322,17 +323,17 @@ export type ListViewAttributes =  ViewAttributes & {
 };
 
 // ui/action-bar/action-bar.d.ts
-export type NavigationButtonAttributes =  ActionItemAttributes & {
+export type NavigationButtonAttributes = ActionItemAttributes & {
 
 };
 
 // data/observable/observable.d.ts
-export type ObservableAttributes =  {
+export type ObservableAttributes = {
     onPropertyChange?: (data: EventData) => void;
 };
 
 // ui/page/page.d.ts
-export type PageAttributes =  ContentViewAttributes & {
+export type PageAttributes = ContentViewAttributes & {
     actionBar?: ActionBar;
     actionBarHidden?: string | false | true;
     androidStatusBarBackground?: string | Color;
@@ -353,12 +354,12 @@ export type PageAttributes =  ContentViewAttributes & {
 };
 
 // ui/placeholder/placeholder.d.ts
-export type PlaceholderAttributes =  ViewAttributes & {
+export type PlaceholderAttributes = ViewAttributes & {
     onCreatingView?: (args: CreateViewEventData) => void;
 };
 
 // ui/progress/progress.d.ts
-export type ProgressAttributes =  ViewAttributes & {
+export type ProgressAttributes = ViewAttributes & {
     android?: any;
     ios?: any;
     maxValue?: string | number;
@@ -368,13 +369,13 @@ export type ProgressAttributes =  ViewAttributes & {
 };
 
 // ui/proxy-view-container/proxy-view-container.d.ts
-export type ProxyViewContainerAttributes =  LayoutBaseAttributes & {
+export type ProxyViewContainerAttributes = LayoutBaseAttributes & {
     onProxyChange?: (args: PropertyChangeData) => void;
     proxy?: string;
 };
 
 // ui/repeater/repeater.d.ts
-export type RepeaterAttributes =  CustomLayoutViewAttributes & {
+export type RepeaterAttributes = CustomLayoutViewAttributes & {
     itemTemplate?: string | Template;
     items?: string | any[] | RepeaterItemsSource;
     itemsLayout?: string | LayoutBase;
@@ -384,7 +385,7 @@ export type RepeaterAttributes =  CustomLayoutViewAttributes & {
 };
 
 // ui/scroll-view/scroll-view.d.ts
-export type ScrollViewAttributes =  ContentViewAttributes & {
+export type ScrollViewAttributes = ContentViewAttributes & {
     horizontalOffset?: number;
     isScrollEnabled?: string | false | true;
     onIsScrollEnabledChange?: (args: PropertyChangeData) => void;
@@ -399,7 +400,7 @@ export type ScrollViewAttributes =  ContentViewAttributes & {
 };
 
 // ui/search-bar/search-bar.d.ts
-export type SearchBarAttributes =  ViewAttributes & {
+export type SearchBarAttributes = ViewAttributes & {
     android?: any;
     hint?: string;
     ios?: any;
@@ -415,7 +416,7 @@ export type SearchBarAttributes =  ViewAttributes & {
 };
 
 // ui/segmented-bar/segmented-bar.d.ts
-export type SegmentedBarAttributes =  ViewAttributes & {
+export type SegmentedBarAttributes = ViewAttributes & {
     items?: string | SegmentedBarItem[];
     onItemsChange?: (args: PropertyChangeData) => void;
     onSelectedIndexChange?: (args: PropertyChangeData) => void;
@@ -425,12 +426,12 @@ export type SegmentedBarAttributes =  ViewAttributes & {
 };
 
 // ui/segmented-bar/segmented-bar.d.ts
-export type SegmentedBarItemAttributes =  ViewBaseAttributes & {
+export type SegmentedBarItemAttributes = ViewBaseAttributes & {
     title?: string;
 };
 
 // ui/slider/slider.d.ts
-export type SliderAttributes =  ViewAttributes & {
+export type SliderAttributes = ViewAttributes & {
     android?: any;
     ios?: any;
     maxValue?: string | number;
@@ -442,7 +443,7 @@ export type SliderAttributes =  ViewAttributes & {
 };
 
 // ui/text-base/span.ts
-export type SpanAttributes =  ViewBaseAttributes & {
+export type SpanAttributes = ViewBaseAttributes & {
     backgroundColor?: string | Color;
     color?: string | Color;
     fontFamily?: string;
@@ -454,13 +455,13 @@ export type SpanAttributes =  ViewBaseAttributes & {
 };
 
 // ui/layouts/stack-layout/stack-layout.d.ts
-export type StackLayoutAttributes =  LayoutBaseAttributes & {
+export type StackLayoutAttributes = LayoutBaseAttributes & {
     onOrientationChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
 };
 
 // ui/switch/switch.d.ts
-export type SwitchAttributes =  ViewAttributes & {
+export type SwitchAttributes = ViewAttributes & {
     android?: any;
     checked?: string | false | true;
     ios?: any;
@@ -470,25 +471,25 @@ export type SwitchAttributes =  ViewAttributes & {
 };
 
 // ui/tab-navigation-base/tab-content-item/tab-content-item.d.ts
-export type TabContentItemAttributes =  ContentViewAttributes & {
+export type TabContentItemAttributes = ContentViewAttributes & {
     canBeLoaded?: false | true;
 };
 
 // ui/tab-navigation-base/tab-navigation-base/tab-navigation-base.d.ts
-export type TabNavigationBaseAttributes =  ViewAttributes & {
+export type TabNavigationBaseAttributes = ViewAttributes & {
     android?: any;
     ios?: any;
     items?: string | TabContentItem[];
     onItemsChange?: (args: PropertyChangeData) => void;
     onSelectedIndexChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: TabNavigationBaseSelectedIndexChangedEventData) => void;
+    onSelectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
     onTabStripChange?: (args: PropertyChangeData) => void;
     selectedIndex?: string | number;
     tabStrip?: string | TabStrip;
 };
 
 // ui/tab-navigation-base/tab-strip/tab-strip.d.ts
-export type TabStripAttributes =  ViewAttributes & {
+export type TabStripAttributes = ViewAttributes & {
     highlightColor?: string | Color;
     iosIconRenderingMode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
     isIconSizeFixed?: string | false | true;
@@ -505,7 +506,7 @@ export type TabStripAttributes =  ViewAttributes & {
 };
 
 // ui/tab-navigation-base/tab-strip-item/tab-strip-item.d.ts
-export type TabStripItemAttributes =  ViewAttributes & {
+export type TabStripItemAttributes = ViewAttributes & {
     iconClass?: string;
     iconSource?: string;
     image?: Image;
@@ -515,7 +516,7 @@ export type TabStripItemAttributes =  ViewAttributes & {
 };
 
 // ui/tab-view/tab-view.d.ts
-export type TabViewAttributes =  ViewAttributes & {
+export type TabViewAttributes = ViewAttributes & {
     android?: any;
     androidOffscreenTabLimit?: string | number;
     androidSelectedTabHighlightColor?: string | Color;
@@ -539,7 +540,7 @@ export type TabViewAttributes =  ViewAttributes & {
 };
 
 // ui/tab-view/tab-view.d.ts
-export type TabViewItemAttributes =  ViewBaseAttributes & {
+export type TabViewItemAttributes = ViewBaseAttributes & {
     canBeLoaded?: false | true;
     iconSource?: string;
     textTransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
@@ -548,7 +549,7 @@ export type TabViewItemAttributes =  ViewBaseAttributes & {
 };
 
 // ui/tabs/tabs.d.ts
-export type TabsAttributes =  TabNavigationBaseAttributes & {
+export type TabsAttributes = TabNavigationBaseAttributes & {
     android?: any;
     iOSTabBarItemsAlignment?: "center" | "leading" | "justified" | "centerSelected";
     ios?: any;
@@ -556,7 +557,7 @@ export type TabsAttributes =  TabNavigationBaseAttributes & {
     offscreenTabLimit?: string | number;
     onIOsTabBarItemsAlignmentChange?: (args: PropertyChangeData) => void;
     onOffscreenTabLimitChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: TabNavigationBaseSelectedIndexChangedEventData) => void;
+    onSelectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
     onSwipeEnabledChange?: (args: PropertyChangeData) => void;
     onTabsPositionChange?: (args: PropertyChangeData) => void;
     selectedIndex?: number;
@@ -566,7 +567,7 @@ export type TabsAttributes =  TabNavigationBaseAttributes & {
 };
 
 // ui/text-base/text-base.d.ts
-export type TextBaseAttributes =  ViewAttributes & {
+export type TextBaseAttributes = ViewAttributes & {
     fontFamily?: string;
     fontSize?: string | number;
     fontStyle?: "normal" | "italic";
@@ -585,11 +586,11 @@ export type TextBaseAttributes =  ViewAttributes & {
     textAlignment?: "left" | "right" | "center" | "initial";
     textDecoration?: "none" | "underline" | "line-through" | "underline line-through";
     textTransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
-    whiteSpace?: "initial" | "nowrap" | "normal";
+    whiteSpace?: "initial" | "normal" | "nowrap";
 };
 
 // ui/text-field/text-field.d.ts
-export type TextFieldAttributes =  EditableTextBaseAttributes & {
+export type TextFieldAttributes = EditableTextBaseAttributes & {
     android?: any;
     ios?: any;
     onSecureChange?: (args: PropertyChangeData) => void;
@@ -597,14 +598,14 @@ export type TextFieldAttributes =  EditableTextBaseAttributes & {
 };
 
 // ui/text-view/text-view.d.ts
-export type TextViewAttributes =  EditableTextBaseAttributes & {
+export type TextViewAttributes = EditableTextBaseAttributes & {
     android?: any;
     ios?: any;
     maxLines?: number;
 };
 
 // ui/time-picker/time-picker.d.ts
-export type TimePickerAttributes =  ViewAttributes & {
+export type TimePickerAttributes = ViewAttributes & {
     android?: any;
     hour?: string | number;
     ios?: any;
@@ -626,7 +627,7 @@ export type TimePickerAttributes =  ViewAttributes & {
 };
 
 // ui/core/view/view.d.ts
-export type ViewAttributes =  ViewBaseAttributes & {
+export type ViewAttributes = ViewBaseAttributes & {
     android?: any;
     androidDynamicElevationOffset?: string | number;
     androidElevation?: string | number;
@@ -664,12 +665,12 @@ export type ViewAttributes =  ViewBaseAttributes & {
     height?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
     horizontalAlignment?: "left" | "right" | "center" | "stretch";
     ios?: any;
-    iosOverflowSafeArea?: false | true;
-    iosOverflowSafeAreaEnabled?: false | true;
-    isEnabled?: false | true;
+    iosOverflowSafeArea?: string | false | true;
+    iosOverflowSafeAreaEnabled?: string | false | true;
+    isEnabled?: string | false | true;
     isLayoutRequired?: false | true;
     isLayoutValid?: false | true;
-    isUserInteractionEnabled?: false | true;
+    isUserInteractionEnabled?: string | false | true;
     left?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     margin?: string | number | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
     marginBottom?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
@@ -680,13 +681,20 @@ export type ViewAttributes =  ViewBaseAttributes & {
     minWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     modal?: View;
     onAndroidBackPressed?: (args: EventData) => void;
+    onAutomationTextChange?: (args: PropertyChangeData) => void;
     onColumnChange?: (args: PropertyChangeData) => void;
     onColumnSpanChange?: (args: PropertyChangeData) => void;
     onDockChange?: (args: PropertyChangeData) => void;
     onDoubleTap?: (arg: DoubleTapGestureEventData) => any;
+    onIosOverflowSafeAreaChange?: (args: PropertyChangeData) => void;
+    onIosOverflowSafeAreaEnabledChange?: (args: PropertyChangeData) => void;
+    onIsEnabledChange?: (args: PropertyChangeData) => void;
+    onIsUserInteractionEnabledChange?: (args: PropertyChangeData) => void;
     onLeftChange?: (args: PropertyChangeData) => void;
     onLoaded?: (args: EventData) => void;
     onLongPress?: (arg: GestureEventData) => any;
+    onOriginXChange?: (args: PropertyChangeData) => void;
+    onOriginYChange?: (args: PropertyChangeData) => void;
     onPan?: (arg: PanGestureEventData) => any;
     onPinch?: (arg: PinchGestureEventData) => any;
     onRotation?: (arg: RotationGestureEventData) => any;
@@ -700,8 +708,8 @@ export type ViewAttributes =  ViewBaseAttributes & {
     onTouch?: (arg: TouchGestureEventData) => any;
     onUnloaded?: (args: EventData) => void;
     opacity?: string | number;
-    originX?: number;
-    originY?: number;
+    originX?: string | number;
+    originY?: string | number;
     perspective?: string | number;
     rotate?: string | number;
     rotateX?: string | number;
@@ -720,10 +728,9 @@ export type ViewAttributes =  ViewBaseAttributes & {
 };
 
 // ui/core/view-base/view-base.d.ts
-export type ViewBaseAttributes =  ObservableAttributes & {
+export type ViewBaseAttributes = ObservableAttributes & {
     alignSelf?: "auto" | "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
     android?: any;
-    automationText?: string;
     bindingContext?: string | any;
     className?: string;
     col?: number;
@@ -757,27 +764,14 @@ export type ViewBaseAttributes =  ObservableAttributes & {
     flexWrapBefore?: false | true;
     id?: string;
     ios?: any;
-    iosOverflowSafeArea?: string | false | true;
-    iosOverflowSafeAreaEnabled?: string | false | true;
     isCollapsed?: false | true;
-    isEnabled?: string | false | true;
     isLoaded?: false | true;
-    isUserInteractionEnabled?: string | false | true;
     left?: number | "auto" | LengthDipUnit | LengthPxUnit;
     nativeView?: any;
-    onAutomationTextChange?: (args: PropertyChangeData) => void;
     onBindingContextChange?: (args: PropertyChangeData) => void;
     onClassNameChange?: (args: PropertyChangeData) => void;
     onIdChange?: (args: PropertyChangeData) => void;
-    onIosOverflowSafeAreaChange?: (args: PropertyChangeData) => void;
-    onIosOverflowSafeAreaEnabledChange?: (args: PropertyChangeData) => void;
-    onIsEnabledChange?: (args: PropertyChangeData) => void;
-    onIsUserInteractionEnabledChange?: (args: PropertyChangeData) => void;
-    onOriginXChange?: (args: PropertyChangeData) => void;
-    onOriginYChange?: (args: PropertyChangeData) => void;
     order?: number;
-    originX?: string | number;
-    originY?: string | number;
     page?: Page;
     parent?: ViewBase;
     parentNode?: ViewBase;
@@ -790,7 +784,7 @@ export type ViewBaseAttributes =  ObservableAttributes & {
 };
 
 // ui/web-view/web-view.d.ts
-export type WebViewAttributes =  ViewAttributes & {
+export type WebViewAttributes = ViewAttributes & {
     android?: any;
     canGoBack?: false | true;
     canGoForward?: false | true;
@@ -801,7 +795,7 @@ export type WebViewAttributes =  ViewAttributes & {
 };
 
 // ui/layouts/wrap-layout/wrap-layout.d.ts
-export type WrapLayoutAttributes =  LayoutBaseAttributes & {
+export type WrapLayoutAttributes = LayoutBaseAttributes & {
     effectiveItemHeight?: number;
     effectiveItemWidth?: number;
     itemHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -811,3 +805,6 @@ export type WrapLayoutAttributes =  LayoutBaseAttributes & {
     onOrientationChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
 };
+
+
+

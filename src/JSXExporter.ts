@@ -1,4 +1,4 @@
-import { Project, ClassDeclaration, ts, Node, Scope, Type } from "ts-morph";
+import { ClassDeclaration, ts, Node, Scope, Type, SourceFile } from "ts-morph";
 import pascalCase from 'uppercamelcase';
 import path from "path";
 
@@ -34,21 +34,11 @@ export function includeAncestors(classes: ClassDeclaration[]): ClassDeclaration[
 }
 
 
-type ClassDefinitionFilterContext = {
+export type ClassDefinitionBuilderContext = {
     classType: ClassDeclaration,
     className: string,
     parentClasses: AttributeClassDefinition[],
-    props: Map<string, PropType>,
-    getTypeDefinition(t: Type, node?: Node, dereferenceUnionTypes?: boolean): PropType
-}
-
-export type ClassDefinitionFilter = (context: ClassDefinitionFilterContext) => void;
-
-interface JSXExporterConfig {
-    project: Project;
-    isElementClass: (classDecl: ClassDeclaration) => boolean;
-    classDefinitionFilters?: ClassDefinitionFilter[]
-    documentFilters?: ((context: JSXDocumentBuilderContext) => void)[]
+    props: Map<string, AttributeClassPropDefinition>
 }
 
 export type PropType = string
@@ -65,13 +55,21 @@ export type ClassProp = {
 export type AttributeClassPropDefinition = {
     name: string,
     type: PropType,
+    meta: {
+        sourceFile: string,
+        derivedFrom: string | "InstanceProperty"
+        [index: string]: any
+    }
 }
-
 
 export type AttributeClassDefinition = {
     className: string,
     parentClasses: AttributeClassDefinition[],
-    props: AttributeClassPropDefinition[]
+    props: AttributeClassPropDefinition[],
+    meta: {
+        sourceFile: string,
+        [index: string]: any
+    }
 }
 
 export type TypeDefinitionWithImports = {
@@ -90,96 +88,32 @@ export type ImportAlias = {
     name: string
 }
 
+export type IntrinsicElementDefinition = {
+    name: string,
+    attributeClass: AttributeClassDefinition
+}
+
 export type JSXDocument = {
     imports: ImportAlias[],
-    classDefinitions: AttributeClassDefinition[]
-    attributeClasses: AttributeClassDefinition[]
+    classDefinitions: AttributeClassDefinition[],
+    instrinsicElements: IntrinsicElementDefinition[]
 }
 
-type JSXDocumentBuilderContext = {
+export type JSXDocumentBuilderContext = {
+    elementClassDeclarations: ClassDeclaration[],
     imports: ImportMap,
     classDefinitions: Map<string, AttributeClassDefinition>
-    attributeClasses: Set<AttributeClassDefinition>
+    intrinsicElements: Map<string, IntrinsicElementDefinition>
 }
 
-type ClassBuilderContext = {
+export type ClassBuilderContext = {
     uiClasses: ClassDeclaration[],
     classDefinitions: Map<string, AttributeClassDefinition>
 }
 
-function combinedMap<K, V>(a: Map<K, V>, b: Map<K, V>): Map<K, V> {
-    return new Map([...a.entries()].concat([...b.entries()]))
-}
-
-function createAliasForClash(existingImports: ImportMap, importPath: string, importName: string): string {
-    //TODO Check existing imports for clash and add a digit or something
-    return pascalCase(path.basename(importPath)) + importName;
-}
-
-
-
-function resolveImports(text: string, imports: ImportMap): string {
-
-    //Recursively replace imports inside generic type specifiers
-    let def = text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
-        let replaced = resolveImports(genericType, imports)
-        return `<${replaced}>`;
-    });
-
-    //replace the remaining 
-    def = def.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPathMatch: string, importExpression: string) => {
-        let importName = importExpression.replace("[]", "");
-        let importPath = importPathMatch; //('@nativescript/core/' + path.relative(nativescriptSourcePath, importPathMatch)).replace(/\\/g, '/');
-
-        let existingImportAlias = Array.from(imports).find(([_, imp]) => (imp.name == importName && imp.path == importPath))
-
-        if (existingImportAlias)
-            return importExpression.replace(importName, existingImportAlias?.[0])
-
-        //no existing import alias, create one
-        let importAlias = importName;
-
-        //is our alias unique?
-        if (imports.get(importName)) {
-            //create a new alias
-            importAlias = createAliasForClash(imports, importPath, importName);
-            imports.set(importAlias, { name: importName, path: importPath });
-            return importExpression.replace(importName, importAlias);
-        }
-
-        //use name as alias
-        imports.set(importAlias, { path: importPath, name: importName });
-        return importExpression;
-    });
-
-    return def
-}
-
-
-
-export type ImportMap = Map<string, Import>;
-
+export type ImportMap = Map<string, ImportAlias>;
 
 export default class JSXExporter {
-
-    config: JSXExporterConfig;
-
-    constructor(config: JSXExporterConfig) {
-        this.config = config;
-    }
-
-    getElementClasses() {
-        var uiClasses = [];
-        for (var file of this.config.project.getSourceFiles()) {
-            let classes = file.getClasses();
-            for (var classDef of classes) {
-                if (this.config.isElementClass(classDef)) {
-                    uiClasses.push(classDef);
-                }
-            }
-        }
-        return uiClasses;
-    }
 
     getAttributeClassName(c: ClassDeclaration) {
         return pascalCase(c.getName()!) + "Attributes"
@@ -203,66 +137,134 @@ export default class JSXExporter {
         }
     }
 
-    instancePropsClassDefinitionFilter(context: ClassDefinitionFilterContext) {
+
+    createAliasForImport(imports: ImportMap, importPath: string, importName: string): string {
+        let alias = importName;
+
+        if (!imports.get(alias)) {
+            return alias;
+        }
+
+        // first try prefix with parent module
+        alias = pascalCase(path.basename(importPath)) + importName;
+
+        // if we still clash, we will just start adding numbers
+        let i = 1;
+        let baseAlias = alias;
+
+        while (imports.get(alias)) {
+            alias = baseAlias + `_${i}`;
+            i = i + 1;
+        } 
+
+        return alias;
+    }
+
+    addImportsFromTypeDefinition(text: string, imports: ImportMap): string {
+
+        //Recursively replace imports inside generic type specifiers
+        let def = text.replace(/<(.*?)>/g, (match: string, genericType: string) => {
+            let replaced = this.addImportsFromTypeDefinition(genericType, imports)
+            return `<${replaced}>`;
+        });
+
+        //replace the remaining 
+        def = def.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPath: string, importExpression: string) => {
+            let importName = importExpression.replace("[]", "");
+
+            let existingImportAlias = Array.from(imports).find(([_, imp]) => (imp.name == importName && imp.path == importPath))
+
+            if (existingImportAlias)
+                return importExpression.replace(importName, existingImportAlias?.[0])
+
+            //no existing import alias, create one
+            let importAlias = this.createAliasForImport(imports, importPath, importName);
+            imports.set(importAlias, { alias: importAlias, name: importName, path: importPath });
+            
+            return importExpression.replace(importName, importAlias);
+        });
+
+        return def
+    }
+
+
+    addinstancePropsClassDefinitions(context: ClassDefinitionBuilderContext) {
         for (var p of context.classType.getInstanceProperties()) {
             if (p.getScope() == Scope.Public && !p.getName().startsWith("_")) {
-                context.props.set(p.getName(), context.getTypeDefinition(p.getType(), p));
+                let prop: AttributeClassPropDefinition = {
+                    name: p.getName(),
+                    type: this.getTypeDefinition(p.getType(), p),
+                    meta: {
+                        sourceFile: p.getSourceFile().getFilePath(),
+                        derivedFrom: "InstanceProperty"
+                    }
+                }
+                context.props.set(p.getName(), prop);
             }
         }
     }
 
+    addPropDefintions(context: ClassDefinitionBuilderContext) {
+        this.addinstancePropsClassDefinitions(context);
+    }
+
     buildAttributeClassDefinition(c: ClassDeclaration, context: ClassBuilderContext): AttributeClassDefinition {
-        let defContext: ClassDefinitionFilterContext = {
+        let defContext: ClassDefinitionBuilderContext = {
             className: this.getAttributeClassName(c),
             classType: c,
             parentClasses: [],
-            props: new Map(),
-            getTypeDefinition: this.getTypeDefinition
+            props: new Map()
         }
 
         let baseClass = c.getBaseClass();
         if (baseClass) {
-            defContext.parentClasses.push(this.getAttributeClassDef(baseClass, context))
+            defContext.parentClasses.push(this.getOrAddClassDefinition(baseClass, context))
         }
 
-        for (var filter of [this.instancePropsClassDefinitionFilter.bind(this), ...(this.config.classDefinitionFilters || [])]) {
-            filter(defContext);
-        }
+        this.addPropDefintions(defContext);
 
         return {
             className: defContext.className,
             parentClasses: defContext.parentClasses,
-            props: [...defContext.props.entries()].map(([name, def]) => ({ name: name, type: def }))
+            props: [...defContext.props.values()],
+            meta: {
+                sourceFile: c.getSourceFile().getFilePath()
+            }
         }
     }
 
-    getAttributeClassDef(c: ClassDeclaration, context: ClassBuilderContext): AttributeClassDefinition {
+    addClassDefinition(c: ClassDeclaration, context: ClassBuilderContext) {
+        let attributeClassName = this.getAttributeClassName(c);
+        let builtDef = this.buildAttributeClassDefinition(c, context)
+        context.classDefinitions.set(attributeClassName, builtDef);
+    }
+
+    getOrAddClassDefinition(c: ClassDeclaration, context: ClassBuilderContext): AttributeClassDefinition {
         let attributeClassName = this.getAttributeClassName(c);
 
         if (context.classDefinitions.has(attributeClassName)) {
             return context.classDefinitions.get(attributeClassName)!;
         }
-        let builtDef = this.buildAttributeClassDefinition(c, context)
-        context.classDefinitions.set(attributeClassName, builtDef);
-        return builtDef;
+
+        this.addClassDefinition(c, context);
+        return context.classDefinitions.get(attributeClassName)!;
     }
 
 
-    extractImportsFromProp = ( prop: AttributeClassPropDefinition, classDef: AttributeClassDefinition, { imports }: JSXDocumentBuilderContext ) => {
-        prop.type = resolveImports(prop.type, imports);
+    addImportsFromPropDefinition = (prop: AttributeClassPropDefinition, classDef: AttributeClassDefinition, { imports }: JSXDocumentBuilderContext) => {
+        prop.type = this.addImportsFromTypeDefinition(prop.type, imports);
     }
 
-
-    extractImportsFromClasses = (ctx: JSXDocumentBuilderContext) => {
-        for (let classDef of ctx.classDefinitions.values()) {
+    addImportsFromClassDefinitions = (context: JSXDocumentBuilderContext) => {
+        for (let classDef of context.classDefinitions.values()) {
             for (let prop of classDef.props) {
-                this.extractImportsFromProp(prop, classDef, ctx);
+                this.addImportsFromPropDefinition(prop, classDef, context);
             }
         }
     }
 
-    processClassDefinitions = ({ classDefinitions, attributeClasses }: JSXDocumentBuilderContext) => {
-        let uiClasses = this.getElementClasses();
+    addClassDefinitions = (context: JSXDocumentBuilderContext) => {
+        let { elementClassDeclarations: uiClasses, classDefinitions, intrinsicElements } = context;
 
         let classBuilderContext: ClassBuilderContext = {
             uiClasses: uiClasses,
@@ -270,25 +272,27 @@ export default class JSXExporter {
         }
 
         for (let uiClass of uiClasses) {
-            attributeClasses.add(this.getAttributeClassDef(uiClass, classBuilderContext))
+            let intrinsicElementName = uiClass.getName()!;
+            intrinsicElements.set(intrinsicElementName, { name: intrinsicElementName,  attributeClass: this.getOrAddClassDefinition(uiClass, classBuilderContext)})
         }
     }
 
 
-    buildJSXDocument(): JSXDocument {
+    buildJSXDocument(elementClassDeclarations: ClassDeclaration[]): JSXDocument {
         let documentContext: JSXDocumentBuilderContext = {
+            elementClassDeclarations: elementClassDeclarations,
             imports: new Map(),
             classDefinitions: new Map(),
-            attributeClasses: new Set()
+            intrinsicElements: new Map()
         }
 
-        this.processClassDefinitions(documentContext);
-        this.extractImportsFromClasses(documentContext);
+        this.addClassDefinitions(documentContext);
+        this.addImportsFromClassDefinitions(documentContext);
 
         let importAliases = Array.from(documentContext.imports).map(([alias, { path, name }]) => ({ alias, path, name }))
 
         let doc: JSXDocument = {
-            attributeClasses: orderBy([...documentContext.attributeClasses.values()], x => x.className),
+            instrinsicElements: orderBy([...documentContext.intrinsicElements.values()], x => x.name),
             classDefinitions: orderBy([...documentContext.classDefinitions.values()], x => x.className),
             imports: orderBy(importAliases, x => x.alias)
         }
@@ -296,4 +300,62 @@ export default class JSXExporter {
         return doc;
     }
 
+}
+
+
+export class JSXDocumentRenderer {
+
+    constructor(public debug: boolean = false) {}
+
+    renderImport({ alias, path, name }: ImportAlias) {
+        return `type ${alias} = import("${path}").${name};`
+    }
+
+    renderImports(imports: ImportAlias[]): string {
+        return imports.map(i => this.renderImport(i)).join("\n");
+    }
+
+    renderClassPropertyName(propDefinition: AttributeClassPropDefinition): string {
+        return `${propDefinition.name}`
+    }
+
+    renderPropertyDefintion(propDefinition: AttributeClassPropDefinition): string {
+        return `    ${this.renderClassPropertyName(propDefinition)}?: ${propDefinition.type};${ this.debug ? ` // ${propDefinition.meta.derivedFrom} ${path.basename(propDefinition.meta.sourceFile)}` : ''}`
+    }
+
+    renderClass(classDefinition: AttributeClassDefinition): string {
+        let propDefs = orderBy(classDefinition.props, x => x.name).map(p => this.renderPropertyDefintion(p));
+        return `// ${classDefinition.meta.sourceFile}\ntype ${classDefinition.className} = ${classDefinition.parentClasses.map(x => x.className + " & ").join("")}{\n${propDefs.join("\n")}\n};`;
+    }
+
+    renderClasses(classDefinitions: AttributeClassDefinition[]): string {
+        return classDefinitions.map(c => this.renderClass(c)).join("\n\n");
+    }
+
+    renderIntrinsicElementTagName(intrinsicElement: IntrinsicElementDefinition) {
+        return intrinsicElement.name.toLowerCase();
+    }
+
+    renderIntrinsicElement(intrinsicElement: IntrinsicElementDefinition) {
+        return `        ${this.renderIntrinsicElementTagName(intrinsicElement)}: ${intrinsicElement.attributeClass.className};`
+    }
+
+    renderIntrinsicElements(intrinsicElements: IntrinsicElementDefinition[]) {
+        return intrinsicElements.map(c => this.renderIntrinsicElement(c)).join("\n")
+    }
+
+    renderJSXNamespace(intrinsicElements: IntrinsicElementDefinition[]) {
+        return (
+`declare namespace JSX {
+    interface IntrinsicElements {
+${this.renderIntrinsicElements(intrinsicElements)} 
+    [name: string]: { [name: string]: any };
+    }
+}
+`       )
+    }
+
+    render(doc: JSXDocument) {
+        return `${this.renderImports(doc.imports)}\n\n${this.renderClasses(doc.classDefinitions)}\n\n${this.renderJSXNamespace(doc.instrinsicElements)}\n\n`
+    }
 }
