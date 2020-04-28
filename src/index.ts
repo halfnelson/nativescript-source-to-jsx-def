@@ -1,7 +1,9 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { AttributeClassPropDefinition, JSXDocumentRenderer, AttributeClassDefinition, IntrinsicElementDefinition } from './JSXExporter';
+import { AttributeClassPropDefinition, AttributeClassDefinition, IntrinsicElementDefinition } from './JSXExporter';
+import JSXDocumentRenderer from "./JSXDocumentRenderer";
 import NativescriptCoreJSXExporter from './NativescriptCoreJSXExporter';
+import NativescriptPluginJSXExporter from './NativescriptPluginJSXExporter';
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
@@ -34,12 +36,12 @@ class ReactJSXDocumentRenderer extends JSXDocumentRenderer {
 }
 
 
-const jsxExporter = new NativescriptCoreJSXExporter(nativescriptSourcePath)
+const jsxExporter = NativescriptCoreJSXExporter.FromSourcePath(nativescriptSourcePath)
 
 function exportSvelte() {
     console.log("writing svelte defs");
 
-    let jsxDoc = jsxExporter.buildJSXDocumentFromNativeScriptSource();
+    let jsxDoc = jsxExporter.buildJSXDocument();
     let renderer = new SvelteJSXDocumentRenderer();
     fs.writeFileSync("./sveltenative-jsx.d.ts", renderer.render(jsxDoc));
 }
@@ -49,7 +51,7 @@ function exportReact() {
 
     let reactRenderer = new ReactJSXDocumentRenderer();
 
-    let reactJsxDoc = jsxExporter.buildJSXDocumentFromNativeScriptSource();
+    let reactJsxDoc = jsxExporter.buildJSXDocument();
     reactJsxDoc.imports.filter(i => i.alias != "Style");
 
     for (let c of reactJsxDoc.classDefinitions) {
@@ -61,7 +63,16 @@ function exportReact() {
     fs.writeFileSync("./react-nativescript-jsx.ts", reactRenderer.render(reactJsxDoc));
 }
 
+
+function exportSideDrawer() {
+    const pluginExporter = NativescriptPluginJSXExporter.FromNodeModule("nativescript-ui-sidedrawer");
+
+    let renderer = new SvelteJSXDocumentRenderer(true);
+    let doc = pluginExporter.buildJSXDocument()
+    fs.mkdirSync("./plugins");
+    fs.writeFileSync('./plugins/sveltenative-jsx-nativescript-ui-sidedrawer.d.ts', renderer.render(doc));
+}
+
 exportSvelte()
 exportReact()
-
-
+exportSideDrawer()

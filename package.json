@@ -19,6 +19,9 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "@nativescript/core": "^6.5.1",
+    "nativescript-ui-sidedrawer": "^8.0.1",
+    "tns-core-modules": "^6.5.1",
     "uppercamelcase": "^3.0.0"
   }
 }
