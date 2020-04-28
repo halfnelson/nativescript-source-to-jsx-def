@@ -355,7 +355,7 @@ export default class NativescriptCoreJSXExporter extends JSXExporter {
                 name: `on${pascalCase(p.name)}Change`,
                 type: `(args: ${this.getTypeDefinition(this.propertyChangeType)}) => void`,
                 meta: {
-                    derivedFrom: p.meta.derivedFrom,
+                    derivedFrom: "SyntheticEvent:PropertyChange",
                     sourceFile: p.meta.sourceFile
                 }
             }

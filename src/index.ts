@@ -1,13 +1,13 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { AttributeClassPropDefinition, JSXDocumentRenderer, AttributeClassDefinition, IntrinsicElementDefinition } from './JSXExporter';
-import NativescriptCoreJSXExporter, { PropertyRegistration } from './NativescriptCoreJSXExporter';
+import NativescriptCoreJSXExporter from './NativescriptCoreJSXExporter';
 
 const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
 
 class SvelteJSXDocumentRenderer extends JSXDocumentRenderer {
     renderClassPropertyName(prop: AttributeClassPropDefinition): string {
-        return prop.meta.derivedFrom.startsWith('SyntheticEvent') ? prop.name : prop.name.toLowerCase();
+        return prop.meta.derivedFrom.includes("SyntheticEvent") ? prop.name : prop.name.toLowerCase();
     }
 
     renderJSXNamespace(intrinsicElements: IntrinsicElementDefinition[]): string {
