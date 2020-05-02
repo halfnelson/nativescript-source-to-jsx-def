@@ -165,7 +165,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
                         propertyType: propertyValueType,
                         targetClassName: targetClassType.getText(typeRef)
                     })
-                    console.log(`Found prop ${targetClassType.getText(typeRef)}.${name}: ${propertyValueType.getText(typeRef)} in ${path.basename(node.getSourceFile().getFilePath())}`);        
+                    //console.log(`Found prop ${targetClassType.getText(typeRef)}.${name}: ${propertyValueType.getText(typeRef)} in ${path.basename(node.getSourceFile().getFilePath())}`);        
                 }
             }
             

@@ -46,46 +46,43 @@ function lazy<T>(build: () => T): () => T {
 }
 
 
-const jsxExporter = lazy(() => NativescriptCoreJSXExporter.FromSourcePath(nativescriptSourcePath))
 
-function exportSvelte() {
-    console.log("writing svelte defs");
 
-    let jsxDoc = jsxExporter().buildJSXDocument();
-    let renderer = new SvelteJSXDocumentRenderer();
-    fs.writeFileSync("./sveltenative-jsx.d.ts", renderer.render(jsxDoc));
-}
+function exportCore() {
+    console.log("Exporting core")
+    let jsxExporter = NativescriptCoreJSXExporter.FromSourcePath(nativescriptSourcePath);
+    let jsxDoc = jsxExporter.buildJSXDocument();
+    let svelteRenderer = new SvelteJSXDocumentRenderer();
+    fs.writeFileSync("./svelte-native-defs/sveltenative-jsx.d.ts", svelteRenderer.render(jsxDoc));
+    
+    //RNS doesn't want the style attribute
+    jsxDoc.imports.filter(i => i.alias != "Style");
 
-function exportReact() {
-    console.log("writing react defs");
-
-    let reactRenderer = new ReactJSXDocumentRenderer();
-
-    let reactJsxDoc = jsxExporter().buildJSXDocument();
-    reactJsxDoc.imports.filter(i => i.alias != "Style");
-
-    for (let c of reactJsxDoc.classDefinitions) {
+    for (let c of jsxDoc.classDefinitions) {
         if (c.className == "ViewBaseAttributes") {
             c.props = c.props.filter(p => p.name != "style")
         }
     }
-
-    fs.writeFileSync("./react-nativescript-jsx.ts", reactRenderer.render(reactJsxDoc));
+    let rnsRenderer = new ReactJSXDocumentRenderer();
+    fs.writeFileSync("./react-nativescript-defs/react-nativescript-jsx.ts", rnsRenderer.render(jsxDoc));
 }
 
 function exportModule(moduleName: string) {
+    console.log(`Exporting ${moduleName}`)
     const pluginExporter = NativescriptPluginJSXExporter.FromNodeModule(moduleName);
-    let renderer = new SvelteJSXDocumentRenderer(true);
+    let svelteRenderer = new SvelteJSXDocumentRenderer();
+    let rnsRenderer = new ReactJSXDocumentRenderer();
     let doc = pluginExporter.buildJSXDocument()
-    fs.mkdirSync("./plugins", { recursive: true});
-    fs.writeFileSync(`./plugins/sveltenative-jsx-${moduleName}.d.ts`, renderer.render(doc));
+   
+    fs.writeFileSync(`./svelte-native-defs/svelte-native-jsx-${moduleName}.d.ts`, svelteRenderer.render(doc));
+    fs.writeFileSync(`./react-nativescript-defs/react-nativescript-jsx-${moduleName}.ts`, rnsRenderer.render(doc));
 }
 
 
+fs.mkdirSync("./svelte-native-defs", { recursive: true});
+fs.mkdirSync("./react-nativescript-defs", { recursive: true});
 
-
-exportSvelte()
-exportReact()
+exportCore()
 exportModule("nativescript-ui-sidedrawer")
 exportModule("nativescript-ui-listview")
 exportModule("nativescript-ui-chart")
