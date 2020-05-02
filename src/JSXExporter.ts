@@ -113,6 +113,10 @@ export type ClassBuilderContext = {
 
 export type ImportMap = Map<string, ImportAlias>;
 
+function withoutGenericArgs(name: string) {
+    return name.match(/[^<\[]+/)![0];
+}
+
 export default class JSXExporter {
 
     getAttributeClassName(c: ClassDeclaration) {
@@ -150,10 +154,11 @@ export default class JSXExporter {
 
         // if we still clash, we will just start adding numbers
         let i = 1;
-        let baseAlias = alias;
+        let baseAlias = withoutGenericArgs(alias);
+        let oldAlias = alias;
 
         while (imports.get(alias)) {
-            alias = baseAlias + `_${i}`;
+            alias = oldAlias.replace(baseAlias, baseAlias + `_${i}`);
             i = i + 1;
         } 
 
@@ -168,20 +173,29 @@ export default class JSXExporter {
             return `<${replaced}>`;
         });
 
-        //replace the remaining 
-        def = def.replace(/import\("(.*?)"\)\.([a-zA-Z_0-9\<\>\[\]]+)/g, (match: string, importPath: string, importExpression: string) => {
-            let importName = importExpression.replace("[]", "");
+        
 
-            let existingImportAlias = Array.from(imports).find(([_, imp]) => (imp.name == importName && imp.path == importPath))
+        //replace the remaining 
+        def = def.replace(/import\("(.*?)"\)\.(([a-zA-Z_0-9]+)(\<.*\>)?(\[\])?)/g, (match: string, importPath: string, importExpression: string, importName: string, importGenericArgs: string ) => {
+
+            let aliasArgs = "";
+            if (importGenericArgs) {
+                let idx = 1;
+                aliasArgs = importGenericArgs.replace(/[^<>,\s]+/g, m => `T${idx++}`);
+            }
+            let importAlias = importName + aliasArgs;
+
+
+            let existingImportAlias = Array.from(imports).find(([_, imp]) => (imp.name == importAlias && imp.path == importPath))
 
             if (existingImportAlias)
-                return importExpression.replace(importName, existingImportAlias?.[0])
+                return importExpression.replace(importName, withoutGenericArgs(existingImportAlias?.[0]))
 
             //no existing import alias, create one
-            let importAlias = this.createAliasForImport(imports, importPath, importName);
-            imports.set(importAlias, { alias: importAlias, name: importName, path: importPath });
+            importAlias = this.createAliasForImport(imports, importPath, importAlias);
+            imports.set(importAlias, { alias: importAlias, name: importName+aliasArgs, path: importPath });
             
-            return importExpression.replace(importName, importAlias);
+            return importExpression.replace(importName, withoutGenericArgs(importAlias));
         });
 
         return def

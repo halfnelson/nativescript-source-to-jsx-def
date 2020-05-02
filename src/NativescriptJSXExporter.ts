@@ -73,8 +73,13 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
         if (t.isUnion()) {
             let incompatibleWithString = t.getUnionTypes().some(x => !x.isStringLiteral()) && !t.getUnionTypes().some(x => x.isString());
             if (!incompatibleWithString) { return def }
+        } else {
+            if (def.includes('=>')) {
+                def = `(${def})`;
+            }
         }
 
+        
         //otherwise just preprend it
         return `string | ${def}`
     }

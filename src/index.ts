@@ -73,16 +73,19 @@ function exportReact() {
     fs.writeFileSync("./react-nativescript-jsx.ts", reactRenderer.render(reactJsxDoc));
 }
 
-
-function exportSideDrawer() {
-    const pluginExporter = NativescriptPluginJSXExporter.FromNodeModule("nativescript-ui-sidedrawer");
-
+function exportModule(moduleName: string) {
+    const pluginExporter = NativescriptPluginJSXExporter.FromNodeModule(moduleName);
     let renderer = new SvelteJSXDocumentRenderer(true);
     let doc = pluginExporter.buildJSXDocument()
     fs.mkdirSync("./plugins", { recursive: true});
-    fs.writeFileSync('./plugins/sveltenative-jsx-nativescript-ui-sidedrawer.d.ts', renderer.render(doc));
+    fs.writeFileSync(`./plugins/sveltenative-jsx-${moduleName}.d.ts`, renderer.render(doc));
 }
+
+
+
 
 exportSvelte()
 exportReact()
-exportSideDrawer()
+exportModule("nativescript-ui-sidedrawer")
+exportModule("nativescript-ui-listview")
+exportModule("nativescript-ui-chart")
