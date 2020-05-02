@@ -1,3 +1,4 @@
+export {} //Ensure this is a module
 type CartesianAxis = import("nativescript-ui-chart/index").CartesianAxis;
 type ChartAnnotationZPosition = import("nativescript-ui-chart/index").ChartAnnotationZPosition;
 type ChartAxisDateTimeComponent = import("nativescript-ui-chart/index").ChartAxisDateTimeComponent;
@@ -28,6 +29,9 @@ type PropertyChangeData = import("@nativescript/core/data/observable/observable"
 type RadCartesianChartGrid = import("nativescript-ui-chart/index").RadCartesianChartGrid;
 type RadLegendView = import("nativescript-ui-chart/index").RadLegendView;
 type Trackball = import("nativescript-ui-chart/index").Trackball;
+
+declare global {
+namespace svelteNative.JSX {
 
 // index.d.ts
 type AreaSeriesAttributes = CategoricalSeriesAttributes & {
@@ -474,44 +478,45 @@ type TrackballAttributes = ViewBaseAttributes & {
     snapmode?: ChartTrackballSnapMode;
 };
 
-declare namespace svelteNative.JSX {
-    interface IntrinsicElements {
-        areaseries: AreaSeriesAttributes;
-        barseries: BarSeriesAttributes;
-        bubbleseries: BubbleSeriesAttributes;
-        candlestickseries: CandlestickSeriesAttributes;
-        cartesianaxis: CartesianAxisAttributes;
-        cartesianchartannotation: CartesianChartAnnotationAttributes;
-        cartesianseries: CartesianSeriesAttributes;
-        categoricalaxis: CategoricalAxisAttributes;
-        categoricalseries: CategoricalSeriesAttributes;
-        chartaxislabel: ChartAxisLabelAttributes;
-        chartgridlineannotation: ChartGridLineAnnotationAttributes;
-        chartplotbandannotation: ChartPlotBandAnnotationAttributes;
-        chartseries: ChartSeriesAttributes;
-        chartserieslabel: ChartSeriesLabelAttributes;
-        datetimecategoricalaxis: DateTimeCategoricalAxisAttributes;
-        datetimecontinuousaxis: DateTimeContinuousAxisAttributes;
-        donutseries: DonutSeriesAttributes;
-        lineseries: LineSeriesAttributes;
-        linearaxis: LinearAxisAttributes;
-        logarithmicaxis: LogarithmicAxisAttributes;
-        ohlcseries: OhlcSeriesAttributes;
+
+interface IntrinsicElements {
+        areaSeries: AreaSeriesAttributes;
+        barSeries: BarSeriesAttributes;
+        bubbleSeries: BubbleSeriesAttributes;
+        candlestickSeries: CandlestickSeriesAttributes;
+        cartesianAxis: CartesianAxisAttributes;
+        cartesianChartAnnotation: CartesianChartAnnotationAttributes;
+        cartesianSeries: CartesianSeriesAttributes;
+        categoricalAxis: CategoricalAxisAttributes;
+        categoricalSeries: CategoricalSeriesAttributes;
+        chartAxisLabel: ChartAxisLabelAttributes;
+        chartGridLineAnnotation: ChartGridLineAnnotationAttributes;
+        chartPlotBandAnnotation: ChartPlotBandAnnotationAttributes;
+        chartSeries: ChartSeriesAttributes;
+        chartSeriesLabel: ChartSeriesLabelAttributes;
+        dateTimeCategoricalAxis: DateTimeCategoricalAxisAttributes;
+        dateTimeContinuousAxis: DateTimeContinuousAxisAttributes;
+        donutSeries: DonutSeriesAttributes;
+        lineSeries: LineSeriesAttributes;
+        linearAxis: LinearAxisAttributes;
+        logarithmicAxis: LogarithmicAxisAttributes;
+        ohlcSeries: OhlcSeriesAttributes;
         palette: PaletteAttributes;
-        paletteentry: PaletteEntryAttributes;
-        pieseries: PieSeriesAttributes;
-        pointlabelstyle: PointLabelStyleAttributes;
-        radcartesianchart: RadCartesianChartAttributes;
-        radcartesianchartgrid: RadCartesianChartGridAttributes;
-        radlegendview: RadLegendViewAttributes;
-        radpiechart: RadPieChartAttributes;
-        rangebarseries: RangeBarSeriesAttributes;
-        scatterbubbleseries: ScatterBubbleSeriesAttributes;
-        scatterseries: ScatterSeriesAttributes;
-        splineareaseries: SplineAreaSeriesAttributes;
-        splineseries: SplineSeriesAttributes;
+        paletteEntry: PaletteEntryAttributes;
+        pieSeries: PieSeriesAttributes;
+        pointLabelStyle: PointLabelStyleAttributes;
+        radCartesianChart: RadCartesianChartAttributes;
+        radCartesianChartGrid: RadCartesianChartGridAttributes;
+        radLegendView: RadLegendViewAttributes;
+        radPieChart: RadPieChartAttributes;
+        rangeBarSeries: RangeBarSeriesAttributes;
+        scatterBubbleSeries: ScatterBubbleSeriesAttributes;
+        scatterSeries: ScatterSeriesAttributes;
+        splineAreaSeries: SplineAreaSeriesAttributes;
+        splineSeries: SplineSeriesAttributes;
         trackball: TrackballAttributes; 
-        [name: string]: { [name: string]: any };
-    }
 }
 
+
+}
+}

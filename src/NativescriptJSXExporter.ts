@@ -185,10 +185,6 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
                 //don't overwrite if we end in common.d.ts
                 if (p.propertyNode.getSourceFile().getFilePath().endsWith('common.d.ts')) return;
             }
-
-            if (p.propertyType.getText().includes("SideDrawerLocation")) {
-                console.log(p.propertyType.getText());
-            }
             propMap.set(p.propertyName, p);
         })
 

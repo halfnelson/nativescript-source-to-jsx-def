@@ -31,7 +31,7 @@ export default class JSXDocumentRenderer {
     }
 
     renderIntrinsicElementTagName(intrinsicElement: IntrinsicElementDefinition) {
-        return intrinsicElement.name.toLowerCase();
+        return intrinsicElement.name[0].toLowerCase() + intrinsicElement.name.substr(1);
     }
 
     renderIntrinsicElement(intrinsicElement: IntrinsicElementDefinition) {

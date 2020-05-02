@@ -1,3 +1,4 @@
+export {} //Ensure this is a module
 type Color = import("@nativescript/core/color/color").Color;
 type KeyedTemplate = import("@nativescript/core/ui/core/view/view").KeyedTemplate;
 type ListViewItemAnimation = import("nativescript-ui-listview/index").ListViewItemAnimation;
@@ -10,6 +11,9 @@ type ListViewSelectionBehavior = import("nativescript-ui-listview/index").ListVi
 type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
 type PullToRefreshStyle = import("nativescript-ui-listview/index").PullToRefreshStyle;
 type View = import("@nativescript/core/ui/core/view/view").View;
+
+declare global {
+namespace svelteNative.JSX {
 
 // index.d.ts
 type ListViewGridLayoutAttributes = ListViewLinearLayoutAttributes & {
@@ -111,15 +115,16 @@ type ReorderHandleAttributes = StackLayoutAttributes & {
 
 };
 
-declare namespace svelteNative.JSX {
-    interface IntrinsicElements {
-        listviewgridlayout: ListViewGridLayoutAttributes;
-        listviewlinearlayout: ListViewLinearLayoutAttributes;
-        listviewstaggeredlayout: ListViewStaggeredLayoutAttributes;
-        pulltorefreshstyle: PullToRefreshStyleAttributes;
-        radlistview: RadListViewAttributes;
-        reorderhandle: ReorderHandleAttributes; 
-        [name: string]: { [name: string]: any };
-    }
+
+interface IntrinsicElements {
+        listViewGridLayout: ListViewGridLayoutAttributes;
+        listViewLinearLayout: ListViewLinearLayoutAttributes;
+        listViewStaggeredLayout: ListViewStaggeredLayoutAttributes;
+        pullToRefreshStyle: PullToRefreshStyleAttributes;
+        radListView: RadListViewAttributes;
+        reorderHandle: ReorderHandleAttributes; 
 }
 
+
+}
+}

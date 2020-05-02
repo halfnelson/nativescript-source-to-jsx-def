@@ -1,3 +1,4 @@
+export {} //Ensure this is a module
 type ActionBar = import("@nativescript/core/ui/action-bar/action-bar").ActionBar;
 type ActionItems = import("@nativescript/core/ui/action-bar/action-bar").ActionItems;
 type AndroidActionBarSettings = import("@nativescript/core/ui/action-bar/action-bar").AndroidActionBarSettings;
@@ -57,6 +58,9 @@ type TouchGestureEventData = import("@nativescript/core/ui/gestures/gestures").T
 type View = import("@nativescript/core/ui/core/view/view").View;
 type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBase;
 type iOSFrame = import("@nativescript/core/ui/frame/frame").iOSFrame;
+
+declare global {
+namespace svelteNative.JSX {
 
 // ui/layouts/absolute-layout/absolute-layout.d.ts
 type AbsoluteLayoutAttributes = LayoutBaseAttributes & {
@@ -807,56 +811,57 @@ type WrapLayoutAttributes = LayoutBaseAttributes & {
     orientation?: "horizontal" | "vertical";
 };
 
-declare namespace svelteNative.JSX {
-    interface IntrinsicElements {
-        absolutelayout: AbsoluteLayoutAttributes;
-        actionbar: ActionBarAttributes;
-        actionitem: ActionItemAttributes;
-        activityindicator: ActivityIndicatorAttributes;
+
+interface IntrinsicElements {
+        absoluteLayout: AbsoluteLayoutAttributes;
+        actionBar: ActionBarAttributes;
+        actionItem: ActionItemAttributes;
+        activityIndicator: ActivityIndicatorAttributes;
         border: BorderAttributes;
-        bottomnavigation: BottomNavigationAttributes;
+        bottomNavigation: BottomNavigationAttributes;
         button: ButtonAttributes;
-        containerview: ContainerViewAttributes;
-        contentview: ContentViewAttributes;
-        customlayoutview: CustomLayoutViewAttributes;
-        datepicker: DatePickerAttributes;
-        docklayout: DockLayoutAttributes;
-        flexboxlayout: FlexboxLayoutAttributes;
-        formattedstring: FormattedStringAttributes;
+        containerView: ContainerViewAttributes;
+        contentView: ContentViewAttributes;
+        customLayoutView: CustomLayoutViewAttributes;
+        datePicker: DatePickerAttributes;
+        dockLayout: DockLayoutAttributes;
+        flexboxLayout: FlexboxLayoutAttributes;
+        formattedString: FormattedStringAttributes;
         frame: FrameAttributes;
-        gridlayout: GridLayoutAttributes;
-        htmlview: HtmlViewAttributes;
+        gridLayout: GridLayoutAttributes;
+        htmlView: HtmlViewAttributes;
         image: ImageAttributes;
         label: LabelAttributes;
-        listpicker: ListPickerAttributes;
-        listview: ListViewAttributes;
-        navigationbutton: NavigationButtonAttributes;
+        listPicker: ListPickerAttributes;
+        listView: ListViewAttributes;
+        navigationButton: NavigationButtonAttributes;
         page: PageAttributes;
         placeholder: PlaceholderAttributes;
         progress: ProgressAttributes;
-        proxyviewcontainer: ProxyViewContainerAttributes;
+        proxyViewContainer: ProxyViewContainerAttributes;
         repeater: RepeaterAttributes;
-        scrollview: ScrollViewAttributes;
-        searchbar: SearchBarAttributes;
-        segmentedbar: SegmentedBarAttributes;
-        segmentedbaritem: SegmentedBarItemAttributes;
+        scrollView: ScrollViewAttributes;
+        searchBar: SearchBarAttributes;
+        segmentedBar: SegmentedBarAttributes;
+        segmentedBarItem: SegmentedBarItemAttributes;
         slider: SliderAttributes;
         span: SpanAttributes;
-        stacklayout: StackLayoutAttributes;
+        stackLayout: StackLayoutAttributes;
         switch: SwitchAttributes;
-        tabcontentitem: TabContentItemAttributes;
-        tabstrip: TabStripAttributes;
-        tabstripitem: TabStripItemAttributes;
-        tabview: TabViewAttributes;
-        tabviewitem: TabViewItemAttributes;
+        tabContentItem: TabContentItemAttributes;
+        tabStrip: TabStripAttributes;
+        tabStripItem: TabStripItemAttributes;
+        tabView: TabViewAttributes;
+        tabViewItem: TabViewItemAttributes;
         tabs: TabsAttributes;
-        textfield: TextFieldAttributes;
-        textview: TextViewAttributes;
-        timepicker: TimePickerAttributes;
+        textField: TextFieldAttributes;
+        textView: TextViewAttributes;
+        timePicker: TimePickerAttributes;
         view: ViewAttributes;
-        webview: WebViewAttributes;
-        wraplayout: WrapLayoutAttributes; 
-        [name: string]: { [name: string]: any };
-    }
+        webView: WebViewAttributes;
+        wrapLayout: WrapLayoutAttributes; 
 }
 
+
+}
+}

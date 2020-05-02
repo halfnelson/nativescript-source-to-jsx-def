@@ -1,8 +1,12 @@
+export {} //Ensure this is a module
 type Color = import("@nativescript/core/color/color").Color;
 type DrawerTransitionBase = import("nativescript-ui-sidedrawer/index").DrawerTransitionBase;
 type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
 type SideDrawerLocation = import("nativescript-ui-sidedrawer/index").SideDrawerLocation;
 type View = import("@nativescript/core/ui/core/view/view").View;
+
+declare global {
+namespace svelteNative.JSX {
 
 // index.d.ts
 type RadSideDrawerAttributes = ViewAttributes & {
@@ -26,10 +30,11 @@ type RadSideDrawerAttributes = ViewAttributes & {
     shadowcolor?: string | Color;
 };
 
-declare namespace svelteNative.JSX {
-    interface IntrinsicElements {
-        radsidedrawer: RadSideDrawerAttributes; 
-        [name: string]: { [name: string]: any };
-    }
+
+interface IntrinsicElements {
+        radSideDrawer: RadSideDrawerAttributes; 
 }
 
+
+}
+}
