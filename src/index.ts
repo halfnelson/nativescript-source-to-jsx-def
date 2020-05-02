@@ -35,13 +35,23 @@ class ReactJSXDocumentRenderer extends JSXDocumentRenderer {
     }
 }
 
+function lazy<T>(build: () => T): () => T {
+    let cached: T;
+    return () => {
+        if (!cached) {
+            cached = build();
+        }
+        return cached;
+    }
+}
 
-const jsxExporter = NativescriptCoreJSXExporter.FromSourcePath(nativescriptSourcePath)
+
+const jsxExporter = lazy(() => NativescriptCoreJSXExporter.FromSourcePath(nativescriptSourcePath))
 
 function exportSvelte() {
     console.log("writing svelte defs");
 
-    let jsxDoc = jsxExporter.buildJSXDocument();
+    let jsxDoc = jsxExporter().buildJSXDocument();
     let renderer = new SvelteJSXDocumentRenderer();
     fs.writeFileSync("./sveltenative-jsx.d.ts", renderer.render(jsxDoc));
 }
@@ -51,7 +61,7 @@ function exportReact() {
 
     let reactRenderer = new ReactJSXDocumentRenderer();
 
-    let reactJsxDoc = jsxExporter.buildJSXDocument();
+    let reactJsxDoc = jsxExporter().buildJSXDocument();
     reactJsxDoc.imports.filter(i => i.alias != "Style");
 
     for (let c of reactJsxDoc.classDefinitions) {
@@ -69,7 +79,7 @@ function exportSideDrawer() {
 
     let renderer = new SvelteJSXDocumentRenderer(true);
     let doc = pluginExporter.buildJSXDocument()
-    fs.mkdirSync("./plugins");
+    fs.mkdirSync("./plugins", { recursive: true});
     fs.writeFileSync('./plugins/sveltenative-jsx-nativescript-ui-sidedrawer.d.ts', renderer.render(doc));
 }
 

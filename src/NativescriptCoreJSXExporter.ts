@@ -1,14 +1,19 @@
 import { ClassDefinitionBuilderContext, AttributeClassPropDefinition, AttributeClassDefinition, ImportMap, JSXDocumentBuilderContext } from "./JSXExporter";
-import { Project, Node, ClassDeclaration } from "ts-morph";
+import { Project, Node, ClassDeclaration, Type } from "ts-morph";
 import path from "path";
 import pascalCase from 'uppercamelcase';
-import NativescriptJSXExporter from "./NativescriptJSXExporter";
+import NativescriptJSXExporter, { PropertyRegistration } from "./NativescriptJSXExporter";
 
 /*
   Exports the nativescript core ui classes. Expects a path to the nativescript source, since it needs the original TS files to find properties that were not exposed in the .d.ts
 */
 
+
+
+
+
 export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter {
+   
 
     static FromSourcePath(nativescriptSourcePath: string): NativescriptCoreJSXExporter {
         let project = new Project({
@@ -16,7 +21,13 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         });
         return new NativescriptCoreJSXExporter(nativescriptSourcePath, project);
     }
-   
+
+
+    constructor(srcPath: string, project: Project) {
+        super(srcPath, project)
+        
+    }
+
     isElementClass(c: ClassDeclaration) {
         // nativescript can have multiple definitions of a class, one in the .d.ts file and the other in .android/.ios file (or even in -common) file
         // so as well as ensuring it inherits from viewbase, we should also prefer the ones defined in the .d.ts files where available
@@ -24,7 +35,7 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
         //only consider files in /ui/*
         if (! /\/ui\//.test(fp)) return false
-  
+
         //prefer .d.ts versions where possible (except for formatted-string and span where ts-morph won't load their .d.ts files)
         const isValidFile = (fp.endsWith('text-base/formatted-string.ts')
             || fp.endsWith('text-base/span.ts')
@@ -72,6 +83,34 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
     }
 
+    getPropertyRegistrations() {
+        var statements: PropertyRegistration[] = [];
+        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/properties.d.ts").getClassOrThrow("Property");
+
+        var refs = propertyClass.getMethod("register")?.findReferencesAsNodes() ?? []
+        for (var ref of refs) {
+            let accessExpr = ref.getParent();
+            if (accessExpr && Node.isPropertyAccessExpression(accessExpr)) {
+                let propExpr = accessExpr.getExpression();
+                if (Node.isIdentifier(propExpr)) {
+                    var callExpr = accessExpr.getParent();
+                    if (callExpr && Node.isCallExpression(callExpr)) {
+                        var target = callExpr.getArguments()[0];
+                        if (Node.isIdentifier(target)) {
+                            statements.push({
+                                propertyName: propExpr.getText().replace(/Property$/, ""),
+                                propertyType: propExpr.getType().getTypeArguments()[1], //Property<Target, valueType>
+                                propertyNode: propExpr,
+                                targetClassName: target.getText()
+                            })
+                        }
+                    }
+                }
+            }
+        }
+
+        return statements;
+    }
 
     private getStyleProxyProperties(c: ClassDeclaration): AttributeClassPropDefinition[] {
         let setterProps: AttributeClassPropDefinition[] = []
@@ -252,12 +291,12 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
     buildJSXDocument() {
         let doc = super.buildJSXDocument();
-        
+
         //patch class file meta to be relative
         doc.classDefinitions.forEach(c => {
             c.meta.sourceFile = path.relative(this.nativescriptCorePath, c.meta.sourceFile).replace(/\\/g, '/');
         })
-        
+
         return doc;
     }
 }

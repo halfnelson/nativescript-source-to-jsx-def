@@ -121,7 +121,7 @@ export default class JSXExporter {
 
     getTypeDefinition: (t: Type, node?: Node, dereferenceUnionTypes?: boolean) => PropType = (t: Type, node?: Node, dereferenceUnionTypes = true) => {
         //expand union types in-place instead of using imports, to keep the definition file easier to read
-        if (dereferenceUnionTypes && t.isUnion()) {
+        if (dereferenceUnionTypes && t.isUnion() && !t.isEnum() && !t.isBoolean()) {
             let utDefs = t.getUnionTypes()
                 .map(ut => this.getTypeDefinition(ut, undefined, false))
                 .map(d => d.includes('=>') ? `(${d})` : d);
@@ -129,7 +129,7 @@ export default class JSXExporter {
             return utDefs.join(" | ");
         }
 
-        if (t.isClassOrInterface() || t.isArray() || t.isObject() || !node) {
+        if (t.isClassOrInterface() || t.isArray() || t.isObject() || t.isEnum() || !node) {
             return t.getText();
         } else {
             // by passing in these flags, our type is no rendered as an import and is expanded if possible

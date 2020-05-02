@@ -2,6 +2,7 @@ import JSXExporter, { getAncestors, JSXDocument, ClassDefinitionBuilderContext, 
 import { Project, Node, ClassDeclaration, Type, SourceFile, InterfaceDeclaration } from "ts-morph";
 import path from "path";
 import pascalCase from 'uppercamelcase';
+import { nodeModuleNameResolver } from "typescript";
 
 
 
@@ -18,8 +19,6 @@ export function isUIClass(cl: ClassDeclaration) {
 }
 
 
-
-
 export type PropertyRegistration = {
     propertyName: string,
     targetClassName: string,
@@ -28,11 +27,12 @@ export type PropertyRegistration = {
 }
 
 
+
 export default abstract class NativescriptJSXExporter extends JSXExporter {
     nativescriptCorePath: string;
     project: Project;
-
-    dynamicProperties: PropertyRegistration[]
+    dynamicProperties: PropertyRegistration[];
+    
     propertyChangeType: Type;
 
     protected constructor(nativescriptCorePath: string, project: Project) {
@@ -63,34 +63,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
     }
 
 
-    getPropertyRegistrations() {
-        var statements: PropertyRegistration[] = [];
-        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/properties.d.ts").getClassOrThrow("Property");
-        
-        var refs = propertyClass.getMethod("register")?.findReferencesAsNodes() ?? []
-        for (var ref of refs) {
-            let accessExpr = ref.getParent();
-            if (accessExpr && Node.isPropertyAccessExpression(accessExpr)) {
-                let propExpr = accessExpr.getExpression();
-                if (Node.isIdentifier(propExpr)) {
-                    var callExpr = accessExpr.getParent();
-                    if (callExpr && Node.isCallExpression(callExpr)) {
-                        var target = callExpr.getArguments()[0];
-                        if (Node.isIdentifier(target)) {
-                            statements.push({
-                                propertyName: propExpr.getText().replace(/Property$/, ""),
-                                propertyType: propExpr.getType().getTypeArguments()[1], //Property<Target, valueType>
-                                propertyNode: propExpr,
-                                targetClassName: target.getText()
-                            })
-                        }
-                    }
-                }
-            }
-        }
-    
-        return statements;
-    }
+  
 
     protected addStringToType(t: Type, def: string): string {
         //already compatible with string
@@ -142,18 +115,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
         }
     }
 
-    getDynamicPropertiesForClass(classDecl: ClassDeclaration): AttributeClassPropDefinition[] {
-        let propsForThisClass = this.dynamicProperties.filter(x => x.targetClassName == classDecl.getName());
 
-        return propsForThisClass.map(p => ({
-            name: p.propertyName,
-            type: this.addStringToType(p.propertyType, this.getTypeDefinition(p.propertyType, p.propertyNode)),
-            meta: {
-                derivedFrom: "DynamicPropertyRegistration",
-                sourceFile: p.propertyNode.getSourceFile().getFilePath()
-            }
-        }) as AttributeClassPropDefinition)
-    }
 
     addPropDefintions(ctx: ClassDefinitionBuilderContext) {
         super.addPropDefintions(ctx);
@@ -180,6 +142,61 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
             ctx.props.set(changeEventProp.name, changeEventProp);
         })
     }
+
+    getPropertyRegistrations(): PropertyRegistration[] {
+        let registrations:PropertyRegistration[] = [];
+        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/properties.d.ts").getClassOrThrow("Property");
+        for (var node of propertyClass.findReferencesAsNodes()) {
+            let possibleDeclaration = node.getParent()?.getParent();
+            
+            if (possibleDeclaration && (Node.isVariableDeclaration(possibleDeclaration) || Node.isPropertyDeclaration(possibleDeclaration))) {
+                let typeRef = possibleDeclaration.getTypeNode();
+                let name = possibleDeclaration.getName().replace(/Property$/, "");
+                if (typeRef) {
+                    let [targetClassType, propertyValueType] = typeRef.getType().getTypeArguments();
+                    registrations.push({
+                        propertyName: name,
+                        propertyNode: typeRef,
+                        propertyType: propertyValueType,
+                        targetClassName: targetClassType.getText(typeRef)
+                    })
+                    console.log(`Found prop ${targetClassType.getText(typeRef)}.${name}: ${propertyValueType.getText(typeRef)} in ${path.basename(node.getSourceFile().getFilePath())}`);        
+                }
+            }
+            
+        }
+        return registrations;
+    }
+
+    
+    getDynamicPropertiesForClass(classDecl: ClassDeclaration): AttributeClassPropDefinition[] {
+        let propsForThisClass = this.dynamicProperties.filter(x => x.targetClassName == classDecl.getName());
+
+        //remove duplicates
+        let propMap: Map<string, PropertyRegistration> = new Map()
+
+        propsForThisClass.forEach(p => {
+            if (propMap.has(p.propertyName)) {
+                //don't overwrite if we end in common.d.ts
+                if (p.propertyNode.getSourceFile().getFilePath().endsWith('common.d.ts')) return;
+            }
+
+            if (p.propertyType.getText().includes("SideDrawerLocation")) {
+                console.log(p.propertyType.getText());
+            }
+            propMap.set(p.propertyName, p);
+        })
+
+        return [...propMap.values()].map(p => ({
+            name: p.propertyName,
+            type: this.addStringToType(p.propertyType, this.getTypeDefinition(p.propertyType, p.propertyNode)),
+            meta: {
+                derivedFrom: "DynamicPropertyRegistration",
+                sourceFile: p.propertyNode.getSourceFile().getFilePath()
+            }
+        }) as AttributeClassPropDefinition)
+    }
+
 
     buildJSXDocument(): JSXDocument {
         let doc = this.buildJSXDocumentFromElementClassDeclarations(this.getElementClassDeclarations(this.project));

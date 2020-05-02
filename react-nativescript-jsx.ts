@@ -72,7 +72,7 @@ export type ActionBarAttributes = ViewAttributes & {
     androidContentInsetRight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     effectiveContentInsetLeft?: number;
     effectiveContentInsetRight?: number;
-    flat?: string | false | true;
+    flat?: string | boolean;
     ios?: any;
     iosIconRenderingMode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
     navigationButton?: NavigationButton;
@@ -101,7 +101,7 @@ export type ActionItemAttributes = ViewBaseAttributes & {
 // ui/activity-indicator/activity-indicator.d.ts
 export type ActivityIndicatorAttributes = ViewAttributes & {
     android?: any;
-    busy?: string | false | true;
+    busy?: string | boolean;
     ios?: any;
     onBusyChange?: (args: PropertyChangeData) => void;
 };
@@ -126,12 +126,12 @@ export type ButtonAttributes = TextBaseAttributes & {
     android?: any;
     ios?: any;
     onTap?: (args: EventData) => void;
-    textWrap?: false | true;
+    textWrap?: boolean;
 };
 
 // ui/core/view/view.d.ts
 export type ContainerViewAttributes = ViewAttributes & {
-    iosOverflowSafeArea?: false | true;
+    iosOverflowSafeArea?: boolean;
 };
 
 // ui/content-view/content-view.d.ts
@@ -166,14 +166,14 @@ export type DatePickerAttributes = ViewAttributes & {
 // ui/layouts/dock-layout/dock-layout.d.ts
 export type DockLayoutAttributes = LayoutBaseAttributes & {
     onStretchLastChildChange?: (args: PropertyChangeData) => void;
-    stretchLastChild?: string | false | true;
+    stretchLastChild?: string | boolean;
 };
 
 // ui/editable-text-base/editable-text-base.d.ts
 export type EditableTextBaseAttributes = TextBaseAttributes & {
     autocapitalizationType?: "none" | "words" | "sentences" | "allcharacters";
-    autocorrect?: string | false | true;
-    editable?: string | false | true;
+    autocorrect?: string | boolean;
+    editable?: string | boolean;
     hint?: string;
     keyboardType?: "number" | "datetime" | "phone" | "url" | "email" | "integer";
     maxLength?: string | number;
@@ -216,7 +216,7 @@ export type FormattedStringAttributes = ViewBaseAttributes & {
 export type FrameAttributes = ViewAttributes & {
     actionBarVisibility?: "always" | "never" | "auto";
     android?: AndroidFrame;
-    animated?: false | true;
+    animated?: boolean;
     backStack?: BackstackEntry[];
     currentEntry?: NavigationEntry;
     currentPage?: Page;
@@ -249,7 +249,7 @@ export type ImageAttributes = ViewAttributes & {
     decodeWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     imageSource?: string | ImageSource;
     ios?: any;
-    isLoading?: string | false | true;
+    isLoading?: string | boolean;
     loadMode?: "sync" | "async";
     onDecodeHeightChange?: (args: PropertyChangeData) => void;
     onDecodeWidthChange?: (args: PropertyChangeData) => void;
@@ -267,13 +267,13 @@ export type ImageAttributes = ViewAttributes & {
 export type LabelAttributes = TextBaseAttributes & {
     android?: any;
     ios?: any;
-    textWrap?: string | false | true;
+    textWrap?: string | boolean;
 };
 
 // ui/layouts/layout-base.d.ts
 export type LayoutBaseAttributes = CustomLayoutViewAttributes & {
-    clipToBounds?: string | false | true;
-    isPassThroughParentEnabled?: string | false | true;
+    clipToBounds?: string | boolean;
+    isPassThroughParentEnabled?: string | boolean;
     onClipToBoundsChange?: (args: PropertyChangeData) => void;
     onIsPassThroughParentEnabledChange?: (args: PropertyChangeData) => void;
     padding?: string | number | LengthDipUnit | LengthPxUnit;
@@ -287,7 +287,7 @@ export type LayoutBaseAttributes = CustomLayoutViewAttributes & {
 export type ListPickerAttributes = ViewAttributes & {
     android?: any;
     ios?: any;
-    isItemsSource?: false | true;
+    isItemsSource?: boolean;
     items?: string | any[] | ItemsSource;
     onItemsChange?: (args: PropertyChangeData) => void;
     onSelectedIndexChange?: (args: PropertyChangeData) => void;
@@ -335,12 +335,12 @@ export type ObservableAttributes = {
 // ui/page/page.d.ts
 export type PageAttributes = ContentViewAttributes & {
     actionBar?: ActionBar;
-    actionBarHidden?: string | false | true;
+    actionBarHidden?: string | boolean;
     androidStatusBarBackground?: string | Color;
-    backgroundSpanUnderStatusBar?: string | false | true;
-    enableSwipeBackNavigation?: string | false | true;
+    backgroundSpanUnderStatusBar?: string | boolean;
+    enableSwipeBackNavigation?: string | boolean;
     frame?: Frame;
-    hasActionBar?: false | true;
+    hasActionBar?: boolean;
     navigationContext?: any;
     onActionBarHiddenChange?: (args: PropertyChangeData) => void;
     onBackgroundSpanUnderStatusBarChange?: (args: PropertyChangeData) => void;
@@ -387,13 +387,13 @@ export type RepeaterAttributes = CustomLayoutViewAttributes & {
 // ui/scroll-view/scroll-view.d.ts
 export type ScrollViewAttributes = ContentViewAttributes & {
     horizontalOffset?: number;
-    isScrollEnabled?: string | false | true;
+    isScrollEnabled?: string | boolean;
     onIsScrollEnabledChange?: (args: PropertyChangeData) => void;
     onOrientationChange?: (args: PropertyChangeData) => void;
     onScroll?: (args: ScrollEventData) => void;
     onScrollBarIndicatorVisibleChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
-    scrollBarIndicatorVisible?: string | false | true;
+    scrollBarIndicatorVisible?: string | boolean;
     scrollableHeight?: number;
     scrollableWidth?: number;
     verticalOffset?: number;
@@ -463,7 +463,7 @@ export type StackLayoutAttributes = LayoutBaseAttributes & {
 // ui/switch/switch.d.ts
 export type SwitchAttributes = ViewAttributes & {
     android?: any;
-    checked?: string | false | true;
+    checked?: string | boolean;
     ios?: any;
     offBackgroundColor?: string | Color;
     onCheckedChange?: (args: PropertyChangeData) => void;
@@ -472,7 +472,7 @@ export type SwitchAttributes = ViewAttributes & {
 
 // ui/tab-navigation-base/tab-content-item/tab-content-item.d.ts
 export type TabContentItemAttributes = ContentViewAttributes & {
-    canBeLoaded?: false | true;
+    canBeLoaded?: boolean;
 };
 
 // ui/tab-navigation-base/tab-navigation-base/tab-navigation-base.d.ts
@@ -492,7 +492,7 @@ export type TabNavigationBaseAttributes = ViewAttributes & {
 export type TabStripAttributes = ViewAttributes & {
     highlightColor?: string | Color;
     iosIconRenderingMode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
-    isIconSizeFixed?: string | false | true;
+    isIconSizeFixed?: string | boolean;
     items?: string | TabStripItem[];
     onHighlightColorChange?: (args: PropertyChangeData) => void;
     onIosIconRenderingModeChange?: (args: PropertyChangeData) => void;
@@ -520,7 +520,7 @@ export type TabViewAttributes = ViewAttributes & {
     android?: any;
     androidOffscreenTabLimit?: string | number;
     androidSelectedTabHighlightColor?: string | Color;
-    androidSwipeEnabled?: string | false | true;
+    androidSwipeEnabled?: string | boolean;
     androidTabsPosition?: "top" | "bottom";
     ios?: any;
     iosIconRenderingMode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
@@ -541,7 +541,7 @@ export type TabViewAttributes = ViewAttributes & {
 
 // ui/tab-view/tab-view.d.ts
 export type TabViewItemAttributes = ViewBaseAttributes & {
-    canBeLoaded?: false | true;
+    canBeLoaded?: boolean;
     iconSource?: string;
     textTransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
     title?: string;
@@ -561,7 +561,7 @@ export type TabsAttributes = TabNavigationBaseAttributes & {
     onSwipeEnabledChange?: (args: PropertyChangeData) => void;
     onTabsPositionChange?: (args: PropertyChangeData) => void;
     selectedIndex?: number;
-    swipeEnabled?: string | false | true;
+    swipeEnabled?: string | boolean;
     tabStrip?: TabStrip;
     tabsPosition?: "top" | "bottom";
 };
@@ -594,7 +594,7 @@ export type TextFieldAttributes = EditableTextBaseAttributes & {
     android?: any;
     ios?: any;
     onSecureChange?: (args: PropertyChangeData) => void;
-    secure?: string | false | true;
+    secure?: string | boolean;
 };
 
 // ui/text-view/text-view.d.ts
@@ -665,12 +665,12 @@ export type ViewAttributes = ViewBaseAttributes & {
     height?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
     horizontalAlignment?: "left" | "right" | "center" | "stretch";
     ios?: any;
-    iosOverflowSafeArea?: string | false | true;
-    iosOverflowSafeAreaEnabled?: string | false | true;
-    isEnabled?: string | false | true;
-    isLayoutRequired?: false | true;
-    isLayoutValid?: false | true;
-    isUserInteractionEnabled?: string | false | true;
+    iosOverflowSafeArea?: string | boolean;
+    iosOverflowSafeAreaEnabled?: string | boolean;
+    isEnabled?: string | boolean;
+    isLayoutRequired?: boolean;
+    isLayoutValid?: boolean;
+    isUserInteractionEnabled?: string | boolean;
     left?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     margin?: string | number | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
     marginBottom?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
@@ -761,11 +761,11 @@ export type ViewBaseAttributes = ObservableAttributes & {
     effectiveWidth?: number;
     flexGrow?: number;
     flexShrink?: number;
-    flexWrapBefore?: false | true;
+    flexWrapBefore?: boolean;
     id?: string;
     ios?: any;
-    isCollapsed?: false | true;
-    isLoaded?: false | true;
+    isCollapsed?: boolean;
+    isLoaded?: boolean;
     left?: number | "auto" | LengthDipUnit | LengthPxUnit;
     nativeView?: any;
     onBindingContextChange?: (args: PropertyChangeData) => void;
@@ -786,8 +786,8 @@ export type ViewBaseAttributes = ObservableAttributes & {
 // ui/web-view/web-view.d.ts
 export type WebViewAttributes = ViewAttributes & {
     android?: any;
-    canGoBack?: false | true;
-    canGoForward?: false | true;
+    canGoBack?: boolean;
+    canGoForward?: boolean;
     ios?: any;
     onLoadFinished?: (args: LoadEventData) => void;
     onLoadStarted?: (args: LoadEventData) => void;
