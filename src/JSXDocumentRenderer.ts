@@ -10,7 +10,7 @@ export default class JSXDocumentRenderer {
     }
     
     renderImports(imports: ImportAlias[]): string {
-        return imports.map(i => this.renderImport(i)).join("\n");
+        return imports.map(i => this.renderImport(i)).join("\n") +  "\ntype Override<What, With> = Omit<What, keyof With> & With\n";
     }
 
     renderClassPropertyName(propDefinition: AttributeClassPropDefinition): string {
@@ -23,7 +23,9 @@ export default class JSXDocumentRenderer {
 
     renderClass(classDefinition: AttributeClassDefinition): string {
         let propDefs = orderBy(classDefinition.props, x => x.name).map(p => this.renderPropertyDefintion(p));
-        return `// ${classDefinition.meta.sourceFile}\ntype ${classDefinition.className} = ${classDefinition.parentClasses.map(x => x.className + " & ").join("")}{\n${propDefs.join("\n")}\n};`;
+        let baseClassPreamble = classDefinition.parentClasses.length > 0 ? `Override<${classDefinition.parentClasses.map(x => x.className).join(" & ")}, ` : ``;
+        let baseClassPostscript = classDefinition.parentClasses.length > 0 ? `>`: ``;
+        return `// ${classDefinition.meta.sourceFile}\ntype ${classDefinition.className} = ${baseClassPreamble}{\n${propDefs.join("\n")}\n}${baseClassPostscript};`;
     }
 
     renderClasses(classDefinitions: AttributeClassDefinition[]): string {

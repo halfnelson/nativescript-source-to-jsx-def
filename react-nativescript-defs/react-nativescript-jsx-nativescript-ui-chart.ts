@@ -28,36 +28,38 @@ type PropertyChangeData = import("@nativescript/core/data/observable/observable"
 type RadCartesianChartGrid = import("nativescript-ui-chart/index").RadCartesianChartGrid;
 type RadLegendView = import("nativescript-ui-chart/index").RadLegendView;
 type Trackball = import("nativescript-ui-chart/index").Trackball;
+type Override<What, With> = Omit<What, keyof With> & With
+
 
 // index.d.ts
-export type AreaSeriesAttributes = CategoricalSeriesAttributes & {
+export type AreaSeriesAttributes = Override<CategoricalSeriesAttributes, {
 
-};
+}>;
 
 // index.d.ts
-export type BarSeriesAttributes = CategoricalSeriesAttributes & {
+export type BarSeriesAttributes = Override<CategoricalSeriesAttributes, {
     maxBarSize?: string | number;
     minBarSize?: string | number;
     onMaxBarSizeChange?: (args: PropertyChangeData) => void;
     onMinBarSizeChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type BubbleSeriesAttributes = CategoricalSeriesAttributes & {
+export type BubbleSeriesAttributes = Override<CategoricalSeriesAttributes, {
     bubbleScale?: string | number;
     bubbleSizeProperty?: string;
     onBubbleScaleChange?: (args: PropertyChangeData) => void;
     onBubbleSizePropertyChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type CandlestickSeriesAttributes = OhlcSeriesAttributes & {
+export type CandlestickSeriesAttributes = Override<OhlcSeriesAttributes, {
     fillColors?: string | Color[];
     onFillColorsChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type CartesianAxisAttributes = ViewBaseAttributes & {
+export type CartesianAxisAttributes = Override<ViewBaseAttributes, {
     allowPan?: string | boolean;
     allowZoom?: string | boolean;
     hidden?: string | boolean;
@@ -108,10 +110,10 @@ export type CartesianAxisAttributes = ViewBaseAttributes & {
     ticksOffset?: string | number;
     ticksThickness?: string | number;
     verticalLocation?: ChartAxisVerticalLocation;
-};
+}>;
 
 // index.d.ts
-export type CartesianChartAnnotationAttributes = ViewBaseAttributes & {
+export type CartesianChartAnnotationAttributes = Override<ViewBaseAttributes, {
     axisId?: string;
     hidden?: string | boolean;
     onAxisIdChange?: (args: PropertyChangeData) => void;
@@ -124,10 +126,10 @@ export type CartesianChartAnnotationAttributes = ViewBaseAttributes & {
     strokeDashPattern?: string;
     strokeWidth?: string | number;
     zPosition?: ChartAnnotationZPosition;
-};
+}>;
 
 // index.d.ts
-export type CartesianSeriesAttributes = ChartSeriesAttributes & {
+export type CartesianSeriesAttributes = Override<ChartSeriesAttributes, {
     fillColor?: string | Color;
     horizontalAxis?: string | CartesianAxis;
     onFillColorChange?: (args: PropertyChangeData) => void;
@@ -140,10 +142,10 @@ export type CartesianSeriesAttributes = ChartSeriesAttributes & {
     strokeColor?: string | Color;
     strokeWidth?: string | number;
     verticalAxis?: string | CartesianAxis;
-};
+}>;
 
 // index.d.ts
-export type CategoricalAxisAttributes = CartesianAxisAttributes & {
+export type CategoricalAxisAttributes = Override<CartesianAxisAttributes, {
     firstLabelVisibility?: ChartAxisLabelVisibility;
     lastLabelVisibility?: ChartAxisLabelVisibility;
     majorTickInterval?: string | number;
@@ -152,18 +154,18 @@ export type CategoricalAxisAttributes = CartesianAxisAttributes & {
     onMajorTickIntervalChange?: (args: PropertyChangeData) => void;
     onPlotModeChange?: (args: PropertyChangeData) => void;
     plotMode?: ChartAxisPlotMode;
-};
+}>;
 
 // index.d.ts
-export type CategoricalSeriesAttributes = CartesianSeriesAttributes & {
+export type CategoricalSeriesAttributes = Override<CartesianSeriesAttributes, {
     categoryProperty?: string;
     onCategoryPropertyChange?: (args: PropertyChangeData) => void;
     onStackModeChange?: (args: PropertyChangeData) => void;
     stackMode?: ChartSeriesStackMode;
-};
+}>;
 
 // visualization\views\chart-axis.common.d.ts
-export type ChartAxisLabelAttributes = ViewAttributes & {
+export type ChartAxisLabelAttributes = Override<ViewAttributes, {
     fitMode?: ChartPublicEnumChartAxisLabelFitMode;
     format?: string;
     layoutMode?: ChartPublicEnumChartAxisLabelLayoutMode;
@@ -172,26 +174,26 @@ export type ChartAxisLabelAttributes = ViewAttributes & {
     onLayoutModeChange?: (args: PropertyChangeData) => void;
     onRotationAngleChange?: (args: PropertyChangeData) => void;
     rotationAngle?: string | number;
-};
+}>;
 
 // index.d.ts
-export type ChartGridLineAnnotationAttributes = CartesianChartAnnotationAttributes & {
+export type ChartGridLineAnnotationAttributes = Override<CartesianChartAnnotationAttributes, {
     onValueChange?: (args: PropertyChangeData) => void;
     value?: string | any;
-};
+}>;
 
 // index.d.ts
-export type ChartPlotBandAnnotationAttributes = CartesianChartAnnotationAttributes & {
+export type ChartPlotBandAnnotationAttributes = Override<CartesianChartAnnotationAttributes, {
     fillColor?: string | Color;
     maxValue?: string | any;
     minValue?: string | any;
     onFillColorChange?: (args: PropertyChangeData) => void;
     onMaxValueChange?: (args: PropertyChangeData) => void;
     onMinValueChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type ChartSeriesAttributes = ViewBaseAttributes & {
+export type ChartSeriesAttributes = Override<ViewBaseAttributes, {
     android?: any;
     ios?: any;
     items?: string | any;
@@ -209,24 +211,24 @@ export type ChartSeriesAttributes = ViewBaseAttributes & {
     showLabels?: string | boolean;
     value?: string | any;
     valueProperty?: string | any;
-};
+}>;
 
 // visualization\views\chart-series.common.d.ts
-export type ChartSeriesLabelAttributes = ViewAttributes & {
+export type ChartSeriesLabelAttributes = Override<ViewAttributes, {
     format?: string;
     onFormatChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type DateTimeCategoricalAxisAttributes = CategoricalAxisAttributes & {
+export type DateTimeCategoricalAxisAttributes = Override<CategoricalAxisAttributes, {
     dateFormat?: string;
     dateTimeComponent?: ChartAxisDateTimeComponent;
     onDateFormatChange?: (args: PropertyChangeData) => void;
     onDateTimeComponentChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type DateTimeContinuousAxisAttributes = LinearAxisAttributes & {
+export type DateTimeContinuousAxisAttributes = Override<LinearAxisAttributes, {
     dateFormat?: string;
     majorStepUnit?: ChartAxisDateTimeComponent;
     onDateFormatChange?: (args: PropertyChangeData) => void;
@@ -235,39 +237,39 @@ export type DateTimeContinuousAxisAttributes = LinearAxisAttributes & {
     onSourceDateFormatChange?: (args: PropertyChangeData) => void;
     plotMode?: ChartAxisPlotMode;
     sourceDateFormat?: string;
-};
+}>;
 
 // index.d.ts
-export type DonutSeriesAttributes = PieSeriesAttributes & {
+export type DonutSeriesAttributes = Override<PieSeriesAttributes, {
     innerRadiusFactor?: string | number;
     onInnerRadiusFactorChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type LineSeriesAttributes = CategoricalSeriesAttributes & {
+export type LineSeriesAttributes = Override<CategoricalSeriesAttributes, {
 
-};
+}>;
 
 // index.d.ts
-export type LinearAxisAttributes = CartesianAxisAttributes & {
+export type LinearAxisAttributes = Override<CartesianAxisAttributes, {
     majorStep?: string | number;
     maximum?: string | any;
     minimum?: string | any;
     onMajorStepChange?: (args: PropertyChangeData) => void;
     onMaximumChange?: (args: PropertyChangeData) => void;
     onMinimumChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type LogarithmicAxisAttributes = LinearAxisAttributes & {
+export type LogarithmicAxisAttributes = Override<LinearAxisAttributes, {
     exponentStep?: string | number;
     logarithmBase?: string | number;
     onExponentStepChange?: (args: PropertyChangeData) => void;
     onLogarithmBaseChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type OhlcSeriesAttributes = CartesianSeriesAttributes & {
+export type OhlcSeriesAttributes = Override<CartesianSeriesAttributes, {
     closePropertyName?: string;
     highPropertyName?: string;
     lowPropertyName?: string;
@@ -278,30 +280,30 @@ export type OhlcSeriesAttributes = CartesianSeriesAttributes & {
     onStrokeColorsChange?: (args: PropertyChangeData) => void;
     openPropertyName?: string;
     strokeColors?: string | Color[];
-};
+}>;
 
 // index.d.ts
-export type PaletteAttributes = ViewBaseAttributes & {
+export type PaletteAttributes = Override<ViewBaseAttributes, {
     entries?: string | ObservableArray<PaletteEntry>;
     onEntriesChange?: (args: PropertyChangeData) => void;
     onSeriesNameChange?: (args: PropertyChangeData) => void;
     onSeriesStateChange?: (args: PropertyChangeData) => void;
     seriesName?: string;
     seriesState?: ChartPaletteSeriesState;
-};
+}>;
 
 // index.d.ts
-export type PaletteEntryAttributes = ViewBaseAttributes & {
+export type PaletteEntryAttributes = Override<ViewBaseAttributes, {
     fillColor?: string | Color;
     onFillColorChange?: (args: PropertyChangeData) => void;
     onStrokeColorChange?: (args: PropertyChangeData) => void;
     onStrokeWidthChange?: (args: PropertyChangeData) => void;
     strokeColor?: string | Color;
     strokeWidth?: string | number;
-};
+}>;
 
 // index.d.ts
-export type PieSeriesAttributes = ChartSeriesAttributes & {
+export type PieSeriesAttributes = Override<ChartSeriesAttributes, {
     endAngle?: string | number;
     expandRadius?: string | number;
     fillColors?: string | Color[];
@@ -320,10 +322,10 @@ export type PieSeriesAttributes = ChartSeriesAttributes & {
     startAngle?: string | number;
     strokeColors?: string | Color[];
     strokeWidth?: string | number;
-};
+}>;
 
 // index.d.ts
-export type PointLabelStyleAttributes = ViewBaseAttributes & {
+export type PointLabelStyleAttributes = Override<ViewBaseAttributes, {
     fillColor?: string | Color;
     fontName?: string;
     fontStyle?: ChartFontStyle;
@@ -342,10 +344,10 @@ export type PointLabelStyleAttributes = ViewBaseAttributes & {
     textColor?: string | Color;
     textFormat?: string;
     textSize?: string | number;
-};
+}>;
 
 // index.d.ts
-export type RadCartesianChartAttributes = RadChartBaseAttributes & {
+export type RadCartesianChartAttributes = Override<RadChartBaseAttributes, {
     grid?: string | RadCartesianChartGrid;
     horizontalAxis?: string | CartesianAxis;
     horizontalZoom?: string | number;
@@ -358,10 +360,10 @@ export type RadCartesianChartAttributes = RadChartBaseAttributes & {
     trackball?: string | Trackball;
     verticalAxis?: string | CartesianAxis;
     verticalZoom?: string | number;
-};
+}>;
 
 // index.d.ts
-export type RadCartesianChartGridAttributes = ViewBaseAttributes & {
+export type RadCartesianChartGridAttributes = Override<ViewBaseAttributes, {
     android?: any;
     horizontalLinesVisible?: string | boolean;
     horizontalStripLineColor?: string | Color | Color[];
@@ -384,10 +386,10 @@ export type RadCartesianChartGridAttributes = ViewBaseAttributes & {
     verticalStripLinesVisible?: string | boolean;
     verticalStrokeColor?: string | Color | Color[];
     verticalStrokeWidth?: string | number;
-};
+}>;
 
 // index.d.ts
-export type RadChartBaseAttributes = ViewAttributes & {
+export type RadChartBaseAttributes = Override<ViewAttributes, {
     allowAnimations?: string | boolean;
     androidView?: any;
     annotations?: string | ObservableArray<any>;
@@ -403,10 +405,10 @@ export type RadChartBaseAttributes = ViewAttributes & {
     pointSelectionMode?: ChartSelectionMode;
     series?: string | ObservableArray<any>;
     seriesSelectionMode?: ChartSelectionMode;
-};
+}>;
 
 // index.d.ts
-export type RadLegendViewAttributes = ViewAttributes & {
+export type RadLegendViewAttributes = Override<ViewAttributes, {
     enableSelection?: string | boolean;
     horizontalOffset?: string | number;
     offsetOrigin?: ChartLegendOffsetOrigin;
@@ -423,56 +425,56 @@ export type RadLegendViewAttributes = ViewAttributes & {
     titleColor?: string | Color;
     titleSize?: string | number;
     verticalOffset?: string | number;
-};
+}>;
 
 // index.d.ts
-export type RadPieChartAttributes = RadChartBaseAttributes & {
+export type RadPieChartAttributes = Override<RadChartBaseAttributes, {
 
-};
+}>;
 
 // index.d.ts
-export type RangeBarSeriesAttributes = CategoricalSeriesAttributes & {
+export type RangeBarSeriesAttributes = Override<CategoricalSeriesAttributes, {
     highPropertyName?: string;
     lowPropertyName?: string;
     onHighPropertyNameChange?: (args: PropertyChangeData) => void;
     onLowPropertyNameChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type ScatterBubbleSeriesAttributes = ScatterSeriesAttributes & {
+export type ScatterBubbleSeriesAttributes = Override<ScatterSeriesAttributes, {
     bubbleScale?: string | number;
     bubbleSizeProperty?: string;
     bubbleSizePropertyName?: string;
     onBubbleScaleChange?: (args: PropertyChangeData) => void;
     onBubbleSizePropertyChange?: (args: PropertyChangeData) => void;
     onBubbleSizePropertyNameChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // index.d.ts
-export type ScatterSeriesAttributes = CartesianSeriesAttributes & {
+export type ScatterSeriesAttributes = Override<CartesianSeriesAttributes, {
     onXPropertyChange?: (args: PropertyChangeData) => void;
     onYPropertyChange?: (args: PropertyChangeData) => void;
     xProperty?: string;
     yProperty?: string;
-};
+}>;
 
 // index.d.ts
-export type SplineAreaSeriesAttributes = AreaSeriesAttributes & {
+export type SplineAreaSeriesAttributes = Override<AreaSeriesAttributes, {
 
-};
-
-// index.d.ts
-export type SplineSeriesAttributes = LineSeriesAttributes & {
-
-};
+}>;
 
 // index.d.ts
-export type TrackballAttributes = ViewBaseAttributes & {
+export type SplineSeriesAttributes = Override<LineSeriesAttributes, {
+
+}>;
+
+// index.d.ts
+export type TrackballAttributes = Override<ViewBaseAttributes, {
     onShowIntersectionPointsChange?: (args: PropertyChangeData) => void;
     onSnapModeChange?: (args: PropertyChangeData) => void;
     showIntersectionPoints?: string | boolean;
     snapMode?: ChartTrackballSnapMode;
-};
+}>;
 
 
 

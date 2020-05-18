@@ -4,12 +4,14 @@ type DrawerTransitionBase = import("nativescript-ui-sidedrawer/index").DrawerTra
 type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
 type SideDrawerLocation = import("nativescript-ui-sidedrawer/index").SideDrawerLocation;
 type View = import("@nativescript/core/ui/core/view/view").View;
+type Override<What, With> = Omit<What, keyof With> & With
+
 
 declare global {
 namespace svelteNative.JSX {
 
 // index.d.ts
-type RadSideDrawerAttributes = ViewAttributes & {
+type RadSideDrawerAttributes = Override<ViewAttributes, {
     allowedgeswipe?: string | boolean;
     android?: any;
     drawercontent?: string | View;
@@ -28,7 +30,7 @@ type RadSideDrawerAttributes = ViewAttributes & {
     onMainContentChange?: (args: PropertyChangeData) => void;
     onShadowColorChange?: (args: PropertyChangeData) => void;
     shadowcolor?: string | Color;
-};
+}>;
 
 
 interface IntrinsicElements {

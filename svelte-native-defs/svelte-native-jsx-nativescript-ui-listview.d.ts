@@ -11,23 +11,25 @@ type ListViewSelectionBehavior = import("nativescript-ui-listview/index").ListVi
 type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
 type PullToRefreshStyle = import("nativescript-ui-listview/index").PullToRefreshStyle;
 type View = import("@nativescript/core/ui/core/view/view").View;
+type Override<What, With> = Omit<What, keyof With> & With
+
 
 declare global {
 namespace svelteNative.JSX {
 
 // index.d.ts
-type ListViewGridLayoutAttributes = ListViewLinearLayoutAttributes & {
+type ListViewGridLayoutAttributes = Override<ListViewLinearLayoutAttributes, {
     onSpanCountChange?: (args: PropertyChangeData) => void;
     spancount?: string | number;
-};
+}>;
 
 // index.d.ts
-type ListViewLayoutBaseAttributes = ViewBaseAttributes & {
+type ListViewLayoutBaseAttributes = Override<ViewBaseAttributes, {
 
-};
+}>;
 
 // index.d.ts
-type ListViewLinearLayoutAttributes = ListViewLayoutBaseAttributes & {
+type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttributes, {
     android?: any;
     ios?: any;
     itemdeleteanimation?: ListViewItemAnimation;
@@ -40,21 +42,21 @@ type ListViewLinearLayoutAttributes = ListViewLayoutBaseAttributes & {
     onItemWidthChange?: (args: PropertyChangeData) => void;
     onScrollDirectionChange?: (args: PropertyChangeData) => void;
     scrolldirection?: ListViewScrollDirection;
-};
+}>;
 
 // index.d.ts
-type ListViewStaggeredLayoutAttributes = ListViewGridLayoutAttributes & {
+type ListViewStaggeredLayoutAttributes = Override<ListViewGridLayoutAttributes, {
 
-};
+}>;
 
 // ui-listview.common.d.ts
-type PullToRefreshStyleAttributes = ViewBaseAttributes & {
+type PullToRefreshStyleAttributes = Override<ViewBaseAttributes, {
     indicatorbackgroundcolor?: Color;
     indicatorcolor?: Color;
-};
+}>;
 
 // index.d.ts
-type RadListViewAttributes = ViewAttributes & {
+type RadListViewAttributes = Override<ViewAttributes, {
     android?: any;
     androidlistview?: any;
     enablecollapsiblegroups?: string | boolean;
@@ -108,12 +110,12 @@ type RadListViewAttributes = ViewAttributes & {
     selectionbehavior?: ListViewSelectionBehavior;
     sortingfunction?: string | ((item: any, otherItem: any) => number);
     swipeactions?: string | boolean;
-};
+}>;
 
 // index.d.ts
-type ReorderHandleAttributes = StackLayoutAttributes & {
+type ReorderHandleAttributes = Override<StackLayoutAttributes, {
 
-};
+}>;
 
 
 interface IntrinsicElements {

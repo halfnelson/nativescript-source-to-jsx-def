@@ -10,20 +10,22 @@ type ListViewSelectionBehavior = import("nativescript-ui-listview/index").ListVi
 type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
 type PullToRefreshStyle = import("nativescript-ui-listview/index").PullToRefreshStyle;
 type View = import("@nativescript/core/ui/core/view/view").View;
+type Override<What, With> = Omit<What, keyof With> & With
+
 
 // index.d.ts
-export type ListViewGridLayoutAttributes = ListViewLinearLayoutAttributes & {
+export type ListViewGridLayoutAttributes = Override<ListViewLinearLayoutAttributes, {
     onSpanCountChange?: (args: PropertyChangeData) => void;
     spanCount?: string | number;
-};
+}>;
 
 // index.d.ts
-export type ListViewLayoutBaseAttributes = ViewBaseAttributes & {
+export type ListViewLayoutBaseAttributes = Override<ViewBaseAttributes, {
 
-};
+}>;
 
 // index.d.ts
-export type ListViewLinearLayoutAttributes = ListViewLayoutBaseAttributes & {
+export type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttributes, {
     android?: any;
     ios?: any;
     itemDeleteAnimation?: ListViewItemAnimation;
@@ -36,21 +38,21 @@ export type ListViewLinearLayoutAttributes = ListViewLayoutBaseAttributes & {
     onItemWidthChange?: (args: PropertyChangeData) => void;
     onScrollDirectionChange?: (args: PropertyChangeData) => void;
     scrollDirection?: ListViewScrollDirection;
-};
+}>;
 
 // index.d.ts
-export type ListViewStaggeredLayoutAttributes = ListViewGridLayoutAttributes & {
+export type ListViewStaggeredLayoutAttributes = Override<ListViewGridLayoutAttributes, {
 
-};
+}>;
 
 // ui-listview.common.d.ts
-export type PullToRefreshStyleAttributes = ViewBaseAttributes & {
+export type PullToRefreshStyleAttributes = Override<ViewBaseAttributes, {
     indicatorBackgroundColor?: Color;
     indicatorColor?: Color;
-};
+}>;
 
 // index.d.ts
-export type RadListViewAttributes = ViewAttributes & {
+export type RadListViewAttributes = Override<ViewAttributes, {
     android?: any;
     androidListView?: any;
     enableCollapsibleGroups?: string | boolean;
@@ -104,12 +106,12 @@ export type RadListViewAttributes = ViewAttributes & {
     selectionBehavior?: ListViewSelectionBehavior;
     sortingFunction?: string | ((item: any, otherItem: any) => number);
     swipeActions?: string | boolean;
-};
+}>;
 
 // index.d.ts
-export type ReorderHandleAttributes = StackLayoutAttributes & {
+export type ReorderHandleAttributes = Override<StackLayoutAttributes, {
 
-};
+}>;
 
 
 

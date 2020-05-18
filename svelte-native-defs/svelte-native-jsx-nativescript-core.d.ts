@@ -58,17 +58,19 @@ type TouchGestureEventData = import("@nativescript/core/ui/gestures/gestures").T
 type View = import("@nativescript/core/ui/core/view/view").View;
 type ViewBase = import("@nativescript/core/ui/core/view-base/view-base").ViewBase;
 type iOSFrame = import("@nativescript/core/ui/frame/frame").iOSFrame;
+type Override<What, With> = Omit<What, keyof With> & With
+
 
 declare global {
 namespace svelteNative.JSX {
 
 // ui/layouts/absolute-layout/absolute-layout.d.ts
-type AbsoluteLayoutAttributes = LayoutBaseAttributes & {
+type AbsoluteLayoutAttributes = Override<LayoutBaseAttributes, {
 
-};
+}>;
 
 // ui/action-bar/action-bar.d.ts
-type ActionBarAttributes = ViewAttributes & {
+type ActionBarAttributes = Override<ViewAttributes, {
     actionitems?: ActionItems;
     android?: AndroidActionBarSettings;
     androidcontentinset?: string | number | LengthDipUnit | LengthPxUnit;
@@ -85,10 +87,10 @@ type ActionBarAttributes = ViewAttributes & {
     onTitleChange?: (args: PropertyChangeData) => void;
     title?: string;
     titleview?: View;
-};
+}>;
 
 // ui/action-bar/action-bar.d.ts
-type ActionItemAttributes = ViewBaseAttributes & {
+type ActionItemAttributes = Override<ViewBaseAttributes, {
     actionbar?: ActionBar;
     actionview?: View;
     android?: AndroidActionItemSettings;
@@ -100,57 +102,57 @@ type ActionItemAttributes = ViewBaseAttributes & {
     onVisibilityChange?: (args: PropertyChangeData) => void;
     text?: string;
     visibility?: string;
-};
+}>;
 
 // ui/activity-indicator/activity-indicator.d.ts
-type ActivityIndicatorAttributes = ViewAttributes & {
+type ActivityIndicatorAttributes = Override<ViewAttributes, {
     android?: any;
     busy?: string | boolean;
     ios?: any;
     onBusyChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // ui/border/border.d.ts
-type BorderAttributes = ContentViewAttributes & {
+type BorderAttributes = Override<ContentViewAttributes, {
     cornerradius?: number;
-};
+}>;
 
 // ui/bottom-navigation/bottom-navigation.d.ts
-type BottomNavigationAttributes = TabNavigationBaseAttributes & {
+type BottomNavigationAttributes = Override<TabNavigationBaseAttributes, {
     android?: any;
     ios?: any;
     items?: TabContentItem[];
     onSelectedIndexChanged?: (args: BottomNavigationSelectedIndexChangedEventData) => void;
     selectedindex?: number;
     tabstrip?: TabStrip;
-};
+}>;
 
 // ui/button/button.d.ts
-type ButtonAttributes = TextBaseAttributes & {
+type ButtonAttributes = Override<TextBaseAttributes, {
     android?: any;
     ios?: any;
     onTap?: (args: EventData) => void;
     textwrap?: boolean;
-};
+}>;
 
 // ui/core/view/view.d.ts
-type ContainerViewAttributes = ViewAttributes & {
+type ContainerViewAttributes = Override<ViewAttributes, {
     iosoverflowsafearea?: boolean;
-};
+}>;
 
 // ui/content-view/content-view.d.ts
-type ContentViewAttributes = ViewAttributes & {
+type ContentViewAttributes = Override<ViewAttributes, {
     content?: View;
     layoutview?: View;
-};
+}>;
 
 // ui/core/view/view.d.ts
-type CustomLayoutViewAttributes = ContainerViewAttributes & {
+type CustomLayoutViewAttributes = Override<ContainerViewAttributes, {
 
-};
+}>;
 
 // ui/date-picker/date-picker.d.ts
-type DatePickerAttributes = ViewAttributes & {
+type DatePickerAttributes = Override<ViewAttributes, {
     android?: any;
     date?: string | Date;
     day?: string | number;
@@ -165,16 +167,16 @@ type DatePickerAttributes = ViewAttributes & {
     onMonthChange?: (args: PropertyChangeData) => void;
     onYearChange?: (args: PropertyChangeData) => void;
     year?: string | number;
-};
+}>;
 
 // ui/layouts/dock-layout/dock-layout.d.ts
-type DockLayoutAttributes = LayoutBaseAttributes & {
+type DockLayoutAttributes = Override<LayoutBaseAttributes, {
     onStretchLastChildChange?: (args: PropertyChangeData) => void;
     stretchlastchild?: string | boolean;
-};
+}>;
 
 // ui/editable-text-base/editable-text-base.d.ts
-type EditableTextBaseAttributes = TextBaseAttributes & {
+type EditableTextBaseAttributes = Override<TextBaseAttributes, {
     autocapitalizationtype?: "none" | "words" | "sentences" | "allcharacters";
     autocorrect?: string | boolean;
     editable?: string | boolean;
@@ -193,19 +195,19 @@ type EditableTextBaseAttributes = TextBaseAttributes & {
     onUpdateTextTriggerChange?: (args: PropertyChangeData) => void;
     returnkeytype?: "done" | "next" | "go" | "search" | "send";
     updatetexttrigger?: "focusLost" | "textChanged";
-};
+}>;
 
 // ui/layouts/flexbox-layout/flexbox-layout.d.ts
-type FlexboxLayoutAttributes = LayoutBaseAttributes & {
+type FlexboxLayoutAttributes = Override<LayoutBaseAttributes, {
     aligncontent?: "flex-start" | "flex-end" | "center" | "stretch" | "space-between" | "space-around";
     alignitems?: "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
     flexdirection?: "row" | "column" | "row-reverse" | "column-reverse";
     flexwrap?: "nowrap" | "wrap" | "wrap-reverse";
     justifycontent?: "flex-start" | "flex-end" | "center" | "space-between" | "space-around";
-};
+}>;
 
 // ui/text-base/formatted-string.ts
-type FormattedStringAttributes = ViewBaseAttributes & {
+type FormattedStringAttributes = Override<ViewBaseAttributes, {
     backgroundcolor?: string | Color;
     color?: string | Color;
     fontfamily?: string;
@@ -214,10 +216,10 @@ type FormattedStringAttributes = ViewBaseAttributes & {
     fontweight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
     spans?: ObservableArray<Span>;
     textdecoration?: "none" | "underline" | "line-through" | "underline line-through";
-};
+}>;
 
 // ui/frame/frame.d.ts
-type FrameAttributes = ViewAttributes & {
+type FrameAttributes = Override<ViewAttributes, {
     actionbarvisibility?: "always" | "never" | "auto";
     android?: AndroidFrame;
     animated?: boolean;
@@ -230,24 +232,24 @@ type FrameAttributes = ViewAttributes & {
     onActionBarVisibilityChange?: (args: PropertyChangeData) => void;
     onDefaultPageChange?: (args: PropertyChangeData) => void;
     transition?: NavigationTransition;
-};
+}>;
 
 // ui/layouts/grid-layout/grid-layout.d.ts
-type GridLayoutAttributes = LayoutBaseAttributes & {
+type GridLayoutAttributes = Override<LayoutBaseAttributes, {
     columns?: string;
     rows?: string;
-};
+}>;
 
 // ui/html-view/html-view.d.ts
-type HtmlViewAttributes = ViewAttributes & {
+type HtmlViewAttributes = Override<ViewAttributes, {
     android?: any;
     html?: string;
     ios?: any;
     onHtmlChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // ui/image/image.d.ts
-type ImageAttributes = ViewAttributes & {
+type ImageAttributes = Override<ViewAttributes, {
     android?: any;
     decodeheight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     decodewidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -265,17 +267,17 @@ type ImageAttributes = ViewAttributes & {
     src?: string | any;
     stretch?: "none" | "aspectFill" | "aspectFit" | "fill";
     tintcolor?: string | Color;
-};
+}>;
 
 // ui/label/label.d.ts
-type LabelAttributes = TextBaseAttributes & {
+type LabelAttributes = Override<TextBaseAttributes, {
     android?: any;
     ios?: any;
     textwrap?: string | boolean;
-};
+}>;
 
 // ui/layouts/layout-base.d.ts
-type LayoutBaseAttributes = CustomLayoutViewAttributes & {
+type LayoutBaseAttributes = Override<CustomLayoutViewAttributes, {
     cliptobounds?: string | boolean;
     ispassthroughparentenabled?: string | boolean;
     onClipToBoundsChange?: (args: PropertyChangeData) => void;
@@ -285,10 +287,10 @@ type LayoutBaseAttributes = CustomLayoutViewAttributes & {
     paddingleft?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     paddingright?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     paddingtop?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-};
+}>;
 
 // ui/list-picker/list-picker.d.ts
-type ListPickerAttributes = ViewAttributes & {
+type ListPickerAttributes = Override<ViewAttributes, {
     android?: any;
     ios?: any;
     isitemssource?: boolean;
@@ -302,10 +304,10 @@ type ListPickerAttributes = ViewAttributes & {
     selectedvalue?: string;
     textfield?: string;
     valuefield?: string;
-};
+}>;
 
 // ui/list-view/list-view.d.ts
-type ListViewAttributes = ViewAttributes & {
+type ListViewAttributes = Override<ViewAttributes, {
     android?: any;
     ios?: any;
     iosestimatedrowheight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -324,12 +326,12 @@ type ListViewAttributes = ViewAttributes & {
     onRowHeightChange?: (args: PropertyChangeData) => void;
     rowheight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     separatorcolor?: string | Color;
-};
+}>;
 
 // ui/action-bar/action-bar.d.ts
-type NavigationButtonAttributes = ActionItemAttributes & {
+type NavigationButtonAttributes = Override<ActionItemAttributes, {
 
-};
+}>;
 
 // data/observable/observable.d.ts
 type ObservableAttributes = {
@@ -337,7 +339,7 @@ type ObservableAttributes = {
 };
 
 // ui/page/page.d.ts
-type PageAttributes = ContentViewAttributes & {
+type PageAttributes = Override<ContentViewAttributes, {
     actionbar?: ActionBar;
     actionbarhidden?: string | boolean;
     androidstatusbarbackground?: string | Color;
@@ -355,41 +357,41 @@ type PageAttributes = ContentViewAttributes & {
     onNavigatingTo?: (args: NavigatedData) => void;
     page?: Page;
     statusbarstyle?: "light" | "dark";
-};
+}>;
 
 // ui/placeholder/placeholder.d.ts
-type PlaceholderAttributes = ViewAttributes & {
+type PlaceholderAttributes = Override<ViewAttributes, {
     onCreatingView?: (args: CreateViewEventData) => void;
-};
+}>;
 
 // ui/progress/progress.d.ts
-type ProgressAttributes = ViewAttributes & {
+type ProgressAttributes = Override<ViewAttributes, {
     android?: any;
     ios?: any;
     maxvalue?: string | number;
     onMaxValueChange?: (args: PropertyChangeData) => void;
     onValueChange?: (args: PropertyChangeData) => void;
     value?: string | number;
-};
+}>;
 
 // ui/proxy-view-container/proxy-view-container.d.ts
-type ProxyViewContainerAttributes = LayoutBaseAttributes & {
+type ProxyViewContainerAttributes = Override<LayoutBaseAttributes, {
     onProxyChange?: (args: PropertyChangeData) => void;
     proxy?: string;
-};
+}>;
 
 // ui/repeater/repeater.d.ts
-type RepeaterAttributes = CustomLayoutViewAttributes & {
+type RepeaterAttributes = Override<CustomLayoutViewAttributes, {
     itemtemplate?: string | Template;
     items?: string | any[] | RepeaterItemsSource;
     itemslayout?: string | LayoutBase;
     onItemTemplateChange?: (args: PropertyChangeData) => void;
     onItemsChange?: (args: PropertyChangeData) => void;
     onItemsLayoutChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // ui/scroll-view/scroll-view.d.ts
-type ScrollViewAttributes = ContentViewAttributes & {
+type ScrollViewAttributes = Override<ContentViewAttributes, {
     horizontaloffset?: number;
     isscrollenabled?: string | boolean;
     onIsScrollEnabledChange?: (args: PropertyChangeData) => void;
@@ -401,10 +403,10 @@ type ScrollViewAttributes = ContentViewAttributes & {
     scrollableheight?: number;
     scrollablewidth?: number;
     verticaloffset?: number;
-};
+}>;
 
 // ui/search-bar/search-bar.d.ts
-type SearchBarAttributes = ViewAttributes & {
+type SearchBarAttributes = Override<ViewAttributes, {
     android?: any;
     hint?: string;
     ios?: any;
@@ -417,25 +419,25 @@ type SearchBarAttributes = ViewAttributes & {
     text?: string;
     textfieldbackgroundcolor?: string | Color;
     textfieldhintcolor?: string | Color;
-};
+}>;
 
 // ui/segmented-bar/segmented-bar.d.ts
-type SegmentedBarAttributes = ViewAttributes & {
+type SegmentedBarAttributes = Override<ViewAttributes, {
     items?: string | SegmentedBarItem[];
     onItemsChange?: (args: PropertyChangeData) => void;
     onSelectedIndexChange?: (args: PropertyChangeData) => void;
     onSelectedIndexChanged?: (args: SegmentedBarSelectedIndexChangedEventData) => void;
     selectedbackgroundcolor?: string | Color;
     selectedindex?: string | number;
-};
+}>;
 
 // ui/segmented-bar/segmented-bar.d.ts
-type SegmentedBarItemAttributes = ViewBaseAttributes & {
+type SegmentedBarItemAttributes = Override<ViewBaseAttributes, {
     title?: string;
-};
+}>;
 
 // ui/slider/slider.d.ts
-type SliderAttributes = ViewAttributes & {
+type SliderAttributes = Override<ViewAttributes, {
     android?: any;
     ios?: any;
     maxvalue?: string | number;
@@ -444,10 +446,10 @@ type SliderAttributes = ViewAttributes & {
     onMinValueChange?: (args: PropertyChangeData) => void;
     onValueChange?: (args: PropertyChangeData) => void;
     value?: string | number;
-};
+}>;
 
 // ui/text-base/span.ts
-type SpanAttributes = ViewBaseAttributes & {
+type SpanAttributes = Override<ViewBaseAttributes, {
     backgroundcolor?: string | Color;
     color?: string | Color;
     fontfamily?: string;
@@ -456,31 +458,31 @@ type SpanAttributes = ViewBaseAttributes & {
     fontweight?: "normal" | "100" | "200" | "300" | "400" | "500" | "600" | "bold" | "700" | "800" | "900";
     text?: string;
     textdecoration?: "none" | "underline" | "line-through" | "underline line-through";
-};
+}>;
 
 // ui/layouts/stack-layout/stack-layout.d.ts
-type StackLayoutAttributes = LayoutBaseAttributes & {
+type StackLayoutAttributes = Override<LayoutBaseAttributes, {
     onOrientationChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
-};
+}>;
 
 // ui/switch/switch.d.ts
-type SwitchAttributes = ViewAttributes & {
+type SwitchAttributes = Override<ViewAttributes, {
     android?: any;
     checked?: string | boolean;
     ios?: any;
     offbackgroundcolor?: string | Color;
     onCheckedChange?: (args: PropertyChangeData) => void;
     onOffBackgroundColorChange?: (args: PropertyChangeData) => void;
-};
+}>;
 
 // ui/tab-navigation-base/tab-content-item/tab-content-item.d.ts
-type TabContentItemAttributes = ContentViewAttributes & {
+type TabContentItemAttributes = Override<ContentViewAttributes, {
     canbeloaded?: boolean;
-};
+}>;
 
 // ui/tab-navigation-base/tab-navigation-base/tab-navigation-base.d.ts
-type TabNavigationBaseAttributes = ViewAttributes & {
+type TabNavigationBaseAttributes = Override<ViewAttributes, {
     android?: any;
     ios?: any;
     items?: string | TabContentItem[];
@@ -490,10 +492,10 @@ type TabNavigationBaseAttributes = ViewAttributes & {
     onTabStripChange?: (args: PropertyChangeData) => void;
     selectedindex?: string | number;
     tabstrip?: string | TabStrip;
-};
+}>;
 
 // ui/tab-navigation-base/tab-strip/tab-strip.d.ts
-type TabStripAttributes = ViewAttributes & {
+type TabStripAttributes = Override<ViewAttributes, {
     highlightcolor?: string | Color;
     iosiconrenderingmode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
     isiconsizefixed?: string | boolean;
@@ -507,20 +509,20 @@ type TabStripAttributes = ViewAttributes & {
     onUnSelectedItemColorChange?: (args: PropertyChangeData) => void;
     selecteditemcolor?: string | Color;
     unselecteditemcolor?: string | Color;
-};
+}>;
 
 // ui/tab-navigation-base/tab-strip-item/tab-strip-item.d.ts
-type TabStripItemAttributes = ViewAttributes & {
+type TabStripItemAttributes = Override<ViewAttributes, {
     iconclass?: string;
     iconsource?: string;
     image?: Image;
     label?: Label;
     onTap?: (args: EventData) => void;
     title?: string;
-};
+}>;
 
 // ui/tab-view/tab-view.d.ts
-type TabViewAttributes = ViewAttributes & {
+type TabViewAttributes = Override<ViewAttributes, {
     android?: any;
     androidoffscreentablimit?: string | number;
     androidselectedtabhighlightcolor?: string | Color;
@@ -541,19 +543,19 @@ type TabViewAttributes = ViewAttributes & {
     tabbackgroundcolor?: string | Color;
     tabtextcolor?: string | Color;
     tabtextfontsize?: string | number;
-};
+}>;
 
 // ui/tab-view/tab-view.d.ts
-type TabViewItemAttributes = ViewBaseAttributes & {
+type TabViewItemAttributes = Override<ViewBaseAttributes, {
     canbeloaded?: boolean;
     iconsource?: string;
     texttransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
     title?: string;
     view?: View;
-};
+}>;
 
 // ui/tabs/tabs.d.ts
-type TabsAttributes = TabNavigationBaseAttributes & {
+type TabsAttributes = Override<TabNavigationBaseAttributes, {
     android?: any;
     iostabbaritemsalignment?: "center" | "leading" | "justified" | "centerSelected";
     ios?: any;
@@ -568,10 +570,10 @@ type TabsAttributes = TabNavigationBaseAttributes & {
     swipeenabled?: string | boolean;
     tabstrip?: TabStrip;
     tabsposition?: "top" | "bottom";
-};
+}>;
 
 // ui/text-base/text-base.d.ts
-type TextBaseAttributes = ViewAttributes & {
+type TextBaseAttributes = Override<ViewAttributes, {
     fontfamily?: string;
     fontsize?: string | number;
     fontstyle?: "normal" | "italic";
@@ -591,25 +593,25 @@ type TextBaseAttributes = ViewAttributes & {
     textdecoration?: "none" | "underline" | "line-through" | "underline line-through";
     texttransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
     whitespace?: "initial" | "normal" | "nowrap";
-};
+}>;
 
 // ui/text-field/text-field.d.ts
-type TextFieldAttributes = EditableTextBaseAttributes & {
+type TextFieldAttributes = Override<EditableTextBaseAttributes, {
     android?: any;
     ios?: any;
     onSecureChange?: (args: PropertyChangeData) => void;
     secure?: string | boolean;
-};
+}>;
 
 // ui/text-view/text-view.d.ts
-type TextViewAttributes = EditableTextBaseAttributes & {
+type TextViewAttributes = Override<EditableTextBaseAttributes, {
     android?: any;
     ios?: any;
     maxlines?: number;
-};
+}>;
 
 // ui/time-picker/time-picker.d.ts
-type TimePickerAttributes = ViewAttributes & {
+type TimePickerAttributes = Override<ViewAttributes, {
     android?: any;
     hour?: string | number;
     ios?: any;
@@ -628,10 +630,10 @@ type TimePickerAttributes = ViewAttributes & {
     onMinuteIntervalChange?: (args: PropertyChangeData) => void;
     onTimeChange?: (args: PropertyChangeData) => void;
     time?: string | Date;
-};
+}>;
 
 // ui/core/view/view.d.ts
-type ViewAttributes = ViewBaseAttributes & {
+type ViewAttributes = Override<ViewBaseAttributes, {
     android?: any;
     androiddynamicelevationoffset?: string | number;
     androidelevation?: string | number;
@@ -729,10 +731,10 @@ type ViewAttributes = ViewBaseAttributes & {
     verticalalignment?: "top" | "bottom" | "stretch" | "middle";
     visibility?: "visible" | "hidden" | "collapse";
     width?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-};
+}>;
 
 // ui/core/view-base/view-base.d.ts
-type ViewBaseAttributes = ObservableAttributes & {
+type ViewBaseAttributes = Override<ObservableAttributes, {
     alignself?: "auto" | "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
     android?: any;
     bindingcontext?: string | any;
@@ -786,10 +788,10 @@ type ViewBaseAttributes = ObservableAttributes & {
     top?: number | "auto" | LengthDipUnit | LengthPxUnit;
     typename?: string;
     viewcontroller?: any;
-};
+}>;
 
 // ui/web-view/web-view.d.ts
-type WebViewAttributes = ViewAttributes & {
+type WebViewAttributes = Override<ViewAttributes, {
     android?: any;
     cangoback?: boolean;
     cangoforward?: boolean;
@@ -797,10 +799,10 @@ type WebViewAttributes = ViewAttributes & {
     onLoadFinished?: (args: LoadEventData) => void;
     onLoadStarted?: (args: LoadEventData) => void;
     src?: string;
-};
+}>;
 
 // ui/layouts/wrap-layout/wrap-layout.d.ts
-type WrapLayoutAttributes = LayoutBaseAttributes & {
+type WrapLayoutAttributes = Override<LayoutBaseAttributes, {
     effectiveitemheight?: number;
     effectiveitemwidth?: number;
     itemheight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -809,7 +811,7 @@ type WrapLayoutAttributes = LayoutBaseAttributes & {
     onItemWidthChange?: (args: PropertyChangeData) => void;
     onOrientationChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
-};
+}>;
 
 
 interface IntrinsicElements {
