@@ -1,4 +1,14 @@
 {
+  "ts-node": {
+    "transpileOnly": true,
+		"compilerOptions": {
+			"module": "commonjs",
+			"esModuleInterop": true,
+      "strict": true,
+      "sourceMap": true
+		},
+		"include": ["src/**/*"]
+  },
   "compilerOptions": {
     /* Basic Options */
     "incremental": true,                   /* Enable incremental compilation */

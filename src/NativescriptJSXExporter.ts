@@ -41,7 +41,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
     
         this.project = project;
 
-        this.propertyChangeType = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/data/observable/observable.d.ts").getInterfaceOrThrow("PropertyChangeData").getType();
+        this.propertyChangeType = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/data/observable/index.ts").getInterfaceOrThrow("PropertyChangeData").getType();
         this.dynamicProperties = this.getPropertyRegistrations();
     }
 
@@ -150,7 +150,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
 
     getPropertyRegistrations(): PropertyRegistration[] {
         let registrations:PropertyRegistration[] = [];
-        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/properties.d.ts").getClassOrThrow("Property");
+        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/index.ts").getClassOrThrow("Property");
         for (var node of propertyClass.findReferencesAsNodes()) {
             let possibleDeclaration = node.getParent()?.getParent();
             

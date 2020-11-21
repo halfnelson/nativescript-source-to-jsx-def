@@ -3,6 +3,7 @@ import { Project, Node, ClassDeclaration, Type } from "ts-morph";
 import path from "path";
 import pascalCase from 'uppercamelcase';
 import NativescriptJSXExporter, { PropertyRegistration } from "./NativescriptJSXExporter";
+import { formatWithOptions } from "util";
 
 /*
   Exports the nativescript core ui classes. Expects a path to the nativescript source, since it needs the original TS files to find properties that were not exposed in the .d.ts
@@ -39,7 +40,8 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         //prefer .d.ts versions where possible (except for formatted-string and span where ts-morph won't load their .d.ts files)
         const isValidFile = (fp.endsWith('text-base/formatted-string.ts')
             || fp.endsWith('text-base/span.ts')
-            || path.basename(fp) == `${path.basename(path.dirname(fp))}.d.ts`
+            || path.basename(fp) == `index.d.ts`
+            || path.basename(fp) == `index.ts`
         )
 
         if (!isValidFile) return false;
@@ -49,7 +51,7 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
     getSyntheticEventHandlers(c: ClassDeclaration): AttributeClassPropDefinition[] {
         let props = super.getSyntheticEventHandlers(c);
 
-        var gestureTypes = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/gestures/gestures.d.ts").getEnumOrThrow("GestureTypes");
+        var gestureTypes = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/gestures/index.d.ts").getEnumOrThrow("GestureTypes");
 
         for (var m of c.getInstanceMethods().filter(m => m.getName() == "on")) {
 
@@ -64,7 +66,7 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
                 let defaultEventType = gestureSource.getInterfaceOrThrow("GestureEventData");
                 for (var gesture of gestureTypes.getMembers().map(m => m.getName())) {
                     let name = "on" + pascalCase(gesture);
-                    let expectedEventDataTypeName = gesture == "tap" ? "DoubleTapGestureEventData" : pascalCase(gesture) + "GestureEventData";
+                    let expectedEventDataTypeName = gesture == "doubleTap" ? "TapGestureEventData" : pascalCase(gesture) + "GestureEventData";
                     let eventType = gestureSource.getInterface(expectedEventDataTypeName) || defaultEventType;
 
                     let eventTypeDef = this.getTypeDefinition(eventType.getType(), eventType);
@@ -85,7 +87,7 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
     getPropertyRegistrations() {
         var statements: PropertyRegistration[] = [];
-        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/properties.d.ts").getClassOrThrow("Property");
+        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/index.ts").getClassOrThrow("Property");
 
         var refs = propertyClass.getMethod("register")?.findReferencesAsNodes() ?? []
         for (var ref of refs) {
@@ -169,7 +171,12 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         //find our base class:
 
         //look for a -common file
-        let filename = path.basename(currentFile, ".d.ts");
+        // our common files are usually named after our containing folder suffixed with -common.ts in the case of index.d.ts
+        // or their current name with -common.ts instead of .d.ts
+        
+        let filename = path.basename(currentFile,".d.ts");
+        if (filename == "index") 
+            filename = path.basename(path.dirname(currentFile));
         let commonFilename = path.dirname(currentFile) + "/" + filename + "-common.ts";
         let commonSource = this.project.getSourceFile(commonFilename);
 

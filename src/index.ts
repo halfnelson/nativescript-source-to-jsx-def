@@ -6,7 +6,7 @@ import NativescriptCoreJSXExporter from './NativescriptCoreJSXExporter';
 import NativescriptPluginJSXExporter from './NativescriptPluginJSXExporter';
 import { SvelteJSXDocumentRenderer } from './SvelteJSXDocumentRenderer';
 
-const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/nativescript-core");
+const nativescriptSourcePath = path.resolve(__dirname, "../nativescript_src/packages/core");
 
 class ReactJSXDocumentRenderer extends JSXDocumentRenderer {
     renderClass(classDefinition: AttributeClassDefinition): string {
@@ -54,6 +54,6 @@ fs.mkdirSync("./svelte-native-defs", { recursive: true});
 fs.mkdirSync("./react-nativescript-defs", { recursive: true});
 
 exportCore()
-exportModule("nativescript-ui-sidedrawer")
-exportModule("nativescript-ui-listview")
-exportModule("nativescript-ui-chart")
+//exportModule("nativescript-ui-sidedrawer")
+//exportModule("nativescript-ui-listview")
+//exportModule("nativescript-ui-chart")
