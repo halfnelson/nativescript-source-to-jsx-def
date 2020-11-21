@@ -1,7 +1,7 @@
 {
   "name": "nativescript-source-to-jsx-def",
   "version": "1.0.0",
-  "description": "Introspect the NativeScript source to generate JSX definitions for `svelte-type-checker`",
+  "description": "Introspect NativeScript source and plugins to generate JSX definitions for svelte and react",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
