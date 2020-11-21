@@ -9,6 +9,9 @@
     "prestart": "npm run build",
     "start": "node dist/index.js"
   },
+  "files": [
+    "dist/"
+  ],
   "author": "David Pershouse",
   "license": "MIT",
   "devDependencies": {
