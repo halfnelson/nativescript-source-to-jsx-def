@@ -1,5 +1,5 @@
 import NativescriptJSXExporter, { isUIClass } from "./NativescriptJSXExporter";
-import { Project, ClassDeclaration } from "ts-morph";
+import { Project, ClassDeclaration, Type } from "ts-morph";
 import path from "path";
 import { getAncestors, ClassBuilderContext, AttributeClassDefinition } from "./JSXExporter";
 
@@ -7,6 +7,9 @@ import { getAncestors, ClassBuilderContext, AttributeClassDefinition } from "./J
 //TODO
 export default class NativescriptPluginJSXExporter extends NativescriptJSXExporter {
     pluginFolder: string;
+
+    propertyChangeType: Type;
+    propertyClass: ClassDeclaration;
 
 
     static FromNodeModule(moduleName: string): NativescriptPluginJSXExporter {
@@ -27,9 +30,12 @@ export default class NativescriptPluginJSXExporter extends NativescriptJSXExport
    
 
  
-    constructor(modulePath: string, nativescriptPath: string, project: Project) {
-        super(nativescriptPath, project);
+    constructor(modulePath: string, nativescriptCorePath: string, project: Project) {
+        super(project);
         this.pluginFolder = path.normalize(modulePath).replace(/\\/g, '/');
+        nativescriptCorePath = path.normalize(nativescriptCorePath).replace(/\\/g, '/');
+        this.propertyChangeType = this.project.getSourceFileOrThrow(nativescriptCorePath + "/data/observable/index.d.ts").getInterfaceOrThrow("PropertyChangeData").getType();
+        this.propertyClass = this.project.getSourceFileOrThrow(nativescriptCorePath + "/ui/core/properties/index.d.ts").getClassOrThrow("Property");
     }
 
     isElementClass(c: ClassDeclaration) {

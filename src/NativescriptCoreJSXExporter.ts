@@ -3,18 +3,16 @@ import { Project, Node, ClassDeclaration, Type } from "ts-morph";
 import path from "path";
 import pascalCase from 'uppercamelcase';
 import NativescriptJSXExporter, { PropertyRegistration } from "./NativescriptJSXExporter";
-import { formatWithOptions } from "util";
 
 /*
   Exports the nativescript core ui classes. Expects a path to the nativescript source, since it needs the original TS files to find properties that were not exposed in the .d.ts
 */
 
-
-
-
-
 export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter {
-   
+
+    nativescriptCorePath: string;
+    propertyChangeType: Type;
+    propertyClass: ClassDeclaration;
 
     static FromSourcePath(nativescriptSourcePath: string): NativescriptCoreJSXExporter {
         let project = new Project({
@@ -23,10 +21,11 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         return new NativescriptCoreJSXExporter(nativescriptSourcePath, project);
     }
 
-
     constructor(srcPath: string, project: Project) {
-        super(srcPath, project)
-        
+        super(project)
+        this.nativescriptCorePath = path.normalize(srcPath).replace(/\\/g, '/');
+        this.propertyChangeType = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/data/observable/index.ts").getInterfaceOrThrow("PropertyChangeData").getType();
+        this.propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/index.ts").getClassOrThrow("Property");
     }
 
     isElementClass(c: ClassDeclaration) {
@@ -55,7 +54,7 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
         var classMethods = c.getInstanceMethods().filter(m => m.getName() == "on");
 
-        
+
         // some classes have a partner interface of the same name which specifies the events
         var className = c.getName();
         var partnerInterface = className ? c.getSourceFile().getInterface(className) : null;
@@ -200,9 +199,9 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         //look for a -common file
         // our common files are usually named after our containing folder suffixed with -common.ts in the case of index.d.ts
         // or their current name with -common.ts instead of .d.ts
-        
-        let filename = path.basename(currentFile,".d.ts");
-        if (filename == "index") 
+
+        let filename = path.basename(currentFile, ".d.ts");
+        if (filename == "index")
             filename = path.basename(path.dirname(currentFile));
         let commonFilename = path.dirname(currentFile) + "/" + filename + "-common.ts";
         let commonSource = this.project.getSourceFile(commonFilename);
@@ -325,6 +324,17 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
     buildJSXDocument() {
         let doc = super.buildJSXDocument();
+
+        //patch imports to point to their npm package
+        doc.imports.forEach(p => {
+            if (p.path.startsWith(this.nativescriptCorePath)) {
+                if (p.name.toLowerCase().startsWith('ios') || p.name.toLowerCase().startsWith('android') || p.name.toLowerCase() == 'lineargradient' || p.name.toLowerCase() == 'domnode') {
+                    p.path = '@nativescript/core/' + path.relative(this.nativescriptCorePath, p.path).replace(/\\/g, '/');
+                } else {
+                    p.path = '@nativescript/core'
+                }
+            }
+        })
 
         //patch class file meta to be relative
         doc.classDefinitions.forEach(c => {
