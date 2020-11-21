@@ -46,7 +46,6 @@ type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core").Se
 type SelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
 type ShownModallyData = import("@nativescript/core").ShownModallyData;
 type Span = import("@nativescript/core").Span;
-type Style = import("@nativescript/core").Style;
 type SwipeGestureEventData = import("@nativescript/core").SwipeGestureEventData;
 type TabContentItem = import("@nativescript/core").TabContentItem;
 type TabStrip = import("@nativescript/core").TabStrip;

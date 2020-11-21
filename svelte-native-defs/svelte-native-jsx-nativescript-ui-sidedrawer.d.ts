@@ -1,9 +1,9 @@
 export {} //Ensure this is a module
-type Color = import("@nativescript/core/color/color").Color;
-type DrawerTransitionBase = import("nativescript-ui-sidedrawer/index").DrawerTransitionBase;
-type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
-type SideDrawerLocation = import("nativescript-ui-sidedrawer/index").SideDrawerLocation;
-type View = import("@nativescript/core/ui/core/view/view").View;
+type Color = import("@nativescript/core/color").Color;
+type DrawerTransitionBase = import("nativescript-ui-sidedrawer").DrawerTransitionBase;
+type PropertyChangeData = import("@nativescript/core/data/observable").PropertyChangeData;
+type SideDrawerLocation = import("nativescript-ui-sidedrawer").SideDrawerLocation;
+type View = import("@nativescript/core/ui/core/view").View;
 type Override<What, With> = Omit<What, keyof With> & With
 
 
@@ -21,14 +21,14 @@ type RadSideDrawerAttributes = Override<ViewAttributes, {
     gesturesenabled?: string | boolean;
     ios?: any;
     maincontent?: string | View;
-    onAllowEdgeSwipeChange?: (args: PropertyChangeData) => void;
-    onDrawerContentChange?: (args: PropertyChangeData) => void;
-    onDrawerContentSizeChange?: (args: PropertyChangeData) => void;
-    onDrawerLocationChange?: (args: PropertyChangeData) => void;
-    onDrawerTransitionChange?: (args: PropertyChangeData) => void;
-    onGesturesEnabledChange?: (args: PropertyChangeData) => void;
-    onMainContentChange?: (args: PropertyChangeData) => void;
-    onShadowColorChange?: (args: PropertyChangeData) => void;
+    onallowEdgeSwipeChange?: (args: PropertyChangeData) => void;
+    ondrawerContentChange?: (args: PropertyChangeData) => void;
+    ondrawerContentSizeChange?: (args: PropertyChangeData) => void;
+    ondrawerLocationChange?: (args: PropertyChangeData) => void;
+    ondrawerTransitionChange?: (args: PropertyChangeData) => void;
+    ongesturesEnabledChange?: (args: PropertyChangeData) => void;
+    onmainContentChange?: (args: PropertyChangeData) => void;
+    onshadowColorChange?: (args: PropertyChangeData) => void;
     shadowcolor?: string | Color;
 }>;
 

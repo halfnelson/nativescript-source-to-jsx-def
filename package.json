@@ -7,20 +7,17 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node dist/index.js",
-    "getsource": "git clone --branch 7.0.13-core --depth 1 https://github.com/NativeScript/NativeScript.git nativescript_src"
+    "start": "node dist/index.js"
   },
   "author": "David Pershouse",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^13.11.1",
-    "@types/uppercamelcase": "^3.0.0",
-    "ts-morph": "^7.0.2",
-    "ts-node": "^9.0.0",
-    "typescript": "^3.8.3",
-    "uppercamelcase": "^3.0.0"
+    "@types/uppercamelcase": "^3.0.0"
   },
   "dependencies": {
-    "@nativescript/core": "^7.0.13"
+    "ts-morph": "^7.0.2",
+    "typescript": "^3.8.3",
+    "uppercamelcase": "^3.0.0"
   }
 }

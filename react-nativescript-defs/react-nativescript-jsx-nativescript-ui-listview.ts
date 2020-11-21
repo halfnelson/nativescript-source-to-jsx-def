@@ -1,33 +1,30 @@
-type Color = import("@nativescript/core/color/color").Color;
-type KeyedTemplate = import("@nativescript/core/ui/core/view/view").KeyedTemplate;
-type ListViewItemAnimation = import("nativescript-ui-listview/index").ListViewItemAnimation;
-type ListViewLayoutBase = import("nativescript-ui-listview/index").ListViewLayoutBase;
-type ListViewLoadOnDemandMode = import("nativescript-ui-listview/index").ListViewLoadOnDemandMode;
-type ListViewReorderMode = import("nativescript-ui-listview/index").ListViewReorderMode;
-type ListViewScrollDirection = import("nativescript-ui-listview/index").ListViewScrollDirection;
-type ListViewScrollPosition = import("nativescript-ui-listview/index").ListViewScrollPosition;
-type ListViewSelectionBehavior = import("nativescript-ui-listview/index").ListViewSelectionBehavior;
-type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
-type PullToRefreshStyle = import("nativescript-ui-listview/index").PullToRefreshStyle;
-type View = import("@nativescript/core/ui/core/view/view").View;
+type Color = import("@nativescript/core/color").Color;
+type KeyedTemplate = import("@nativescript/core/ui/core/view").KeyedTemplate;
+type ListViewItemAnimation = import("nativescript-ui-listview/ui-listview.common").ListViewItemAnimation;
+type ListViewLayoutBase = import("nativescript-ui-listview").ListViewLayoutBase;
+type ListViewLoadOnDemandMode = import("nativescript-ui-listview").ListViewLoadOnDemandMode;
+type ListViewReorderMode = import("nativescript-ui-listview").ListViewReorderMode;
+type ListViewScrollDirection = import("nativescript-ui-listview/ui-listview.common").ListViewScrollDirection;
+type ListViewScrollPosition = import("nativescript-ui-listview").ListViewScrollPosition;
+type ListViewSelectionBehavior = import("nativescript-ui-listview").ListViewSelectionBehavior;
+type NativescriptUiListviewListViewItemAnimation = import("nativescript-ui-listview").ListViewItemAnimation;
+type NativescriptUiListviewListViewScrollDirection = import("nativescript-ui-listview").ListViewScrollDirection;
+type PropertyChangeData = import("@nativescript/core/data/observable").PropertyChangeData;
+type PullToRefreshStyle = import("nativescript-ui-listview").PullToRefreshStyle;
+type View = import("@nativescript/core/ui/core/view").View;
 type Override<What, With> = Omit<What, keyof With> & With
 
 
 // index.d.ts
 export type ListViewGridLayoutAttributes = Override<ListViewLinearLayoutAttributes, {
+    lineSpacing?: string | number;
+    onLineSpacingChange?: (args: PropertyChangeData) => void;
     onSpanCountChange?: (args: PropertyChangeData) => void;
     spanCount?: string | number;
 }>;
 
 // index.d.ts
 export type ListViewLayoutBaseAttributes = Override<ViewBaseAttributes, {
-
-}>;
-
-// index.d.ts
-export type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttributes, {
-    android?: any;
-    ios?: any;
     itemDeleteAnimation?: ListViewItemAnimation;
     itemHeight?: string | number;
     itemInsertAnimation?: ListViewItemAnimation;
@@ -41,14 +38,34 @@ export type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttribut
 }>;
 
 // index.d.ts
+export type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttributes, {
+    android?: any;
+    dynamicItemSize?: string | boolean;
+    ios?: any;
+    itemDeleteAnimation?: NativescriptUiListviewListViewItemAnimation;
+    itemHeight?: string | number;
+    itemInsertAnimation?: NativescriptUiListviewListViewItemAnimation;
+    itemWidth?: string | number;
+    onDynamicItemSizeChange?: (args: PropertyChangeData) => void;
+    onItemDeleteAnimationChange?: (args: PropertyChangeData) => void;
+    onItemHeightChange?: (args: PropertyChangeData) => void;
+    onItemInsertAnimationChange?: (args: PropertyChangeData) => void;
+    onItemWidthChange?: (args: PropertyChangeData) => void;
+    onScrollDirectionChange?: (args: PropertyChangeData) => void;
+    scrollDirection?: NativescriptUiListviewListViewScrollDirection;
+}>;
+
+// index.d.ts
 export type ListViewStaggeredLayoutAttributes = Override<ListViewGridLayoutAttributes, {
 
 }>;
 
 // ui-listview.common.d.ts
 export type PullToRefreshStyleAttributes = Override<ViewBaseAttributes, {
-    indicatorBackgroundColor?: Color;
-    indicatorColor?: Color;
+    indicatorBackgroundColor?: string | Color;
+    indicatorColor?: string | Color;
+    onIndicatorBackgroundColorChange?: (args: PropertyChangeData) => void;
+    onIndicatorColorChange?: (args: PropertyChangeData) => void;
 }>;
 
 // index.d.ts
@@ -73,6 +90,7 @@ export type RadListViewAttributes = Override<ViewAttributes, {
     items?: string | any;
     listViewLayout?: string | ListViewLayoutBase;
     loadOnDemandBufferSize?: string | number;
+    loadOnDemandItemTemplate?: string;
     loadOnDemandMode?: ListViewLoadOnDemandMode;
     multipleSelection?: string | boolean;
     nativeScriptViewAdded?: (parent: View, child: View) => void;
@@ -87,9 +105,12 @@ export type RadListViewAttributes = Override<ViewAttributes, {
     onItemSwipeChange?: (args: PropertyChangeData) => void;
     onItemSwipeTemplateChange?: (args: PropertyChangeData) => void;
     onItemTemplateChange?: (args: PropertyChangeData) => void;
+    onItemTemplateSelectorChange?: (args: PropertyChangeData) => void;
+    onItemTemplatesChange?: (args: PropertyChangeData) => void;
     onItemsChange?: (args: PropertyChangeData) => void;
     onListViewLayoutChange?: (args: PropertyChangeData) => void;
     onLoadOnDemandBufferSizeChange?: (args: PropertyChangeData) => void;
+    onLoadOnDemandItemTemplateChange?: (args: PropertyChangeData) => void;
     onLoadOnDemandModeChange?: (args: PropertyChangeData) => void;
     onMultipleSelectionChange?: (args: PropertyChangeData) => void;
     onPullToRefreshChange?: (args: PropertyChangeData) => void;

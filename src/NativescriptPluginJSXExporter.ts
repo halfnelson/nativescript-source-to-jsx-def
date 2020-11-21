@@ -10,32 +10,34 @@ export default class NativescriptPluginJSXExporter extends NativescriptJSXExport
 
     propertyChangeType: Type;
     propertyClass: ClassDeclaration;
+    moduleName: string;
+    nativescriptCorePath: string;
 
 
-    static FromNodeModule(moduleName: string): NativescriptPluginJSXExporter {
+    static FromNodeModule(moduleName: string, modulePath: string, nativescriptCorePath: string): NativescriptPluginJSXExporter {
         let project = new Project({ 
             compilerOptions: {
                 allowJs: true,
             }
         });
-        let pluginFolder = path.dirname(require.resolve(moduleName+"/package.json"));
-        let nativescriptFolder = path.dirname(require.resolve("@nativescript/core"));
-        project.addSourceFilesAtPaths(nativescriptFolder+"/**/*.d.ts");
+        let pluginFolder = modulePath;
+       // let nativescriptFolder = path.dirname(require.resolve("@nativescript/core", ));
+        project.addSourceFilesAtPaths(nativescriptCorePath+"/**/*.d.ts");
         project.addSourceFilesAtPaths(pluginFolder+"/**/*.d.ts");
         project.addSourceFilesAtPaths(pluginFolder+"/**/*.js");
         project.resolveSourceFileDependencies();
-
-        return new NativescriptPluginJSXExporter(pluginFolder, nativescriptFolder, project);
+        return new NativescriptPluginJSXExporter(pluginFolder, moduleName, nativescriptCorePath, project);
     }
    
 
  
-    constructor(modulePath: string, nativescriptCorePath: string, project: Project) {
+    constructor(modulePath: string, moduleName: string,  nativescriptCorePath: string, project: Project) {
         super(project);
+        this.moduleName = moduleName;
         this.pluginFolder = path.normalize(modulePath).replace(/\\/g, '/');
-        nativescriptCorePath = path.normalize(nativescriptCorePath).replace(/\\/g, '/');
-        this.propertyChangeType = this.project.getSourceFileOrThrow(nativescriptCorePath + "/data/observable/index.d.ts").getInterfaceOrThrow("PropertyChangeData").getType();
-        this.propertyClass = this.project.getSourceFileOrThrow(nativescriptCorePath + "/ui/core/properties/index.d.ts").getClassOrThrow("Property");
+        this.nativescriptCorePath = path.normalize(nativescriptCorePath).replace(/\\/g, '/');
+        this.propertyChangeType = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/data/observable/index.d.ts").getInterfaceOrThrow("PropertyChangeData").getType();
+        this.propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/index.d.ts").getClassOrThrow("Property");
     }
 
     isElementClass(c: ClassDeclaration) {
@@ -46,6 +48,9 @@ export default class NativescriptPluginJSXExporter extends NativescriptJSXExport
              return false;
         }
         
+        //ignore .android and .ios versions
+        if ( path.basename(srcPath).includes(".android.") ||path.basename(srcPath).includes(".ios.") ) return false;
+
         let isClassOk = isUIClass(c);
         if (!isClassOk) {
             return false;
@@ -82,11 +87,17 @@ export default class NativescriptPluginJSXExporter extends NativescriptJSXExport
             c.meta.sourceFile = path.relative(this.pluginFolder, c.meta.sourceFile);
         })
 
-        let nodeModulesFolder = path.dirname(this.pluginFolder);
+       
         doc.imports.forEach(c => {
 
-            if (c.path.startsWith(nodeModulesFolder)) {
-                c.path = c.path.replace(nodeModulesFolder+"/", "");
+            if (c.path.startsWith(this.pluginFolder)) {
+                c.path = c.path.replace(this.pluginFolder, this.moduleName);
+            }
+            if (c.path.startsWith(this.nativescriptCorePath)) {
+                c.path = c.path.replace(this.nativescriptCorePath, '@nativescript/core');
+            }
+            if (c.path.endsWith('/index')) {
+                c.path = c.path.substring(0, c.path.length - '/index'.length)
             }
         })
         
