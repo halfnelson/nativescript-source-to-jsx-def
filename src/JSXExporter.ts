@@ -150,7 +150,7 @@ export default class JSXExporter {
         }
 
         // first try prefix with parent module
-        alias = pascalCase(path.basename(importPath)) + importName;
+        alias = pascalCase(path.basename(importPath) == "index" ? path.basename(path.dirname(importPath)) : path.basename(importPath)) + importName;
 
         // if we still clash, we will just start adding numbers
         let i = 1;

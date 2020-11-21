@@ -17,7 +17,7 @@ BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CON
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ----
-sveltenative-jsx.d.ts is derived from Nativescript Sources which are licensed 
+type definitions are derived from Nativescript Sources which are licensed 
 
                                 Apache License
                            Version 2.0, January 2004

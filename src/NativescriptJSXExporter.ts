@@ -1,11 +1,5 @@
 import JSXExporter, { getAncestors, JSXDocument, ClassDefinitionBuilderContext, AttributeClassPropDefinition, AttributeClassDefinition, ImportMap, JSXDocumentBuilderContext } from "./JSXExporter";
-import { Project, Node, ClassDeclaration, Type, SourceFile, InterfaceDeclaration } from "ts-morph";
-import path from "path";
-import pascalCase from 'uppercamelcase';
-import { nodeModuleNameResolver } from "typescript";
-
-
-
+import { Project, Node, ClassDeclaration, Type } from "ts-morph";
 
 
 export function inheritsFromViewBase(cl: ClassDeclaration): boolean {
@@ -29,21 +23,21 @@ export type PropertyRegistration = {
 
 
 export default abstract class NativescriptJSXExporter extends JSXExporter {
-    nativescriptCorePath: string;
     project: Project;
-    dynamicProperties: PropertyRegistration[];
+    _dynamicProperties: PropertyRegistration[] | undefined;
     
-    propertyChangeType: Type;
+    abstract propertyChangeType: Type;
+    abstract propertyClass: ClassDeclaration;
 
-    protected constructor(nativescriptCorePath: string, project: Project) {
+    protected constructor(project: Project) {
         super();
-        this.nativescriptCorePath = path.normalize(nativescriptCorePath).replace(/\\/g, '/');
-    
         this.project = project;
-
-        this.propertyChangeType = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/data/observable/observable.d.ts").getInterfaceOrThrow("PropertyChangeData").getType();
-        this.dynamicProperties = this.getPropertyRegistrations();
     }
+
+    get dynamicProperties():PropertyRegistration[] {
+        return this._dynamicProperties ?? this.getPropertyRegistrations();
+    }
+
 
     isElementClass(c: ClassDeclaration) {
         return isUIClass(c);
@@ -96,7 +90,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
 
             //explicitly defined event
             if (eventParam.getType().isStringLiteral()) {
-                var propname = "on" + pascalCase(eventParam.getType().getText().replace(/"/g, ""));
+                var propname = "on" + eventParam.getType().getText().replace(/"/g, "");
                 props.push({
                     name: propname,
                     type: this.getTypeDefinition(callbackParam.getType(), callbackParam),
@@ -137,7 +131,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
         // add propchange events
         dynamicProps.forEach(p => {
             let changeEventProp: AttributeClassPropDefinition = {
-                name: `on${pascalCase(p.name)}Change`,
+                name: `on${p.name}Change`,
                 type: `(args: ${this.getTypeDefinition(this.propertyChangeType)}) => void`,
                 meta: {
                     derivedFrom: "SyntheticEvent:PropertyChange",
@@ -150,7 +144,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
 
     getPropertyRegistrations(): PropertyRegistration[] {
         let registrations:PropertyRegistration[] = [];
-        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/properties.d.ts").getClassOrThrow("Property");
+        var propertyClass = this.propertyClass;
         for (var node of propertyClass.findReferencesAsNodes()) {
             let possibleDeclaration = node.getParent()?.getParent();
             
@@ -202,15 +196,6 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
     buildJSXDocument(): JSXDocument {
         let doc = this.buildJSXDocumentFromElementClassDeclarations(this.getElementClassDeclarations(this.project));
         
-        //patch imports to point to their npm package
-        doc.imports.forEach(p => {
-            if (p.path.startsWith(this.nativescriptCorePath)) {
-                p.path = '@nativescript/core/' + path.relative(this.nativescriptCorePath, p.path).replace(/\\/g, '/');
-            }
-        })
-
-      
-
         return doc;
     }
 }

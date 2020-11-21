@@ -8,12 +8,11 @@ import NativescriptJSXExporter, { PropertyRegistration } from "./NativescriptJSX
   Exports the nativescript core ui classes. Expects a path to the nativescript source, since it needs the original TS files to find properties that were not exposed in the .d.ts
 */
 
-
-
-
-
 export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter {
-   
+
+    nativescriptCorePath: string;
+    propertyChangeType: Type;
+    propertyClass: ClassDeclaration;
 
     static FromSourcePath(nativescriptSourcePath: string): NativescriptCoreJSXExporter {
         let project = new Project({
@@ -22,10 +21,11 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         return new NativescriptCoreJSXExporter(nativescriptSourcePath, project);
     }
 
-
     constructor(srcPath: string, project: Project) {
-        super(srcPath, project)
-        
+        super(project)
+        this.nativescriptCorePath = path.normalize(srcPath).replace(/\\/g, '/');
+        this.propertyChangeType = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/data/observable/index.ts").getInterfaceOrThrow("PropertyChangeData").getType();
+        this.propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/index.ts").getClassOrThrow("Property");
     }
 
     isElementClass(c: ClassDeclaration) {
@@ -39,7 +39,8 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         //prefer .d.ts versions where possible (except for formatted-string and span where ts-morph won't load their .d.ts files)
         const isValidFile = (fp.endsWith('text-base/formatted-string.ts')
             || fp.endsWith('text-base/span.ts')
-            || path.basename(fp) == `${path.basename(path.dirname(fp))}.d.ts`
+            || path.basename(fp) == `index.d.ts`
+            || path.basename(fp) == `index.ts`
         )
 
         if (!isValidFile) return false;
@@ -49,9 +50,36 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
     getSyntheticEventHandlers(c: ClassDeclaration): AttributeClassPropDefinition[] {
         let props = super.getSyntheticEventHandlers(c);
 
-        var gestureTypes = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/gestures/gestures.d.ts").getEnumOrThrow("GestureTypes");
+        var gestureTypes = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/gestures/index.d.ts").getEnumOrThrow("GestureTypes");
 
-        for (var m of c.getInstanceMethods().filter(m => m.getName() == "on")) {
+        var classMethods = c.getInstanceMethods().filter(m => m.getName() == "on");
+
+
+        // some classes have a partner interface of the same name which specifies the events
+        var className = c.getName();
+        var partnerInterface = className ? c.getSourceFile().getInterface(className) : null;
+        var interfaceMethods = partnerInterface?.getMethods().filter(m => m.getName() == "on") ?? []
+
+        for (var i of interfaceMethods) {
+            let params = i.getParameters()
+            let [eventParam, callbackParam] = params;
+
+            //explicitly defined event
+            if (eventParam.getType().isStringLiteral()) {
+                var propname = "on" + eventParam.getType().getText().replace(/"/g, "");
+                if (props.find(p => p.name == propname)) continue;
+                props.push({
+                    name: propname,
+                    type: this.getTypeDefinition(callbackParam.getType(), callbackParam),
+                    meta: {
+                        derivedFrom: "SyntheticEvent:ExplicitInterface",
+                        sourceFile: eventParam.getSourceFile().getFilePath()
+                    }
+                })
+            }
+        }
+
+        for (var m of classMethods) {
 
             let params = m.getParameters();
             if (!params || params.length < 2) continue;
@@ -63,8 +91,8 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
                 let gestureSource = gestureTypes.getSourceFile();
                 let defaultEventType = gestureSource.getInterfaceOrThrow("GestureEventData");
                 for (var gesture of gestureTypes.getMembers().map(m => m.getName())) {
-                    let name = "on" + pascalCase(gesture);
-                    let expectedEventDataTypeName = gesture == "tap" ? "DoubleTapGestureEventData" : pascalCase(gesture) + "GestureEventData";
+                    let name = "on" + gesture;
+                    let expectedEventDataTypeName = gesture == "doubleTap" ? "TapGestureEventData" : pascalCase(gesture) + "GestureEventData";
                     let eventType = gestureSource.getInterface(expectedEventDataTypeName) || defaultEventType;
 
                     let eventTypeDef = this.getTypeDefinition(eventType.getType(), eventType);
@@ -85,7 +113,7 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
     getPropertyRegistrations() {
         var statements: PropertyRegistration[] = [];
-        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/properties.d.ts").getClassOrThrow("Property");
+        var propertyClass = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/core/properties/index.ts").getClassOrThrow("Property");
 
         var refs = propertyClass.getMethod("register")?.findReferencesAsNodes() ?? []
         for (var ref of refs) {
@@ -169,7 +197,12 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
         //find our base class:
 
         //look for a -common file
+        // our common files are usually named after our containing folder suffixed with -common.ts in the case of index.d.ts
+        // or their current name with -common.ts instead of .d.ts
+
         let filename = path.basename(currentFile, ".d.ts");
+        if (filename == "index")
+            filename = path.basename(path.dirname(currentFile));
         let commonFilename = path.dirname(currentFile) + "/" + filename + "-common.ts";
         let commonSource = this.project.getSourceFile(commonFilename);
 
@@ -291,6 +324,17 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
     buildJSXDocument() {
         let doc = super.buildJSXDocument();
+
+        //patch imports to point to their npm package
+        doc.imports.forEach(p => {
+            if (p.path.startsWith(this.nativescriptCorePath)) {
+                if (p.name.toLowerCase().startsWith('ios') || p.name.toLowerCase().startsWith('android') || p.name.toLowerCase() == 'lineargradient' || p.name.toLowerCase() == 'domnode') {
+                    p.path = '@nativescript/core/' + path.relative(this.nativescriptCorePath, p.path).replace(/\\/g, '/');
+                } else {
+                    p.path = '@nativescript/core'
+                }
+            }
+        })
 
         //patch class file meta to be relative
         doc.classDefinitions.forEach(c => {

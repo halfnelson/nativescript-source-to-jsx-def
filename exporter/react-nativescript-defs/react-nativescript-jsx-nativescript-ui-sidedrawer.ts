@@ -1,8 +1,8 @@
-type Color = import("@nativescript/core/color/color").Color;
-type DrawerTransitionBase = import("nativescript-ui-sidedrawer/index").DrawerTransitionBase;
-type PropertyChangeData = import("@nativescript/core/data/observable/observable").PropertyChangeData;
-type SideDrawerLocation = import("nativescript-ui-sidedrawer/index").SideDrawerLocation;
-type View = import("@nativescript/core/ui/core/view/view").View;
+type Color = import("@nativescript/core/color").Color;
+type DrawerTransitionBase = import("nativescript-ui-sidedrawer").DrawerTransitionBase;
+type PropertyChangeData = import("@nativescript/core/data/observable").PropertyChangeData;
+type SideDrawerLocation = import("nativescript-ui-sidedrawer").SideDrawerLocation;
+type View = import("@nativescript/core/ui/core/view").View;
 type Override<What, With> = Omit<What, keyof With> & With
 
 
