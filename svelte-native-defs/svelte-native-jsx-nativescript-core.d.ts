@@ -1,63 +1,66 @@
 export {} //Ensure this is a module
-type ActionBar = import("@nativescript/core/ui/action-bar/index").ActionBar;
-type ActionItems = import("@nativescript/core/ui/action-bar/index").ActionItems;
+type ActionBar = import("@nativescript/core").ActionBar;
+type ActionItems = import("@nativescript/core").ActionItems;
 type AndroidActionBarSettings = import("@nativescript/core/ui/action-bar/index").AndroidActionBarSettings;
 type AndroidActionItemSettings = import("@nativescript/core/ui/action-bar/index").AndroidActionItemSettings;
 type AndroidFrame = import("@nativescript/core/ui/frame/index").AndroidFrame;
-type BackstackEntry = import("@nativescript/core/ui/frame/frame-interfaces").BackstackEntry;
-type Color = import("@nativescript/core/color/index").Color;
+type BackstackEntry = import("@nativescript/core").BackstackEntry;
+type BottomNavigationSelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
+type Color = import("@nativescript/core").Color;
+type CreateViewEventData = import("@nativescript/core").CreateViewEventData;
 type DOMNode = import("@nativescript/core/debugger/dom-node").DOMNode;
-type EventData = import("@nativescript/core/data/observable/index").EventData;
-type FormattedString = import("@nativescript/core/ui/text-base/formatted-string").FormattedString;
-type Frame = import("@nativescript/core/ui/frame/index").Frame;
-type FrameBackstackEntry = import("@nativescript/core/ui/frame/index").BackstackEntry;
-type FrameNavigationEntry = import("@nativescript/core/ui/frame/index").NavigationEntry;
-type FrameNavigationTransition = import("@nativescript/core/ui/frame/index").NavigationTransition;
-type GestureEventData = import("@nativescript/core/ui/gestures/index").GestureEventData;
+type EventData = import("@nativescript/core").EventData;
+type FormattedString = import("@nativescript/core").FormattedString;
+type Frame = import("@nativescript/core").Frame;
+type FrameBackstackEntry = import("@nativescript/core").BackstackEntry;
+type FrameNavigationEntry = import("@nativescript/core").NavigationEntry;
+type FrameNavigationTransition = import("@nativescript/core").NavigationTransition;
+type GestureEventData = import("@nativescript/core").GestureEventData;
 type IOSActionItemSettings = import("@nativescript/core/ui/action-bar/index").IOSActionItemSettings;
-type Image = import("@nativescript/core/ui/image/index").Image;
-type ImageSource = import("@nativescript/core/image-source/index").ImageSource;
-type ItemEventData = import("@nativescript/core/ui/list-view/index").ItemEventData;
-type ItemsSource = import("@nativescript/core/ui/list-picker/list-picker-common").ItemsSource;
-type KeyedTemplate = import("@nativescript/core/ui/core/view/index").KeyedTemplate;
-type Label = import("@nativescript/core/ui/label/index").Label;
-type LayoutBase = import("@nativescript/core/ui/layouts/layout-base").LayoutBase;
-type LengthDipUnit = import("@nativescript/core/ui/styling/style-properties").LengthDipUnit;
-type LengthPercentUnit = import("@nativescript/core/ui/styling/style-properties").LengthPercentUnit;
-type LengthPxUnit = import("@nativescript/core/ui/styling/style-properties").LengthPxUnit;
+type Image = import("@nativescript/core").Image;
+type ImageSource = import("@nativescript/core").ImageSource;
+type ItemEventData = import("@nativescript/core").ItemEventData;
+type ItemsSource = import("@nativescript/core").ItemsSource;
+type KeyedTemplate = import("@nativescript/core").KeyedTemplate;
+type Label = import("@nativescript/core").Label;
+type LayoutBase = import("@nativescript/core").LayoutBase;
+type LengthDipUnit = import("@nativescript/core").LengthDipUnit;
+type LengthPercentUnit = import("@nativescript/core").LengthPercentUnit;
+type LengthPxUnit = import("@nativescript/core").LengthPxUnit;
 type LinearGradient = import("@nativescript/core/ui/styling/gradient").LinearGradient;
-type ListViewItemsSource = import("@nativescript/core/ui/list-view/index").ItemsSource;
-type LoadEventData = import("@nativescript/core/ui/web-view/index").LoadEventData;
-type NavigatedData = import("@nativescript/core/ui/page/index").NavigatedData;
-type NavigationButton = import("@nativescript/core/ui/action-bar/index").NavigationButton;
-type NavigationEntry = import("@nativescript/core/ui/frame/frame-interfaces").NavigationEntry;
-type NavigationTransition = import("@nativescript/core/ui/frame/frame-interfaces").NavigationTransition;
-type ObservableArray<T1> = import("@nativescript/core/data/observable-array/index").ObservableArray<T1>;
-type Page = import("@nativescript/core/ui/page/index").Page;
-type PanGestureEventData = import("@nativescript/core/ui/gestures/index").PanGestureEventData;
-type PinchGestureEventData = import("@nativescript/core/ui/gestures/index").PinchGestureEventData;
-type PropertyChangeData = import("@nativescript/core/data/observable/index").PropertyChangeData;
-type RepeaterItemsSource = import("@nativescript/core/ui/repeater/index").ItemsSource;
-type RotationGestureEventData = import("@nativescript/core/ui/gestures/index").RotationGestureEventData;
-type ScrollEventData = import("@nativescript/core/ui/scroll-view/index").ScrollEventData;
-type SegmentedBarItem = import("@nativescript/core/ui/segmented-bar/index").SegmentedBarItem;
-type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core/ui/segmented-bar/index").SelectedIndexChangedEventData;
-type SelectedIndexChangedEventData = import("@nativescript/core/ui/bottom-navigation/index").SelectedIndexChangedEventData;
-type ShownModallyData = import("@nativescript/core/ui/core/view/index").ShownModallyData;
-type Span = import("@nativescript/core/ui/text-base/span").Span;
-type Style = import("@nativescript/core/ui/styling/style/index").Style;
-type SwipeGestureEventData = import("@nativescript/core/ui/gestures/index").SwipeGestureEventData;
-type TabContentItem = import("@nativescript/core/ui/tab-navigation-base/tab-content-item/index").TabContentItem;
-type TabNavigationBaseSelectedIndexChangedEventData = import("@nativescript/core/ui/tab-navigation-base/tab-navigation-base/index").SelectedIndexChangedEventData;
-type TabStrip = import("@nativescript/core/ui/tab-navigation-base/tab-strip/index").TabStrip;
-type TabStripItem = import("@nativescript/core/ui/tab-navigation-base/tab-strip-item/index").TabStripItem;
-type TabViewItem = import("@nativescript/core/ui/tab-view/index").TabViewItem;
-type TabViewSelectedIndexChangedEventData = import("@nativescript/core/ui/tab-view/index").SelectedIndexChangedEventData;
-type TapGestureEventData = import("@nativescript/core/ui/gestures/index").TapGestureEventData;
-type Template = import("@nativescript/core/ui/core/view/index").Template;
-type TouchGestureEventData = import("@nativescript/core/ui/gestures/index").TouchGestureEventData;
-type View = import("@nativescript/core/ui/core/view/index").View;
-type ViewBase = import("@nativescript/core/ui/core/view-base/index").ViewBase;
+type ListViewItemsSource = import("@nativescript/core").ItemsSource;
+type LoadEventData = import("@nativescript/core").LoadEventData;
+type NavigatedData = import("@nativescript/core").NavigatedData;
+type NavigationButton = import("@nativescript/core").NavigationButton;
+type NavigationEntry = import("@nativescript/core").NavigationEntry;
+type NavigationTransition = import("@nativescript/core").NavigationTransition;
+type ObservableArray<T1> = import("@nativescript/core").ObservableArray<T1>;
+type Page = import("@nativescript/core").Page;
+type PanGestureEventData = import("@nativescript/core").PanGestureEventData;
+type PinchGestureEventData = import("@nativescript/core").PinchGestureEventData;
+type PropertyChangeData = import("@nativescript/core").PropertyChangeData;
+type RepeaterItemsSource = import("@nativescript/core").ItemsSource;
+type RotationGestureEventData = import("@nativescript/core").RotationGestureEventData;
+type ScrollEventData = import("@nativescript/core").ScrollEventData;
+type SegmentedBarItem = import("@nativescript/core").SegmentedBarItem;
+type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
+type SelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
+type ShownModallyData = import("@nativescript/core").ShownModallyData;
+type Span = import("@nativescript/core").Span;
+type Style = import("@nativescript/core").Style;
+type SwipeGestureEventData = import("@nativescript/core").SwipeGestureEventData;
+type TabContentItem = import("@nativescript/core").TabContentItem;
+type TabStrip = import("@nativescript/core").TabStrip;
+type TabStripItem = import("@nativescript/core").TabStripItem;
+type TabStripItemEventData = import("@nativescript/core").TabStripItemEventData;
+type TabViewItem = import("@nativescript/core").TabViewItem;
+type TabViewSelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
+type TapGestureEventData = import("@nativescript/core").TapGestureEventData;
+type Template = import("@nativescript/core").Template;
+type TouchGestureEventData = import("@nativescript/core").TouchGestureEventData;
+type View = import("@nativescript/core").View;
+type ViewBase = import("@nativescript/core").ViewBase;
+type WebViewInterfacesLoadEventData = import("@nativescript/core").LoadEventData;
 type iOSFrame = import("@nativescript/core/ui/frame/index").iOSFrame;
 type Override<What, With> = Omit<What, keyof With> & With
 
@@ -83,9 +86,9 @@ type ActionBarAttributes = Override<ViewAttributes, {
     ios?: any;
     iosiconrenderingmode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
     navigationbutton?: NavigationButton;
-    onFlatChange?: (args: PropertyChangeData) => void;
-    onIosIconRenderingModeChange?: (args: PropertyChangeData) => void;
-    onTitleChange?: (args: PropertyChangeData) => void;
+    onflatChange?: (args: PropertyChangeData) => void;
+    oniosIconRenderingModeChange?: (args: PropertyChangeData) => void;
+    ontitleChange?: (args: PropertyChangeData) => void;
     title?: string;
     titleview?: View;
 }>;
@@ -97,10 +100,10 @@ type ActionItemAttributes = Override<ViewBaseAttributes, {
     android?: AndroidActionItemSettings;
     icon?: string;
     ios?: IOSActionItemSettings;
-    onIconChange?: (args: PropertyChangeData) => void;
-    onTap?: (args: EventData) => void;
-    onTextChange?: (args: PropertyChangeData) => void;
-    onVisibilityChange?: (args: PropertyChangeData) => void;
+    oniconChange?: (args: PropertyChangeData) => void;
+    ontap?: (args: EventData) => void;
+    ontextChange?: (args: PropertyChangeData) => void;
+    onvisibilityChange?: (args: PropertyChangeData) => void;
     text?: string;
     visibility?: string;
 }>;
@@ -110,7 +113,7 @@ type ActivityIndicatorAttributes = Override<ViewAttributes, {
     android?: any;
     busy?: string | boolean;
     ios?: any;
-    onBusyChange?: (args: PropertyChangeData) => void;
+    onbusyChange?: (args: PropertyChangeData) => void;
 }>;
 
 // ui/bottom-navigation/index.d.ts
@@ -118,7 +121,7 @@ type BottomNavigationAttributes = Override<TabNavigationBaseAttributes, {
     android?: any;
     ios?: any;
     items?: TabContentItem[];
-    onSelectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
+    onselectedIndexChanged?: (args: BottomNavigationSelectedIndexChangedEventData) => void;
     selectedindex?: number;
     tabstrip?: TabStrip;
 }>;
@@ -127,7 +130,7 @@ type BottomNavigationAttributes = Override<TabNavigationBaseAttributes, {
 type ButtonAttributes = Override<TextBaseAttributes, {
     android?: any;
     ios?: any;
-    onTap?: (args: EventData) => void;
+    ontap?: (args: EventData) => void;
     textwrap?: boolean;
 }>;
 
@@ -157,19 +160,19 @@ type DatePickerAttributes = Override<ViewAttributes, {
     maxdate?: string | Date;
     mindate?: string | Date;
     month?: string | number;
-    onDateChange?: (args: PropertyChangeData) => void;
-    onDayChange?: (args: PropertyChangeData) => void;
-    onIosPreferredDatePickerStyleChange?: (args: PropertyChangeData) => void;
-    onMaxDateChange?: (args: PropertyChangeData) => void;
-    onMinDateChange?: (args: PropertyChangeData) => void;
-    onMonthChange?: (args: PropertyChangeData) => void;
-    onYearChange?: (args: PropertyChangeData) => void;
+    ondateChange?: (args: PropertyChangeData) => void;
+    ondayChange?: (args: PropertyChangeData) => void;
+    oniosPreferredDatePickerStyleChange?: (args: PropertyChangeData) => void;
+    onmaxDateChange?: (args: PropertyChangeData) => void;
+    onminDateChange?: (args: PropertyChangeData) => void;
+    onmonthChange?: (args: PropertyChangeData) => void;
+    onyearChange?: (args: PropertyChangeData) => void;
     year?: string | number;
 }>;
 
 // ui/layouts/dock-layout/index.d.ts
 type DockLayoutAttributes = Override<LayoutBaseAttributes, {
-    onStretchLastChildChange?: (args: PropertyChangeData) => void;
+    onstretchLastChildChange?: (args: PropertyChangeData) => void;
     stretchlastchild?: string | boolean;
 }>;
 
@@ -182,15 +185,15 @@ type EditableTextBaseAttributes = Override<TextBaseAttributes, {
     keyboardtype?: "number" | "datetime" | "phone" | "url" | "email" | "integer";
     maxlength?: string | number;
     maxlines?: string | number;
-    onAutocapitalizationTypeChange?: (args: PropertyChangeData) => void;
-    onAutocorrectChange?: (args: PropertyChangeData) => void;
-    onEditableChange?: (args: PropertyChangeData) => void;
-    onHintChange?: (args: PropertyChangeData) => void;
-    onKeyboardTypeChange?: (args: PropertyChangeData) => void;
-    onMaxLengthChange?: (args: PropertyChangeData) => void;
-    onMaxLinesChange?: (args: PropertyChangeData) => void;
-    onReturnKeyTypeChange?: (args: PropertyChangeData) => void;
-    onUpdateTextTriggerChange?: (args: PropertyChangeData) => void;
+    onautocapitalizationTypeChange?: (args: PropertyChangeData) => void;
+    onautocorrectChange?: (args: PropertyChangeData) => void;
+    oneditableChange?: (args: PropertyChangeData) => void;
+    onhintChange?: (args: PropertyChangeData) => void;
+    onkeyboardTypeChange?: (args: PropertyChangeData) => void;
+    onmaxLengthChange?: (args: PropertyChangeData) => void;
+    onmaxLinesChange?: (args: PropertyChangeData) => void;
+    onreturnKeyTypeChange?: (args: PropertyChangeData) => void;
+    onupdateTextTriggerChange?: (args: PropertyChangeData) => void;
     returnkeytype?: "done" | "next" | "go" | "search" | "send";
     updatetexttrigger?: "focusLost" | "textChanged";
 }>;
@@ -238,8 +241,8 @@ type FrameBaseAttributes = Override<CustomLayoutViewAttributes, {
     currentpage?: Page;
     defaultpage?: string;
     navigationbarheight?: number;
-    onActionBarVisibilityChange?: (args: PropertyChangeData) => void;
-    onDefaultPageChange?: (args: PropertyChangeData) => void;
+    onactionBarVisibilityChange?: (args: PropertyChangeData) => void;
+    ondefaultPageChange?: (args: PropertyChangeData) => void;
     transition?: NavigationTransition;
 }>;
 
@@ -254,7 +257,7 @@ type HtmlViewAttributes = Override<ViewAttributes, {
     android?: any;
     html?: string;
     ios?: any;
-    onHtmlChange?: (args: PropertyChangeData) => void;
+    onhtmlChange?: (args: PropertyChangeData) => void;
 }>;
 
 // ui/image/index.d.ts
@@ -266,13 +269,13 @@ type ImageAttributes = Override<ViewAttributes, {
     ios?: any;
     isloading?: string | boolean;
     loadmode?: "sync" | "async";
-    onDecodeHeightChange?: (args: PropertyChangeData) => void;
-    onDecodeWidthChange?: (args: PropertyChangeData) => void;
-    onImageSourceChange?: (args: PropertyChangeData) => void;
-    onIsLoadingChange?: (args: PropertyChangeData) => void;
-    onLoadModeChange?: (args: PropertyChangeData) => void;
-    onSrcChange?: (args: PropertyChangeData) => void;
-    onStretchChange?: (args: PropertyChangeData) => void;
+    ondecodeHeightChange?: (args: PropertyChangeData) => void;
+    ondecodeWidthChange?: (args: PropertyChangeData) => void;
+    onimageSourceChange?: (args: PropertyChangeData) => void;
+    onisLoadingChange?: (args: PropertyChangeData) => void;
+    onloadModeChange?: (args: PropertyChangeData) => void;
+    onsrcChange?: (args: PropertyChangeData) => void;
+    onstretchChange?: (args: PropertyChangeData) => void;
     src?: string | any;
     stretch?: "none" | "aspectFill" | "aspectFit" | "fill";
     tintcolor?: string | Color;
@@ -289,8 +292,8 @@ type LabelAttributes = Override<TextBaseAttributes, {
 type LayoutBaseAttributes = Override<CustomLayoutViewAttributes, {
     cliptobounds?: string | boolean;
     ispassthroughparentenabled?: string | boolean;
-    onClipToBoundsChange?: (args: PropertyChangeData) => void;
-    onIsPassThroughParentEnabledChange?: (args: PropertyChangeData) => void;
+    onclipToBoundsChange?: (args: PropertyChangeData) => void;
+    onisPassThroughParentEnabledChange?: (args: PropertyChangeData) => void;
     padding?: string | number | LengthDipUnit | LengthPxUnit;
     paddingbottom?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     paddingleft?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -304,11 +307,11 @@ type ListPickerAttributes = Override<ViewAttributes, {
     ios?: any;
     isitemssource?: boolean;
     items?: string | any[] | ItemsSource;
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChange?: (args: PropertyChangeData) => void;
-    onSelectedValueChange?: (args: PropertyChangeData) => void;
-    onTextFieldChange?: (args: PropertyChangeData) => void;
-    onValueFieldChange?: (args: PropertyChangeData) => void;
+    onitemsChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChange?: (args: PropertyChangeData) => void;
+    onselectedValueChange?: (args: PropertyChangeData) => void;
+    ontextFieldChange?: (args: PropertyChangeData) => void;
+    onvalueFieldChange?: (args: PropertyChangeData) => void;
     selectedindex?: string | number;
     selectedvalue?: string;
     textfield?: string;
@@ -325,14 +328,14 @@ type ListViewAttributes = Override<ViewAttributes, {
     itemtemplateselector?: string | ((item: any, index: number, items: any) => string);
     itemtemplates?: string | KeyedTemplate[];
     items?: string | any[] | ListViewItemsSource;
-    onIosEstimatedRowHeightChange?: (args: PropertyChangeData) => void;
-    onItemLoading?: (args: ItemEventData) => void;
-    onItemTap?: (args: ItemEventData) => void;
-    onItemTemplateChange?: (args: PropertyChangeData) => void;
-    onItemTemplatesChange?: (args: PropertyChangeData) => void;
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onLoadMoreItems?: (args: EventData) => void;
-    onRowHeightChange?: (args: PropertyChangeData) => void;
+    oniosEstimatedRowHeightChange?: (args: PropertyChangeData) => void;
+    onitemLoading?: (args: ItemEventData) => void;
+    onitemTap?: (args: ItemEventData) => void;
+    onitemTemplateChange?: (args: PropertyChangeData) => void;
+    onitemTemplatesChange?: (args: PropertyChangeData) => void;
+    onitemsChange?: (args: PropertyChangeData) => void;
+    onloadMoreItems?: (args: EventData) => void;
+    onrowHeightChange?: (args: PropertyChangeData) => void;
     rowheight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     separatorcolor?: string | Color;
 }>;
@@ -357,10 +360,10 @@ type PageAttributes = Override<PageBaseAttributes, {
     frame?: Frame;
     hasactionbar?: boolean;
     navigationcontext?: any;
-    onNavigatedFrom?: (args: NavigatedData) => void;
-    onNavigatedTo?: (args: NavigatedData) => void;
-    onNavigatingFrom?: (args: NavigatedData) => void;
-    onNavigatingTo?: (args: NavigatedData) => void;
+    onnavigatedFrom?: (args: NavigatedData) => void;
+    onnavigatedTo?: (args: NavigatedData) => void;
+    onnavigatingFrom?: (args: NavigatedData) => void;
+    onnavigatingTo?: (args: NavigatedData) => void;
     statusbarstyle?: "light" | "dark";
 }>;
 
@@ -374,16 +377,22 @@ type PageBaseAttributes = Override<ContentViewAttributes, {
     frame?: Frame;
     hasactionbar?: boolean;
     navigationcontext?: any;
-    onActionBarHiddenChange?: (args: PropertyChangeData) => void;
-    onBackgroundSpanUnderStatusBarChange?: (args: PropertyChangeData) => void;
-    onEnableSwipeBackNavigationChange?: (args: PropertyChangeData) => void;
+    onactionBarHiddenChange?: (args: PropertyChangeData) => void;
+    onbackgroundSpanUnderStatusBarChange?: (args: PropertyChangeData) => void;
+    onenableSwipeBackNavigationChange?: (args: PropertyChangeData) => void;
+    onnavigatedFrom?: (args: NavigatedData) => void;
+    onnavigatedTo?: (args: NavigatedData) => void;
+    onnavigatingFrom?: (args: NavigatedData) => void;
+    onnavigatingTo?: (args: NavigatedData) => void;
+    onshowingModally?: (args: ShownModallyData) => void;
+    onshownModally?: (args: ShownModallyData) => void;
     page?: Page;
     statusbarstyle?: "light" | "dark";
 }>;
 
 // ui/placeholder/index.ts
 type PlaceholderAttributes = Override<ViewAttributes, {
-
+    oncreatingView?: (args: CreateViewEventData) => void;
 }>;
 
 // ui/progress/index.d.ts
@@ -391,8 +400,8 @@ type ProgressAttributes = Override<ViewAttributes, {
     android?: any;
     ios?: any;
     maxvalue?: string | number;
-    onMaxValueChange?: (args: PropertyChangeData) => void;
-    onValueChange?: (args: PropertyChangeData) => void;
+    onmaxValueChange?: (args: PropertyChangeData) => void;
+    onvalueChange?: (args: PropertyChangeData) => void;
     value?: string | number;
 }>;
 
@@ -401,7 +410,7 @@ type ProxyViewContainerAttributes = Override<LayoutBaseAttributes, {
     android?: any;
     ios?: any;
     islayoutrequested?: boolean;
-    onProxyChange?: (args: PropertyChangeData) => void;
+    onproxyChange?: (args: PropertyChangeData) => void;
     proxy?: string;
 }>;
 
@@ -414,20 +423,20 @@ type RepeaterAttributes = Override<CustomLayoutViewAttributes, {
     itemtemplates?: string | KeyedTemplate[];
     items?: string | any[] | RepeaterItemsSource;
     itemslayout?: string | LayoutBase;
-    onItemTemplateChange?: (args: PropertyChangeData) => void;
-    onItemTemplatesChange?: (args: PropertyChangeData) => void;
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onItemsLayoutChange?: (args: PropertyChangeData) => void;
+    onitemTemplateChange?: (args: PropertyChangeData) => void;
+    onitemTemplatesChange?: (args: PropertyChangeData) => void;
+    onitemsChange?: (args: PropertyChangeData) => void;
+    onitemsLayoutChange?: (args: PropertyChangeData) => void;
 }>;
 
 // ui/scroll-view/index.d.ts
 type ScrollViewAttributes = Override<ContentViewAttributes, {
     horizontaloffset?: number;
     isscrollenabled?: string | boolean;
-    onIsScrollEnabledChange?: (args: PropertyChangeData) => void;
-    onOrientationChange?: (args: PropertyChangeData) => void;
-    onScroll?: (args: ScrollEventData) => void;
-    onScrollBarIndicatorVisibleChange?: (args: PropertyChangeData) => void;
+    onisScrollEnabledChange?: (args: PropertyChangeData) => void;
+    onorientationChange?: (args: PropertyChangeData) => void;
+    onscroll?: (args: ScrollEventData) => void;
+    onscrollBarIndicatorVisibleChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
     scrollbarindicatorvisible?: string | boolean;
     scrollableheight?: number;
@@ -440,12 +449,12 @@ type SearchBarAttributes = Override<ViewAttributes, {
     android?: any;
     hint?: string;
     ios?: any;
-    onClose?: (args: EventData) => void;
-    onHintChange?: (args: PropertyChangeData) => void;
-    onSubmit?: (args: EventData) => void;
-    onTextChange?: (args: PropertyChangeData) => void;
-    onTextFieldBackgroundColorChange?: (args: PropertyChangeData) => void;
-    onTextFieldHintColorChange?: (args: PropertyChangeData) => void;
+    onclose?: (args: EventData) => void;
+    onhintChange?: (args: PropertyChangeData) => void;
+    onsubmit?: (args: EventData) => void;
+    ontextChange?: (args: PropertyChangeData) => void;
+    ontextFieldBackgroundColorChange?: (args: PropertyChangeData) => void;
+    ontextFieldHintColorChange?: (args: PropertyChangeData) => void;
     text?: string;
     textfieldbackgroundcolor?: string | Color;
     textfieldhintcolor?: string | Color;
@@ -454,9 +463,9 @@ type SearchBarAttributes = Override<ViewAttributes, {
 // ui/segmented-bar/index.d.ts
 type SegmentedBarAttributes = Override<ViewAttributes, {
     items?: string | SegmentedBarItem[];
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: SegmentedBarSelectedIndexChangedEventData) => void;
+    onitemsChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChanged?: (args: SegmentedBarSelectedIndexChangedEventData) => void;
     selectedbackgroundcolor?: string | Color;
     selectedindex?: string | number;
 }>;
@@ -472,9 +481,9 @@ type SliderAttributes = Override<ViewAttributes, {
     ios?: any;
     maxvalue?: string | number;
     minvalue?: string | number;
-    onMaxValueChange?: (args: PropertyChangeData) => void;
-    onMinValueChange?: (args: PropertyChangeData) => void;
-    onValueChange?: (args: PropertyChangeData) => void;
+    onmaxValueChange?: (args: PropertyChangeData) => void;
+    onminValueChange?: (args: PropertyChangeData) => void;
+    onvalueChange?: (args: PropertyChangeData) => void;
     value?: string | number;
 }>;
 
@@ -493,7 +502,7 @@ type SpanAttributes = Override<ViewBaseAttributes, {
 
 // ui/layouts/stack-layout/index.d.ts
 type StackLayoutAttributes = Override<LayoutBaseAttributes, {
-    onOrientationChange?: (args: PropertyChangeData) => void;
+    onorientationChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
 }>;
 
@@ -503,8 +512,8 @@ type SwitchAttributes = Override<ViewAttributes, {
     checked?: string | boolean;
     ios?: any;
     offbackgroundcolor?: string | Color;
-    onCheckedChange?: (args: PropertyChangeData) => void;
-    onOffBackgroundColorChange?: (args: PropertyChangeData) => void;
+    oncheckedChange?: (args: PropertyChangeData) => void;
+    onoffBackgroundColorChange?: (args: PropertyChangeData) => void;
 }>;
 
 // ui/tab-navigation-base/tab-content-item/index.d.ts
@@ -515,9 +524,10 @@ type TabContentItemAttributes = Override<ContentViewAttributes, {
 // ui/tab-navigation-base/tab-navigation-base/index.ts
 type TabNavigationBaseAttributes = Override<ViewAttributes, {
     items?: string | TabContentItem[];
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChange?: (args: PropertyChangeData) => void;
-    onTabStripChange?: (args: PropertyChangeData) => void;
+    onitemsChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
+    ontabStripChange?: (args: PropertyChangeData) => void;
     selectedindex?: string | number;
     tabstrip?: string | TabStrip;
 }>;
@@ -528,12 +538,13 @@ type TabStripAttributes = Override<ViewAttributes, {
     iosiconrenderingmode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
     isiconsizefixed?: string | boolean;
     items?: string | TabStripItem[];
-    onHighlightColorChange?: (args: PropertyChangeData) => void;
-    onIosIconRenderingModeChange?: (args: PropertyChangeData) => void;
-    onIsIconSizeFixedChange?: (args: PropertyChangeData) => void;
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onSelectedItemColorChange?: (args: PropertyChangeData) => void;
-    onUnSelectedItemColorChange?: (args: PropertyChangeData) => void;
+    onhighlightColorChange?: (args: PropertyChangeData) => void;
+    oniosIconRenderingModeChange?: (args: PropertyChangeData) => void;
+    onisIconSizeFixedChange?: (args: PropertyChangeData) => void;
+    onitemTap?: (args: TabStripItemEventData) => void;
+    onitemsChange?: (args: PropertyChangeData) => void;
+    onselectedItemColorChange?: (args: PropertyChangeData) => void;
+    onunSelectedItemColorChange?: (args: PropertyChangeData) => void;
     selecteditemcolor?: string | Color;
     unselecteditemcolor?: string | Color;
 }>;
@@ -557,13 +568,13 @@ type TabViewAttributes = Override<ViewAttributes, {
     ios?: any;
     iosiconrenderingmode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
     items?: string | TabViewItem[];
-    onAndroidOffscreenTabLimitChange?: (args: PropertyChangeData) => void;
-    onAndroidSwipeEnabledChange?: (args: PropertyChangeData) => void;
-    onAndroidTabsPositionChange?: (args: PropertyChangeData) => void;
-    onIosIconRenderingModeChange?: (args: PropertyChangeData) => void;
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: TabViewSelectedIndexChangedEventData) => void;
+    onandroidOffscreenTabLimitChange?: (args: PropertyChangeData) => void;
+    onandroidSwipeEnabledChange?: (args: PropertyChangeData) => void;
+    onandroidTabsPositionChange?: (args: PropertyChangeData) => void;
+    oniosIconRenderingModeChange?: (args: PropertyChangeData) => void;
+    onitemsChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChanged?: (args: TabViewSelectedIndexChangedEventData) => void;
     selectedindex?: string | number;
     selectedtabtextcolor?: string | Color;
     tabbackgroundcolor?: string | Color;
@@ -588,12 +599,12 @@ type TabsAttributes = Override<TabNavigationBaseAttributes, {
     ios?: any;
     items?: TabContentItem[];
     offscreentablimit?: string | number;
-    onAnimationEnabledChange?: (args: PropertyChangeData) => void;
-    onIOsTabBarItemsAlignmentChange?: (args: PropertyChangeData) => void;
-    onOffscreenTabLimitChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: TabNavigationBaseSelectedIndexChangedEventData) => void;
-    onSwipeEnabledChange?: (args: PropertyChangeData) => void;
-    onTabsPositionChange?: (args: PropertyChangeData) => void;
+    onanimationEnabledChange?: (args: PropertyChangeData) => void;
+    oniOSTabBarItemsAlignmentChange?: (args: PropertyChangeData) => void;
+    onoffscreenTabLimitChange?: (args: PropertyChangeData) => void;
+    onselectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
+    onswipeEnabledChange?: (args: PropertyChangeData) => void;
+    ontabsPositionChange?: (args: PropertyChangeData) => void;
     selectedindex?: number;
     swipeenabled?: string | boolean;
     tabstrip?: TabStrip;
@@ -609,8 +620,8 @@ type TextBaseAttributes = Override<ViewAttributes, {
     formattedtext?: string | FormattedString;
     letterspacing?: string | number;
     lineheight?: string | number;
-    onFormattedTextChange?: (args: PropertyChangeData) => void;
-    onTextChange?: (args: PropertyChangeData) => void;
+    onformattedTextChange?: (args: PropertyChangeData) => void;
+    ontextChange?: (args: PropertyChangeData) => void;
     padding?: string | number | LengthDipUnit | LengthPxUnit;
     paddingbottom?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     paddingleft?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
@@ -628,8 +639,8 @@ type TextFieldAttributes = Override<EditableTextBaseAttributes, {
     android?: any;
     closeonreturn?: string | boolean;
     ios?: any;
-    onCloseOnReturnChange?: (args: PropertyChangeData) => void;
-    onSecureChange?: (args: PropertyChangeData) => void;
+    oncloseOnReturnChange?: (args: PropertyChangeData) => void;
+    onsecureChange?: (args: PropertyChangeData) => void;
     secure?: string | boolean;
     securewithoutautofill?: boolean;
 }>;
@@ -653,15 +664,15 @@ type TimePickerAttributes = Override<ViewAttributes, {
     minminute?: string | number;
     minute?: string | number;
     minuteinterval?: string | number;
-    onHourChange?: (args: PropertyChangeData) => void;
-    onIosPreferredDatePickerStyleChange?: (args: PropertyChangeData) => void;
-    onMaxHourChange?: (args: PropertyChangeData) => void;
-    onMaxMinuteChange?: (args: PropertyChangeData) => void;
-    onMinHourChange?: (args: PropertyChangeData) => void;
-    onMinMinuteChange?: (args: PropertyChangeData) => void;
-    onMinuteChange?: (args: PropertyChangeData) => void;
-    onMinuteIntervalChange?: (args: PropertyChangeData) => void;
-    onTimeChange?: (args: PropertyChangeData) => void;
+    onhourChange?: (args: PropertyChangeData) => void;
+    oniosPreferredDatePickerStyleChange?: (args: PropertyChangeData) => void;
+    onmaxHourChange?: (args: PropertyChangeData) => void;
+    onmaxMinuteChange?: (args: PropertyChangeData) => void;
+    onminHourChange?: (args: PropertyChangeData) => void;
+    onminMinuteChange?: (args: PropertyChangeData) => void;
+    onminuteChange?: (args: PropertyChangeData) => void;
+    onminuteIntervalChange?: (args: PropertyChangeData) => void;
+    ontimeChange?: (args: PropertyChangeData) => void;
     time?: string | Date;
 }>;
 
@@ -719,33 +730,33 @@ type ViewAttributes = Override<ViewBaseAttributes, {
     minheight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     minwidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     modal?: View;
-    onAndroidBackPressed?: (args: EventData) => void;
-    onAutomationTextChange?: (args: PropertyChangeData) => void;
-    onColumnChange?: (args: PropertyChangeData) => void;
-    onColumnSpanChange?: (args: PropertyChangeData) => void;
-    onDockChange?: (args: PropertyChangeData) => void;
-    onDoubleTap?: (arg: TapGestureEventData) => any;
-    onIosOverflowSafeAreaChange?: (args: PropertyChangeData) => void;
-    onIosOverflowSafeAreaEnabledChange?: (args: PropertyChangeData) => void;
-    onIsEnabledChange?: (args: PropertyChangeData) => void;
-    onIsUserInteractionEnabledChange?: (args: PropertyChangeData) => void;
-    onLeftChange?: (args: PropertyChangeData) => void;
-    onLoaded?: (args: EventData) => void;
-    onLongPress?: (arg: GestureEventData) => any;
-    onOriginXChange?: (args: PropertyChangeData) => void;
-    onOriginYChange?: (args: PropertyChangeData) => void;
-    onPan?: (arg: PanGestureEventData) => any;
-    onPinch?: (arg: PinchGestureEventData) => any;
-    onRotation?: (arg: RotationGestureEventData) => any;
-    onRowChange?: (args: PropertyChangeData) => void;
-    onRowSpanChange?: (args: PropertyChangeData) => void;
-    onShowingModally?: (args: ShownModallyData) => void;
-    onShownModally?: (args: ShownModallyData) => void;
-    onSwipe?: (arg: SwipeGestureEventData) => any;
-    onTap?: (arg: TapGestureEventData) => any;
-    onTopChange?: (args: PropertyChangeData) => void;
-    onTouch?: (arg: TouchGestureEventData) => any;
-    onUnloaded?: (args: EventData) => void;
+    onandroidBackPressed?: (args: EventData) => void;
+    onautomationTextChange?: (args: PropertyChangeData) => void;
+    oncolumnChange?: (args: PropertyChangeData) => void;
+    oncolumnSpanChange?: (args: PropertyChangeData) => void;
+    ondockChange?: (args: PropertyChangeData) => void;
+    ondoubleTap?: (arg: TapGestureEventData) => any;
+    oniosOverflowSafeAreaChange?: (args: PropertyChangeData) => void;
+    oniosOverflowSafeAreaEnabledChange?: (args: PropertyChangeData) => void;
+    onisEnabledChange?: (args: PropertyChangeData) => void;
+    onisUserInteractionEnabledChange?: (args: PropertyChangeData) => void;
+    onleftChange?: (args: PropertyChangeData) => void;
+    onloaded?: (args: EventData) => void;
+    onlongPress?: (arg: GestureEventData) => any;
+    onoriginXChange?: (args: PropertyChangeData) => void;
+    onoriginYChange?: (args: PropertyChangeData) => void;
+    onpan?: (arg: PanGestureEventData) => any;
+    onpinch?: (arg: PinchGestureEventData) => any;
+    onrotation?: (arg: RotationGestureEventData) => any;
+    onrowChange?: (args: PropertyChangeData) => void;
+    onrowSpanChange?: (args: PropertyChangeData) => void;
+    onshowingModally?: (args: ShownModallyData) => void;
+    onshownModally?: (args: ShownModallyData) => void;
+    onswipe?: (arg: SwipeGestureEventData) => any;
+    ontap?: (arg: TapGestureEventData) => any;
+    ontopChange?: (args: PropertyChangeData) => void;
+    ontouch?: (arg: TouchGestureEventData) => any;
+    onunloaded?: (args: EventData) => void;
     opacity?: string | number;
     originx?: string | number;
     originy?: string | number;
@@ -808,9 +819,9 @@ type ViewBaseAttributes = Override<ObservableAttributes, {
     isloaded?: boolean;
     left?: number | "auto" | LengthDipUnit | LengthPxUnit;
     nativeview?: any;
-    onBindingContextChange?: (args: PropertyChangeData) => void;
-    onClassNameChange?: (args: PropertyChangeData) => void;
-    onIdChange?: (args: PropertyChangeData) => void;
+    onbindingContextChange?: (args: PropertyChangeData) => void;
+    onclassNameChange?: (args: PropertyChangeData) => void;
+    onidChange?: (args: PropertyChangeData) => void;
     order?: number;
     page?: Page;
     parent?: ViewBase;
@@ -830,8 +841,8 @@ type WebViewAttributes = Override<ViewAttributes, {
     cangoback?: boolean;
     cangoforward?: boolean;
     ios?: any;
-    onLoadFinished?: (args: LoadEventData) => void;
-    onLoadStarted?: (args: LoadEventData) => void;
+    onloadFinished?: (args: LoadEventData) => void;
+    onloadStarted?: (args: WebViewInterfacesLoadEventData) => void;
     src?: string;
 }>;
 
@@ -841,9 +852,9 @@ type WrapLayoutAttributes = Override<LayoutBaseAttributes, {
     effectiveitemwidth?: number;
     itemheight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
     itemwidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    onItemHeightChange?: (args: PropertyChangeData) => void;
-    onItemWidthChange?: (args: PropertyChangeData) => void;
-    onOrientationChange?: (args: PropertyChangeData) => void;
+    onitemHeightChange?: (args: PropertyChangeData) => void;
+    onitemWidthChange?: (args: PropertyChangeData) => void;
+    onorientationChange?: (args: PropertyChangeData) => void;
     orientation?: "horizontal" | "vertical";
 }>;
 

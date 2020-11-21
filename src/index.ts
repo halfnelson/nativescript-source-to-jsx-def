@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { AttributeClassDefinition, IntrinsicElementDefinition } from './JSXExporter';
+import { AttributeClassDefinition, AttributeClassPropDefinition, IntrinsicElementDefinition } from './JSXExporter';
 import JSXDocumentRenderer from "./JSXDocumentRenderer";
 import NativescriptCoreJSXExporter from './NativescriptCoreJSXExporter';
 import NativescriptPluginJSXExporter from './NativescriptPluginJSXExporter';
@@ -12,6 +12,14 @@ class ReactJSXDocumentRenderer extends JSXDocumentRenderer {
     renderClass(classDefinition: AttributeClassDefinition): string {
         let rendered = super.renderClass(classDefinition);
         return rendered.replace(/^type /m, "export type ");
+    }
+
+    renderClassPropertyName(prop: AttributeClassPropDefinition): string {
+        if (prop.meta.derivedFrom.includes("SyntheticEvent") && prop.name.startsWith('on')) {
+            return prop.name.slice(0,2) + prop.name[2].toUpperCase() + prop.name.slice(3);
+        } else {
+            return prop.name;
+        }
     }
 
     renderJSXNamespace(intrinsicElements: IntrinsicElementDefinition[]) {

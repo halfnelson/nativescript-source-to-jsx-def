@@ -96,7 +96,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
 
             //explicitly defined event
             if (eventParam.getType().isStringLiteral()) {
-                var propname = "on" + pascalCase(eventParam.getType().getText().replace(/"/g, ""));
+                var propname = "on" + eventParam.getType().getText().replace(/"/g, "");
                 props.push({
                     name: propname,
                     type: this.getTypeDefinition(callbackParam.getType(), callbackParam),
@@ -137,7 +137,7 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
         // add propchange events
         dynamicProps.forEach(p => {
             let changeEventProp: AttributeClassPropDefinition = {
-                name: `on${pascalCase(p.name)}Change`,
+                name: `on${p.name}Change`,
                 type: `(args: ${this.getTypeDefinition(this.propertyChangeType)}) => void`,
                 meta: {
                     derivedFrom: "SyntheticEvent:PropertyChange",
@@ -205,7 +205,11 @@ export default abstract class NativescriptJSXExporter extends JSXExporter {
         //patch imports to point to their npm package
         doc.imports.forEach(p => {
             if (p.path.startsWith(this.nativescriptCorePath)) {
-                p.path = '@nativescript/core/' + path.relative(this.nativescriptCorePath, p.path).replace(/\\/g, '/');
+                if (p.name.toLowerCase().startsWith('ios') || p.name.toLowerCase().startsWith('android') || p.name.toLowerCase() == 'lineargradient' || p.name.toLowerCase() == 'domnode') {
+                    p.path = '@nativescript/core/' + path.relative(this.nativescriptCorePath, p.path).replace(/\\/g, '/');
+                } else {
+                    p.path = '@nativescript/core'
+                }
             }
         })
 

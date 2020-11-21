@@ -53,7 +53,34 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
         var gestureTypes = this.project.getSourceFileOrThrow(this.nativescriptCorePath + "/ui/gestures/index.d.ts").getEnumOrThrow("GestureTypes");
 
-        for (var m of c.getInstanceMethods().filter(m => m.getName() == "on")) {
+        var classMethods = c.getInstanceMethods().filter(m => m.getName() == "on");
+
+        
+        // some classes have a partner interface of the same name which specifies the events
+        var className = c.getName();
+        var partnerInterface = className ? c.getSourceFile().getInterface(className) : null;
+        var interfaceMethods = partnerInterface?.getMethods().filter(m => m.getName() == "on") ?? []
+
+        for (var i of interfaceMethods) {
+            let params = i.getParameters()
+            let [eventParam, callbackParam] = params;
+
+            //explicitly defined event
+            if (eventParam.getType().isStringLiteral()) {
+                var propname = "on" + eventParam.getType().getText().replace(/"/g, "");
+                if (props.find(p => p.name == propname)) continue;
+                props.push({
+                    name: propname,
+                    type: this.getTypeDefinition(callbackParam.getType(), callbackParam),
+                    meta: {
+                        derivedFrom: "SyntheticEvent:ExplicitInterface",
+                        sourceFile: eventParam.getSourceFile().getFilePath()
+                    }
+                })
+            }
+        }
+
+        for (var m of classMethods) {
 
             let params = m.getParameters();
             if (!params || params.length < 2) continue;
@@ -65,7 +92,7 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
                 let gestureSource = gestureTypes.getSourceFile();
                 let defaultEventType = gestureSource.getInterfaceOrThrow("GestureEventData");
                 for (var gesture of gestureTypes.getMembers().map(m => m.getName())) {
-                    let name = "on" + pascalCase(gesture);
+                    let name = "on" + gesture;
                     let expectedEventDataTypeName = gesture == "doubleTap" ? "TapGestureEventData" : pascalCase(gesture) + "GestureEventData";
                     let eventType = gestureSource.getInterface(expectedEventDataTypeName) || defaultEventType;
 
