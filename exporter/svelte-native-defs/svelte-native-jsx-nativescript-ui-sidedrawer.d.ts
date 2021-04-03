@@ -12,15 +12,15 @@ namespace svelteNative.JSX {
 
 // index.d.ts
 type RadSideDrawerAttributes = Override<ViewAttributes, {
-    allowedgeswipe?: string | boolean;
+    allowEdgeSwipe?: string | boolean;
     android?: any;
-    drawercontent?: string | View;
-    drawercontentsize?: string | number;
-    drawerlocation?: SideDrawerLocation;
-    drawertransition?: string | DrawerTransitionBase;
-    gesturesenabled?: string | boolean;
+    drawerContent?: string | View;
+    drawerContentSize?: string | number;
+    drawerLocation?: SideDrawerLocation;
+    drawerTransition?: string | DrawerTransitionBase;
+    gesturesEnabled?: string | boolean;
     ios?: any;
-    maincontent?: string | View;
+    mainContent?: string | View;
     onallowEdgeSwipeChange?: (args: PropertyChangeData) => void;
     ondrawerContentChange?: (args: PropertyChangeData) => void;
     ondrawerContentSizeChange?: (args: PropertyChangeData) => void;
@@ -29,7 +29,7 @@ type RadSideDrawerAttributes = Override<ViewAttributes, {
     ongesturesEnabledChange?: (args: PropertyChangeData) => void;
     onmainContentChange?: (args: PropertyChangeData) => void;
     onshadowColorChange?: (args: PropertyChangeData) => void;
-    shadowcolor?: string | Color;
+    shadowColor?: string | Color;
 }>;
 
 

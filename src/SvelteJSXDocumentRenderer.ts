@@ -2,14 +2,6 @@ import { AttributeClassPropDefinition, IntrinsicElementDefinition, JSXDocument }
 import JSXDocumentRenderer from "./JSXDocumentRenderer";
 
 export class SvelteJSXDocumentRenderer extends JSXDocumentRenderer {
-    renderClassPropertyName(prop: AttributeClassPropDefinition): string {
-        return prop.meta.derivedFrom.includes("SyntheticEvent") ? prop.name : prop.name.toLowerCase();
-    }
-
-    renderIntrinsicElement(intrinsicElement: IntrinsicElementDefinition) {
-        return super.renderIntrinsicElement(intrinsicElement);
-    }
-
     renderJSXNamespace(intrinsicElements: IntrinsicElementDefinition[]): string {
         return (`
 interface IntrinsicElements {

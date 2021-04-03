@@ -1,11 +1,15 @@
+type AccessibilityLiveRegion = import("@nativescript/core").AccessibilityLiveRegion;
+type AccessibilityRole = import("@nativescript/core").AccessibilityRole;
+type AccessibilityState = import("@nativescript/core").AccessibilityState;
 type ActionBar = import("@nativescript/core").ActionBar;
 type ActionItems = import("@nativescript/core").ActionItems;
 type AndroidActionBarSettings = import("@nativescript/core/ui/action-bar/index").AndroidActionBarSettings;
 type AndroidActionItemSettings = import("@nativescript/core/ui/action-bar/index").AndroidActionItemSettings;
 type AndroidFrame = import("@nativescript/core/ui/frame/index").AndroidFrame;
 type BackstackEntry = import("@nativescript/core").BackstackEntry;
-type BottomNavigationSelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
+type CSSShadow = import("@nativescript/core").CSSShadow;
 type Color = import("@nativescript/core").Color;
+type CoreTypes = import("@nativescript/core").CoreTypes;
 type CreateViewEventData = import("@nativescript/core").CreateViewEventData;
 type DOMNode = import("@nativescript/core/debugger/dom-node").DOMNode;
 type EventData = import("@nativescript/core").EventData;
@@ -16,21 +20,17 @@ type FrameNavigationEntry = import("@nativescript/core").NavigationEntry;
 type FrameNavigationTransition = import("@nativescript/core").NavigationTransition;
 type GestureEventData = import("@nativescript/core").GestureEventData;
 type IOSActionItemSettings = import("@nativescript/core/ui/action-bar/index").IOSActionItemSettings;
-type Image = import("@nativescript/core").Image;
 type ImageSource = import("@nativescript/core").ImageSource;
 type ItemEventData = import("@nativescript/core").ItemEventData;
 type ItemsSource = import("@nativescript/core").ItemsSource;
 type KeyedTemplate = import("@nativescript/core").KeyedTemplate;
-type Label = import("@nativescript/core").Label;
 type LayoutBase = import("@nativescript/core").LayoutBase;
-type LengthDipUnit = import("@nativescript/core").LengthDipUnit;
-type LengthPercentUnit = import("@nativescript/core").LengthPercentUnit;
-type LengthPxUnit = import("@nativescript/core").LengthPxUnit;
 type LinearGradient = import("@nativescript/core/ui/styling/gradient").LinearGradient;
 type ListViewItemsSource = import("@nativescript/core").ItemsSource;
 type LoadEventData = import("@nativescript/core").LoadEventData;
 type NavigatedData = import("@nativescript/core").NavigatedData;
 type NavigationButton = import("@nativescript/core").NavigationButton;
+type NavigationData = import("@nativescript/core").NavigationData;
 type NavigationEntry = import("@nativescript/core").NavigationEntry;
 type NavigationTransition = import("@nativescript/core").NavigationTransition;
 type ObservableArray<T1> = import("@nativescript/core").ObservableArray<T1>;
@@ -42,15 +42,10 @@ type RepeaterItemsSource = import("@nativescript/core").ItemsSource;
 type RotationGestureEventData = import("@nativescript/core").RotationGestureEventData;
 type ScrollEventData = import("@nativescript/core").ScrollEventData;
 type SegmentedBarItem = import("@nativescript/core").SegmentedBarItem;
-type SegmentedBarSelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
 type SelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
 type ShownModallyData = import("@nativescript/core").ShownModallyData;
 type Span = import("@nativescript/core").Span;
 type SwipeGestureEventData = import("@nativescript/core").SwipeGestureEventData;
-type TabContentItem = import("@nativescript/core").TabContentItem;
-type TabStrip = import("@nativescript/core").TabStrip;
-type TabStripItem = import("@nativescript/core").TabStripItem;
-type TabStripItemEventData = import("@nativescript/core").TabStripItemEventData;
 type TabViewItem = import("@nativescript/core").TabViewItem;
 type TabViewSelectedIndexChangedEventData = import("@nativescript/core").SelectedIndexChangedEventData;
 type TapGestureEventData = import("@nativescript/core").TapGestureEventData;
@@ -72,9 +67,9 @@ export type AbsoluteLayoutAttributes = Override<LayoutBaseAttributes, {
 export type ActionBarAttributes = Override<ViewAttributes, {
     actionItems?: ActionItems;
     android?: AndroidActionBarSettings;
-    androidContentInset?: string | number | LengthDipUnit | LengthPxUnit;
-    androidContentInsetLeft?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    androidContentInsetRight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    androidContentInset?: string | number | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    androidContentInsetLeft?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    androidContentInsetRight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     effectiveContentInsetLeft?: number;
     effectiveContentInsetRight?: number;
     flat?: string | boolean;
@@ -111,18 +106,10 @@ export type ActivityIndicatorAttributes = Override<ViewAttributes, {
     onBusyChange?: (args: PropertyChangeData) => void;
 }>;
 
-// ui/bottom-navigation/index.d.ts
-export type BottomNavigationAttributes = Override<TabNavigationBaseAttributes, {
-    android?: any;
-    ios?: any;
-    items?: TabContentItem[];
-    onSelectedIndexChanged?: (args: BottomNavigationSelectedIndexChangedEventData) => void;
-    selectedIndex?: number;
-    tabStrip?: TabStrip;
-}>;
-
 // ui/button/index.d.ts
 export type ButtonAttributes = Override<TextBaseAttributes, {
+    accessibilityRole?: AccessibilityRole;
+    accessible?: boolean;
     android?: any;
     ios?: any;
     onTap?: (args: EventData) => void;
@@ -195,11 +182,11 @@ export type EditableTextBaseAttributes = Override<TextBaseAttributes, {
 
 // ui/layouts/flexbox-layout/index.d.ts
 export type FlexboxLayoutAttributes = Override<LayoutBaseAttributes, {
-    alignContent?: "stretch" | "center" | "flex-start" | "flex-end" | "space-between" | "space-around";
-    alignItems?: "stretch" | "center" | "flex-start" | "flex-end" | "baseline";
+    alignContent?: "stretch" | "flex-start" | "flex-end" | "center" | "space-between" | "space-around";
+    alignItems?: "stretch" | "flex-start" | "flex-end" | "center" | "baseline";
     flexDirection?: "column" | "row" | "row-reverse" | "column-reverse";
     flexWrap?: "nowrap" | "wrap" | "wrap-reverse";
-    justifyContent?: "center" | "flex-start" | "flex-end" | "space-between" | "space-around";
+    justifyContent?: "flex-start" | "flex-end" | "center" | "space-between" | "space-around";
 }>;
 
 // ui/text-base/formatted-string.ts
@@ -224,6 +211,8 @@ export type FrameAttributes = Override<FrameBaseAttributes, {
     currentPage?: Page;
     ios?: iOSFrame;
     navigationBarHeight?: number;
+    onNavigatedTo?: (args: NavigationData) => void;
+    onNavigatingTo?: (args: NavigationData) => void;
     transition?: FrameNavigationTransition;
 }>;
 
@@ -258,8 +247,8 @@ export type HtmlViewAttributes = Override<ViewAttributes, {
 // ui/image/index.d.ts
 export type ImageAttributes = Override<ViewAttributes, {
     android?: any;
-    decodeHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    decodeWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    decodeHeight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    decodeWidth?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     imageSource?: string | ImageSource;
     ios?: any;
     isLoading?: string | boolean;
@@ -289,11 +278,11 @@ export type LayoutBaseAttributes = Override<CustomLayoutViewAttributes, {
     isPassThroughParentEnabled?: string | boolean;
     onClipToBoundsChange?: (args: PropertyChangeData) => void;
     onIsPassThroughParentEnabledChange?: (args: PropertyChangeData) => void;
-    padding?: string | number | LengthDipUnit | LengthPxUnit;
-    paddingBottom?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingLeft?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingRight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingTop?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    padding?: string | number | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingBottom?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingLeft?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingRight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingTop?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
 }>;
 
 // ui/list-picker/index.d.ts
@@ -317,7 +306,7 @@ export type ListPickerAttributes = Override<ViewAttributes, {
 export type ListViewAttributes = Override<ViewAttributes, {
     android?: any;
     ios?: any;
-    iosEstimatedRowHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    iosEstimatedRowHeight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     itemIdGenerator?: (item: any, index: number, items: any) => number;
     itemTemplate?: string | Template;
     itemTemplateSelector?: string | ((item: any, index: number, items: any) => string);
@@ -331,7 +320,7 @@ export type ListViewAttributes = Override<ViewAttributes, {
     onItemsChange?: (args: PropertyChangeData) => void;
     onLoadMoreItems?: (args: EventData) => void;
     onRowHeightChange?: (args: PropertyChangeData) => void;
-    rowHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    rowHeight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     separatorColor?: string | Color;
 }>;
 
@@ -347,6 +336,7 @@ export type ObservableAttributes = {
 
 // ui/page/index.d.ts
 export type PageAttributes = Override<PageBaseAttributes, {
+    accessibilityAnnouncePageEnabled?: boolean;
     actionBar?: ActionBar;
     actionBarHidden?: boolean;
     androidStatusBarBackground?: Color;
@@ -355,6 +345,7 @@ export type PageAttributes = Override<PageBaseAttributes, {
     frame?: Frame;
     hasActionBar?: boolean;
     navigationContext?: any;
+    onAccessibilityPerformEscape?: () => boolean;
     onNavigatedFrom?: (args: NavigatedData) => void;
     onNavigatedTo?: (args: NavigatedData) => void;
     onNavigatingFrom?: (args: NavigatedData) => void;
@@ -364,6 +355,7 @@ export type PageAttributes = Override<PageBaseAttributes, {
 
 // ui/page/page-common.ts
 export type PageBaseAttributes = Override<ContentViewAttributes, {
+    accessibilityAnnouncePageEnabled?: boolean;
     actionBar?: ActionBar;
     actionBarHidden?: string | boolean;
     androidStatusBarBackground?: string | Color;
@@ -424,6 +416,11 @@ export type RepeaterAttributes = Override<CustomLayoutViewAttributes, {
     onItemsLayoutChange?: (args: PropertyChangeData) => void;
 }>;
 
+// ui/layouts/root-layout/index.d.ts
+export type RootLayoutAttributes = Override<GridLayoutAttributes, {
+
+}>;
+
 // ui/scroll-view/index.d.ts
 export type ScrollViewAttributes = Override<ContentViewAttributes, {
     horizontalOffset?: number;
@@ -460,7 +457,7 @@ export type SegmentedBarAttributes = Override<ViewAttributes, {
     items?: string | SegmentedBarItem[];
     onItemsChange?: (args: PropertyChangeData) => void;
     onSelectedIndexChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: SegmentedBarSelectedIndexChangedEventData) => void;
+    onSelectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
     selectedBackgroundColor?: string | Color;
     selectedIndex?: string | number;
 }>;
@@ -472,6 +469,9 @@ export type SegmentedBarItemAttributes = Override<ViewBaseAttributes, {
 
 // ui/slider/index.d.ts
 export type SliderAttributes = Override<ViewAttributes, {
+    accessibilityRole?: AccessibilityRole;
+    accessibilityStep?: string | number;
+    accessible?: boolean;
     android?: any;
     ios?: any;
     maxValue?: string | number;
@@ -511,48 +511,6 @@ export type SwitchAttributes = Override<ViewAttributes, {
     onOffBackgroundColorChange?: (args: PropertyChangeData) => void;
 }>;
 
-// ui/tab-navigation-base/tab-content-item/index.d.ts
-export type TabContentItemAttributes = Override<ContentViewAttributes, {
-    canBeLoaded?: boolean;
-}>;
-
-// ui/tab-navigation-base/tab-navigation-base/index.ts
-export type TabNavigationBaseAttributes = Override<ViewAttributes, {
-    items?: string | TabContentItem[];
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
-    onTabStripChange?: (args: PropertyChangeData) => void;
-    selectedIndex?: string | number;
-    tabStrip?: string | TabStrip;
-}>;
-
-// ui/tab-navigation-base/tab-strip/index.ts
-export type TabStripAttributes = Override<ViewAttributes, {
-    highlightColor?: string | Color;
-    iosIconRenderingMode?: "automatic" | "alwaysOriginal" | "alwaysTemplate";
-    isIconSizeFixed?: string | boolean;
-    items?: string | TabStripItem[];
-    onHighlightColorChange?: (args: PropertyChangeData) => void;
-    onIosIconRenderingModeChange?: (args: PropertyChangeData) => void;
-    onIsIconSizeFixedChange?: (args: PropertyChangeData) => void;
-    onItemTap?: (args: TabStripItemEventData) => void;
-    onItemsChange?: (args: PropertyChangeData) => void;
-    onSelectedItemColorChange?: (args: PropertyChangeData) => void;
-    onUnSelectedItemColorChange?: (args: PropertyChangeData) => void;
-    selectedItemColor?: string | Color;
-    unSelectedItemColor?: string | Color;
-}>;
-
-// ui/tab-navigation-base/tab-strip-item/index.ts
-export type TabStripItemAttributes = Override<ViewAttributes, {
-    iconClass?: string;
-    iconSource?: string;
-    image?: Image;
-    label?: Label;
-    title?: string;
-}>;
-
 // ui/tab-view/index.d.ts
 export type TabViewAttributes = Override<ViewAttributes, {
     android?: any;
@@ -581,29 +539,9 @@ export type TabViewAttributes = Override<ViewAttributes, {
 export type TabViewItemAttributes = Override<ViewBaseAttributes, {
     canBeLoaded?: boolean;
     iconSource?: string;
-    textTransform?: "initial" | "none" | "capitalize" | "uppercase" | "lowercase";
+    textTransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
     title?: string;
     view?: View;
-}>;
-
-// ui/tabs/index.d.ts
-export type TabsAttributes = Override<TabNavigationBaseAttributes, {
-    android?: any;
-    animationEnabled?: string | boolean;
-    iOSTabBarItemsAlignment?: "leading" | "justified" | "center" | "centerSelected";
-    ios?: any;
-    items?: TabContentItem[];
-    offscreenTabLimit?: string | number;
-    onAnimationEnabledChange?: (args: PropertyChangeData) => void;
-    onIOSTabBarItemsAlignmentChange?: (args: PropertyChangeData) => void;
-    onOffscreenTabLimitChange?: (args: PropertyChangeData) => void;
-    onSelectedIndexChanged?: (args: SelectedIndexChangedEventData) => void;
-    onSwipeEnabledChange?: (args: PropertyChangeData) => void;
-    onTabsPositionChange?: (args: PropertyChangeData) => void;
-    selectedIndex?: number;
-    swipeEnabled?: string | boolean;
-    tabStrip?: TabStrip;
-    tabsPosition?: "top" | "bottom";
 }>;
 
 // ui/text-base/index.d.ts
@@ -617,15 +555,16 @@ export type TextBaseAttributes = Override<ViewAttributes, {
     lineHeight?: string | number;
     onFormattedTextChange?: (args: PropertyChangeData) => void;
     onTextChange?: (args: PropertyChangeData) => void;
-    padding?: string | number | LengthDipUnit | LengthPxUnit;
-    paddingBottom?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingLeft?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingRight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    paddingTop?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    padding?: string | number | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingBottom?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingLeft?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingRight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    paddingTop?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     text?: string;
-    textAlignment?: "left" | "right" | "initial" | "center";
+    textAlignment?: "left" | "right" | "center" | "initial";
     textDecoration?: "none" | "underline" | "line-through" | "underline line-through";
-    textTransform?: "initial" | "none" | "capitalize" | "uppercase" | "lowercase";
+    textShadow?: string | CSSShadow;
+    textTransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
     whiteSpace?: "initial" | "normal" | "nowrap";
 }>;
 
@@ -673,6 +612,18 @@ export type TimePickerAttributes = Override<ViewAttributes, {
 
 // ui/core/view/index.d.ts
 export type ViewAttributes = Override<ViewBaseAttributes, {
+    accessibilityHidden?: string | boolean;
+    accessibilityHint?: string;
+    accessibilityIdentifier?: string;
+    accessibilityIgnoresInvertColors?: string | boolean;
+    accessibilityLabel?: string;
+    accessibilityLanguage?: string;
+    accessibilityLiveRegion?: AccessibilityLiveRegion;
+    accessibilityMediaSession?: string | boolean;
+    accessibilityRole?: AccessibilityRole;
+    accessibilityState?: AccessibilityState;
+    accessibilityValue?: string;
+    accessible?: string | boolean;
     android?: any;
     androidDynamicElevationOffset?: string | number;
     androidElevation?: string | number;
@@ -685,20 +636,21 @@ export type ViewAttributes = Override<ViewBaseAttributes, {
     backgroundSize?: string;
     bindingContext?: any;
     borderBottomColor?: string | Color;
-    borderBottomLeftRadius?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderBottomRightRadius?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderBottomWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    borderBottomLeftRadius?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    borderBottomRightRadius?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    borderBottomWidth?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     borderColor?: string | Color;
     borderLeftColor?: string | Color;
-    borderLeftWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderRadius?: string | number | LengthDipUnit | LengthPxUnit;
+    borderLeftWidth?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    borderRadius?: string | number | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     borderRightColor?: string | Color;
-    borderRightWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    borderRightWidth?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     borderTopColor?: string | Color;
-    borderTopLeftRadius?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderTopRightRadius?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderTopWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    borderWidth?: string | number | LengthDipUnit | LengthPxUnit;
+    borderTopLeftRadius?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    borderTopRightRadius?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    borderTopWidth?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    borderWidth?: string | number | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    boxShadow?: string | CSSShadow;
     color?: string | Color;
     column?: string | number;
     columnSpan?: string | number;
@@ -707,30 +659,36 @@ export type ViewAttributes = Override<ViewBaseAttributes, {
     cssPseudoClasses?: Set<string>;
     cssType?: string;
     dock?: "left" | "top" | "right" | "bottom";
-    height?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    height?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit | CoreTypes.LengthPercentUnit;
     horizontalAlignment?: "left" | "right" | "stretch" | "center";
     ios?: any;
+    iosIgnoreSafeArea?: string | boolean;
     iosOverflowSafeArea?: string | boolean;
     iosOverflowSafeAreaEnabled?: string | boolean;
     isEnabled?: string | boolean;
     isLayoutRequired?: boolean;
     isLayoutValid?: boolean;
     isUserInteractionEnabled?: string | boolean;
-    left?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    margin?: string | number | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    marginBottom?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    marginLeft?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    marginRight?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    marginTop?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
-    minHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    minWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    left?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    margin?: string | number | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit | CoreTypes.LengthPercentUnit;
+    marginBottom?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit | CoreTypes.LengthPercentUnit;
+    marginLeft?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit | CoreTypes.LengthPercentUnit;
+    marginRight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit | CoreTypes.LengthPercentUnit;
+    marginTop?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit | CoreTypes.LengthPercentUnit;
+    minHeight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    minWidth?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     modal?: View;
+    onAccessibilityHintChange?: (args: PropertyChangeData) => void;
+    onAccessibilityIdentifierChange?: (args: PropertyChangeData) => void;
+    onAccessibilityIgnoresInvertColorsChange?: (args: PropertyChangeData) => void;
+    onAccessibilityLabelChange?: (args: PropertyChangeData) => void;
+    onAccessibilityValueChange?: (args: PropertyChangeData) => void;
     onAndroidBackPressed?: (args: EventData) => void;
-    onAutomationTextChange?: (args: PropertyChangeData) => void;
     onColumnChange?: (args: PropertyChangeData) => void;
     onColumnSpanChange?: (args: PropertyChangeData) => void;
     onDockChange?: (args: PropertyChangeData) => void;
     onDoubleTap?: (arg: TapGestureEventData) => any;
+    onIosIgnoreSafeAreaChange?: (args: PropertyChangeData) => void;
     onIosOverflowSafeAreaChange?: (args: PropertyChangeData) => void;
     onIosOverflowSafeAreaEnabledChange?: (args: PropertyChangeData) => void;
     onIsEnabledChange?: (args: PropertyChangeData) => void;
@@ -763,18 +721,18 @@ export type ViewAttributes = Override<ViewBaseAttributes, {
     rowSpan?: string | number;
     scaleX?: string | number;
     scaleY?: string | number;
-    textTransform?: "initial" | "none" | "capitalize" | "uppercase" | "lowercase";
-    top?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    textTransform?: "none" | "initial" | "capitalize" | "uppercase" | "lowercase";
+    top?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     translateX?: string | number;
     translateY?: string | number;
-    verticalAlignment?: "top" | "bottom" | "stretch" | "baseline" | "middle" | "text-top" | "text-bottom" | "super" | "sub";
-    visibility?: "visible" | "hidden" | "collapse";
-    width?: string | number | "auto" | LengthDipUnit | LengthPxUnit | LengthPercentUnit;
+    verticalAlignment?: "top" | "bottom" | "stretch" | "middle";
+    visibility?: "hidden" | "visible" | "collapse" | "collapsed";
+    width?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit | CoreTypes.LengthPercentUnit;
 }>;
 
 // ui/core/view-base/index.ts
 export type ViewBaseAttributes = Override<ObservableAttributes, {
-    alignSelf?: "auto" | "stretch" | "center" | "flex-start" | "flex-end" | "baseline";
+    alignSelf?: "auto" | "stretch" | "flex-start" | "flex-end" | "center" | "baseline";
     android?: any;
     bindingContext?: string | any;
     class?: string;
@@ -808,23 +766,26 @@ export type ViewBaseAttributes = Override<ObservableAttributes, {
     flexGrow?: number;
     flexShrink?: number;
     flexWrapBefore?: boolean;
+    hidden?: string | boolean;
     id?: string;
     ios?: any;
     isCollapsed?: any;
     isLoaded?: boolean;
-    left?: number | "auto" | LengthDipUnit | LengthPxUnit;
+    left?: number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     nativeView?: any;
     onBindingContextChange?: (args: PropertyChangeData) => void;
     onClassNameChange?: (args: PropertyChangeData) => void;
+    onHiddenChange?: (args: PropertyChangeData) => void;
     onIdChange?: (args: PropertyChangeData) => void;
     order?: number;
     page?: Page;
     parent?: ViewBase;
     parentNode?: ViewBase;
     recycleNativeView?: "always" | "never" | "auto";
+    reusable?: boolean;
     row?: number;
     rowSpan?: number;
-    top?: number | "auto" | LengthDipUnit | LengthPxUnit;
+    top?: number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     typeName?: string;
     viewController?: any;
 }>;
@@ -844,8 +805,8 @@ export type WebViewAttributes = Override<ViewAttributes, {
 export type WrapLayoutAttributes = Override<LayoutBaseAttributes, {
     effectiveItemHeight?: number;
     effectiveItemWidth?: number;
-    itemHeight?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
-    itemWidth?: string | number | "auto" | LengthDipUnit | LengthPxUnit;
+    itemHeight?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
+    itemWidth?: string | number | "auto" | CoreTypes.LengthDipUnit | CoreTypes.LengthPxUnit;
     onItemHeightChange?: (args: PropertyChangeData) => void;
     onItemWidthChange?: (args: PropertyChangeData) => void;
     onOrientationChange?: (args: PropertyChangeData) => void;

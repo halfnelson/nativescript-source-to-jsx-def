@@ -3,18 +3,19 @@
   "version": "1.0.0",
   "description": "Exports some files as a test",
   "scripts": {
-    "getsource": "git clone --branch 7.0.13-core --depth 1 https://github.com/NativeScript/NativeScript.git nativescript_src",
+    "getsource": "git clone --branch releases/8.0.0 --depth 1 https://github.com/NativeScript/NativeScript.git nativescript_src",
     "start": "node -r ts-node/register build-defs.ts"
   },
   "private": true,
   "author": "David Pershouse",
   "license": "MIT",
   "devDependencies": {
-    "@nativescript/core": "^7.0.13",
-    "nativescript-source-to-jsx-def": "file:../",
+    "@nativescript/core": "^8.0.0",
     "nativescript-ui-chart": "^8.0.2",
     "nativescript-ui-listview": "^9.0.4",
     "nativescript-ui-sidedrawer": "^9.0.3",
+    "nativescript-source-to-jsx-def": "file:../",
+    "@nativescript-community/ui-drawer": "^0.0.24",
     "ts-node": "^9.0.0"
   }
 }
