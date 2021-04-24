@@ -164,7 +164,7 @@ export type CategoricalSeriesAttributes = Override<CartesianSeriesAttributes, {
     stackMode?: ChartSeriesStackMode;
 }>;
 
-// visualization\views\chart-axis.common.d.ts
+// visualization/views/chart-axis.common.d.ts
 export type ChartAxisLabelAttributes = Override<ViewAttributes, {
     fitMode?: ChartPublicEnumChartAxisLabelFitMode;
     format?: string;
@@ -213,7 +213,7 @@ export type ChartSeriesAttributes = Override<ViewBaseAttributes, {
     valueProperty?: string | any;
 }>;
 
-// visualization\views\chart-series.common.d.ts
+// visualization/views/chart-series.common.d.ts
 export type ChartSeriesLabelAttributes = Override<ViewAttributes, {
     format?: string;
     onFormatChange?: (args: PropertyChangeData) => void;
