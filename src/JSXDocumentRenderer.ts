@@ -1,16 +1,18 @@
 import path from "path";
 import { ImportAlias, AttributeClassPropDefinition, AttributeClassDefinition, orderBy, IntrinsicElementDefinition, JSXDocument } from "./JSXExporter";
-
 export default class JSXDocumentRenderer {
     
     constructor(public debug: boolean = false) { }
     
-    renderImport({ alias, path, name }: ImportAlias) {
+    renderImport({ alias, path, name, isNamespace }: ImportAlias) {
+        if (isNamespace) 
+            return `import type { ${name == alias ? alias : `${name} as ${alias}`} } from "${path}"`
+        
         return `type ${alias} = import("${path}").${name};`;
     }
     
     renderImports(imports: ImportAlias[]): string {
-        return imports.map(i => this.renderImport(i)).join("\n") +  "\ntype Override<What, With> = Omit<What, keyof With> & With\n";
+        return orderBy(imports, x => !x.isNamespace).map(i => this.renderImport(i)).join("\n") +  "\ntype Override<What, With> = Omit<What, keyof With> & With\n";
     }
 
     renderClassPropertyName(propDefinition: AttributeClassPropDefinition): string {

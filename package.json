@@ -1,6 +1,6 @@
 {
   "name": "nativescript-source-to-jsx-def",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Introspect NativeScript source and plugins to generate JSX definitions for svelte and react",
   "main": "dist/index.js",
   "scripts": {
@@ -12,6 +12,9 @@
   "files": [
     "dist/"
   ],
+  "bin": {
+    "export-jsx": "export-jsx"
+  },
   "author": "David Pershouse",
   "license": "MIT",
   "devDependencies": {

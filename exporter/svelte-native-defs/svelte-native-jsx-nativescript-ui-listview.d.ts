@@ -21,42 +21,42 @@ namespace svelteNative.JSX {
 
 // index.d.ts
 type ListViewGridLayoutAttributes = Override<ListViewLinearLayoutAttributes, {
-    linespacing?: string | number;
+    lineSpacing?: string | number;
     onlineSpacingChange?: (args: PropertyChangeData) => void;
     onspanCountChange?: (args: PropertyChangeData) => void;
-    spancount?: string | number;
+    spanCount?: string | number;
 }>;
 
 // index.d.ts
 type ListViewLayoutBaseAttributes = Override<ViewBaseAttributes, {
-    itemdeleteanimation?: ListViewItemAnimation;
-    itemheight?: string | number;
-    iteminsertanimation?: ListViewItemAnimation;
-    itemwidth?: string | number;
+    itemDeleteAnimation?: ListViewItemAnimation;
+    itemHeight?: string | number;
+    itemInsertAnimation?: ListViewItemAnimation;
+    itemWidth?: string | number;
     onitemDeleteAnimationChange?: (args: PropertyChangeData) => void;
     onitemHeightChange?: (args: PropertyChangeData) => void;
     onitemInsertAnimationChange?: (args: PropertyChangeData) => void;
     onitemWidthChange?: (args: PropertyChangeData) => void;
     onscrollDirectionChange?: (args: PropertyChangeData) => void;
-    scrolldirection?: ListViewScrollDirection;
+    scrollDirection?: ListViewScrollDirection;
 }>;
 
 // index.d.ts
 type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttributes, {
     android?: any;
-    dynamicitemsize?: string | boolean;
+    dynamicItemSize?: string | boolean;
     ios?: any;
-    itemdeleteanimation?: NativescriptUiListviewListViewItemAnimation;
-    itemheight?: string | number;
-    iteminsertanimation?: NativescriptUiListviewListViewItemAnimation;
-    itemwidth?: string | number;
+    itemDeleteAnimation?: NativescriptUiListviewListViewItemAnimation;
+    itemHeight?: string | number;
+    itemInsertAnimation?: NativescriptUiListviewListViewItemAnimation;
+    itemWidth?: string | number;
     ondynamicItemSizeChange?: (args: PropertyChangeData) => void;
     onitemDeleteAnimationChange?: (args: PropertyChangeData) => void;
     onitemHeightChange?: (args: PropertyChangeData) => void;
     onitemInsertAnimationChange?: (args: PropertyChangeData) => void;
     onitemWidthChange?: (args: PropertyChangeData) => void;
     onscrollDirectionChange?: (args: PropertyChangeData) => void;
-    scrolldirection?: NativescriptUiListviewListViewScrollDirection;
+    scrollDirection?: NativescriptUiListviewListViewScrollDirection;
 }>;
 
 // index.d.ts
@@ -66,8 +66,8 @@ type ListViewStaggeredLayoutAttributes = Override<ListViewGridLayoutAttributes, 
 
 // ui-listview.common.d.ts
 type PullToRefreshStyleAttributes = Override<ViewBaseAttributes, {
-    indicatorbackgroundcolor?: string | Color;
-    indicatorcolor?: string | Color;
+    indicatorBackgroundColor?: string | Color;
+    indicatorColor?: string | Color;
     onindicatorBackgroundColorChange?: (args: PropertyChangeData) => void;
     onindicatorColorChange?: (args: PropertyChangeData) => void;
 }>;
@@ -75,29 +75,29 @@ type PullToRefreshStyleAttributes = Override<ViewBaseAttributes, {
 // index.d.ts
 type RadListViewAttributes = Override<ViewAttributes, {
     android?: any;
-    androidlistview?: any;
-    enablecollapsiblegroups?: string | boolean;
-    filteringfunction?: string | ((item: any) => boolean);
-    footeritemtemplate?: string;
-    grouptemplate?: string;
-    groupingfunction?: string | ((item: any) => any);
-    headeritemtemplate?: string;
-    itemreorder?: string | boolean;
-    itemselectedbackgroundcolor?: string | Color;
-    itemswipe?: string;
-    itemswipetemplate?: string;
-    itemtemplate?: string;
-    itemtemplateselector?: string | ((item: any, index: number, items: any) => string);
-    itemtemplates?: string | KeyedTemplate[];
-    itemviewdisposer?: () => void;
-    itemviewloader?: (viewType: any) => View;
+    androidListView?: any;
+    enableCollapsibleGroups?: string | boolean;
+    filteringFunction?: string | ((item: any) => boolean);
+    footerItemTemplate?: string;
+    groupTemplate?: string;
+    groupingFunction?: string | ((item: any) => any);
+    headerItemTemplate?: string;
+    itemReorder?: string | boolean;
+    itemSelectedBackgroundColor?: string | Color;
+    itemSwipe?: string;
+    itemSwipeTemplate?: string;
+    itemTemplate?: string;
+    itemTemplateSelector?: string | ((item: any, index: number, items: any) => string);
+    itemTemplates?: string | KeyedTemplate[];
+    itemViewDisposer?: () => void;
+    itemViewLoader?: (viewType: any) => View;
     items?: string | any;
-    listviewlayout?: string | ListViewLayoutBase;
-    loadondemandbuffersize?: string | number;
-    loadondemanditemtemplate?: string;
-    loadondemandmode?: ListViewLoadOnDemandMode;
-    multipleselection?: string | boolean;
-    nativescriptviewadded?: (parent: View, child: View) => void;
+    listViewLayout?: string | ListViewLayoutBase;
+    loadOnDemandBufferSize?: string | number;
+    loadOnDemandItemTemplate?: string;
+    loadOnDemandMode?: ListViewLoadOnDemandMode;
+    multipleSelection?: string | boolean;
+    nativeScriptViewAdded?: (parent: View, child: View) => void;
     onenableCollapsibleGroupsChange?: (args: PropertyChangeData) => void;
     onfilteringFunctionChange?: (args: PropertyChangeData) => void;
     onfooterItemTemplateChange?: (args: PropertyChangeData) => void;
@@ -124,13 +124,13 @@ type RadListViewAttributes = Override<ViewAttributes, {
     onselectionBehaviorChange?: (args: PropertyChangeData) => void;
     onsortingFunctionChange?: (args: PropertyChangeData) => void;
     onswipeActionsChange?: (args: PropertyChangeData) => void;
-    pulltorefresh?: string | boolean;
-    pulltorefreshstyle?: string | PullToRefreshStyle;
-    reordermode?: ListViewReorderMode;
-    scrollposition?: ListViewScrollPosition;
-    selectionbehavior?: ListViewSelectionBehavior;
-    sortingfunction?: string | ((item: any, otherItem: any) => number);
-    swipeactions?: string | boolean;
+    pullToRefresh?: string | boolean;
+    pullToRefreshStyle?: string | PullToRefreshStyle;
+    reorderMode?: ListViewReorderMode;
+    scrollPosition?: ListViewScrollPosition;
+    selectionBehavior?: ListViewSelectionBehavior;
+    sortingFunction?: string | ((item: any, otherItem: any) => number);
+    swipeActions?: string | boolean;
 }>;
 
 // index.d.ts

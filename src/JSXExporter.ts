@@ -85,7 +85,8 @@ export type Import = {
 export type ImportAlias = {
     alias: string,
     path: string,
-    name: string
+    name: string,
+    isNamespace?: boolean
 }
 
 export type IntrinsicElementDefinition = {
@@ -176,7 +177,7 @@ export default class JSXExporter {
         
 
         //replace the remaining 
-        def = def.replace(/import\("(.*?)"\)\.(([a-zA-Z_0-9]+)(\<.*\>)?(\[\])?)/g, (match: string, importPath: string, importExpression: string, importName: string, importGenericArgs: string ) => {
+        def = def.replace(/import\("(.*?)"\)\.(([a-zA-Z_0-9]+)(\<.*\>)?(\[\])?)(\.[a-zA-Z_0-9]+)?/g, (match: string, importPath: string, importExpression: string, importName: string, importGenericArgs: string, importArrayArgs: string, namespaceMember: string ) => {
 
             let aliasArgs = "";
             if (importGenericArgs) {
@@ -189,13 +190,13 @@ export default class JSXExporter {
             let existingImportAlias = Array.from(imports).find(([_, imp]) => (imp.name == importAlias && imp.path == importPath))
 
             if (existingImportAlias)
-                return importExpression.replace(importName, withoutGenericArgs(existingImportAlias?.[0]))
+                return importExpression.replace(importName, withoutGenericArgs(existingImportAlias?.[0])) + (namespaceMember ?? "")
 
             //no existing import alias, create one
             importAlias = this.createAliasForImport(imports, importPath, importAlias);
-            imports.set(importAlias, { alias: importAlias, name: importName+aliasArgs, path: importPath });
+            imports.set(importAlias, { alias: importAlias, name: importName+aliasArgs, path: importPath, isNamespace: !!namespaceMember });
             
-            return importExpression.replace(importName, withoutGenericArgs(importAlias));
+            return importExpression.replace(importName, withoutGenericArgs(importAlias)) + (namespaceMember ?? "");
         });
 
         return def
@@ -303,7 +304,7 @@ export default class JSXExporter {
         this.addClassDefinitions(documentContext);
         this.addImportsFromClassDefinitions(documentContext);
 
-        let importAliases = Array.from(documentContext.imports).map(([alias, { path, name }]) => ({ alias, path, name }))
+        let importAliases = Array.from(documentContext.imports).map(([alias, props]) => ({ ...props, alias }))
 
         let doc: JSXDocument = {
             instrinsicElements: orderBy([...documentContext.intrinsicElements.values()], x => x.name),

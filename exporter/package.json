@@ -11,10 +11,11 @@
   "license": "MIT",
   "devDependencies": {
     "@nativescript/core": "8.0.2",
-    "nativescript-source-to-jsx-def": "file:../",
     "nativescript-ui-chart": "^8.0.2",
     "nativescript-ui-listview": "^9.1.0",
     "nativescript-ui-sidedrawer": "^9.0.3",
+    "nativescript-source-to-jsx-def": "file:../",
+    "@nativescript-community/ui-drawer": "^0.0.24",
     "ts-node": "^9.0.0"
   }
 }

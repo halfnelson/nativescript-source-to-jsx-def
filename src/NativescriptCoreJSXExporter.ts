@@ -324,12 +324,13 @@ export default class NativescriptCoreJSXExporter extends NativescriptJSXExporter
 
     buildJSXDocument() {
         let doc = super.buildJSXDocument();
-
+        const keepPaths = ["lineargradient", "domnode", "cssshadow", "navigationdata", "selectedindexchangedeventdata"]
         //patch imports to point to their npm package
         doc.imports.forEach(p => {
             if (p.path.startsWith(this.nativescriptCorePath)) {
-                if (p.name.toLowerCase().startsWith('ios') || p.name.toLowerCase().startsWith('android') || p.name.toLowerCase() == 'lineargradient' || p.name.toLowerCase() == 'domnode') {
+                if (p.name.toLowerCase().startsWith('ios') || p.name.toLowerCase().startsWith('android') || keepPaths.includes(p.name.toLowerCase())) {
                     p.path = '@nativescript/core/' + path.relative(this.nativescriptCorePath, p.path).replace(/\\/g, '/');
+                    p.path = p.path.replace(/\/index$/, '');
                 } else {
                     p.path = '@nativescript/core'
                 }
