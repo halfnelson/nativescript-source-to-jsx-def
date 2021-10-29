@@ -27,7 +27,7 @@ export default class JSXDocumentRenderer {
         let propDefs = orderBy(classDefinition.props, x => x.name).map(p => this.renderPropertyDefintion(p));
         let baseClassPreamble = classDefinition.parentClasses.length > 0 ? `Override<${classDefinition.parentClasses.map(x => x.className).join(" & ")}, ` : ``;
         let baseClassPostscript = classDefinition.parentClasses.length > 0 ? `>`: ``;
-        return `// ${classDefinition.meta.sourceFile}\ntype ${classDefinition.className} = ${baseClassPreamble}{\n${propDefs.join("\n")}\n}${baseClassPostscript};`;
+        return `// ${classDefinition.meta.sourceFile}\ntype T${classDefinition.className} = ${baseClassPreamble}{\n${propDefs.join("\n")}\n}${baseClassPostscript}\ninterface ${classDefinition.className} extends T${classDefinition.className} {}`;
     }
 
     renderClasses(classDefinitions: AttributeClassDefinition[]): string {

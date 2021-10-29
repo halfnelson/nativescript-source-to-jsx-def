@@ -13,22 +13,20 @@ type NativescriptUiListviewListViewScrollDirection = import("nativescript-ui-lis
 type PropertyChangeData = import("@nativescript/core/data/observable").PropertyChangeData;
 type PullToRefreshStyle = import("nativescript-ui-listview").PullToRefreshStyle;
 type View = import("@nativescript/core/ui/core/view").View;
-type Override<What, With> = Omit<What, keyof With> & With
-
 
 declare global {
 namespace svelteNative.JSX {
 
 // index.d.ts
-type ListViewGridLayoutAttributes = Override<ListViewLinearLayoutAttributes, {
+interface ListViewGridLayoutAttributes  extends ListViewLinearLayoutAttributes{
     lineSpacing?: string | number;
     onlineSpacingChange?: (args: PropertyChangeData) => void;
     onspanCountChange?: (args: PropertyChangeData) => void;
     spanCount?: string | number;
-}>;
+};
 
 // index.d.ts
-type ListViewLayoutBaseAttributes = Override<ViewBaseAttributes, {
+interface ListViewLayoutBaseAttributes  extends ViewBaseAttributes{
     itemDeleteAnimation?: ListViewItemAnimation;
     itemHeight?: string | number;
     itemInsertAnimation?: ListViewItemAnimation;
@@ -39,10 +37,10 @@ type ListViewLayoutBaseAttributes = Override<ViewBaseAttributes, {
     onitemWidthChange?: (args: PropertyChangeData) => void;
     onscrollDirectionChange?: (args: PropertyChangeData) => void;
     scrollDirection?: ListViewScrollDirection;
-}>;
+};
 
 // index.d.ts
-type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttributes, {
+interface ListViewLinearLayoutAttributes  extends ListViewLayoutBaseAttributes{
     android?: any;
     dynamicItemSize?: string | boolean;
     ios?: any;
@@ -57,23 +55,23 @@ type ListViewLinearLayoutAttributes = Override<ListViewLayoutBaseAttributes, {
     onitemWidthChange?: (args: PropertyChangeData) => void;
     onscrollDirectionChange?: (args: PropertyChangeData) => void;
     scrollDirection?: NativescriptUiListviewListViewScrollDirection;
-}>;
+};
 
 // index.d.ts
-type ListViewStaggeredLayoutAttributes = Override<ListViewGridLayoutAttributes, {
+interface ListViewStaggeredLayoutAttributes  extends ListViewGridLayoutAttributes{
 
-}>;
+};
 
 // ui-listview.common.d.ts
-type PullToRefreshStyleAttributes = Override<ViewBaseAttributes, {
+interface PullToRefreshStyleAttributes  extends ViewBaseAttributes{
     indicatorBackgroundColor?: string | Color;
     indicatorColor?: string | Color;
     onindicatorBackgroundColorChange?: (args: PropertyChangeData) => void;
     onindicatorColorChange?: (args: PropertyChangeData) => void;
-}>;
+};
 
 // index.d.ts
-type RadListViewAttributes = Override<ViewAttributes, {
+interface RadListViewAttributes  extends ViewAttributes{
     android?: any;
     androidListView?: any;
     enableCollapsibleGroups?: string | boolean;
@@ -131,12 +129,12 @@ type RadListViewAttributes = Override<ViewAttributes, {
     selectionBehavior?: ListViewSelectionBehavior;
     sortingFunction?: string | ((item: any, otherItem: any) => number);
     swipeActions?: string | boolean;
-}>;
+};
 
 // index.d.ts
-type ReorderHandleAttributes = Override<StackLayoutAttributes, {
+interface ReorderHandleAttributes  extends StackLayoutAttributes{
 
-}>;
+};
 
 
 interface IntrinsicElements {

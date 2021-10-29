@@ -29,9 +29,9 @@ function doExports() {
     fs.mkdirSync("./react-nativescript-defs", { recursive: true});
 
     exportCore(nativescriptSourcePath)
-    exportModule("nativescript-ui-listview")
-    exportModule("nativescript-ui-chart")
-    exportModule("nativescript-ui-sidedrawer")
+    //exportModule("nativescript-ui-listview")
+    //exportModule("nativescript-ui-chart")
+    //exportModule("nativescript-ui-sidedrawer")
 }
 
 

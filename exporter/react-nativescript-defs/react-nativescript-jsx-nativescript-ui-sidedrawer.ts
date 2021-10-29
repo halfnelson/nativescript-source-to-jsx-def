@@ -3,11 +3,9 @@ type DrawerTransitionBase = import("nativescript-ui-sidedrawer").DrawerTransitio
 type PropertyChangeData = import("@nativescript/core/data/observable").PropertyChangeData;
 type SideDrawerLocation = import("nativescript-ui-sidedrawer").SideDrawerLocation;
 type View = import("@nativescript/core/ui/core/view").View;
-type Override<What, With> = Omit<What, keyof With> & With
-
 
 // index.d.ts
-export type RadSideDrawerAttributes = Override<ViewAttributes, {
+interface RadSideDrawerAttributes  extends ViewAttributes{
     allowEdgeSwipe?: string | boolean;
     android?: any;
     drawerContent?: string | View;
@@ -26,7 +24,7 @@ export type RadSideDrawerAttributes = Override<ViewAttributes, {
     onMainContentChange?: (args: PropertyChangeData) => void;
     onShadowColorChange?: (args: PropertyChangeData) => void;
     shadowColor?: string | Color;
-}>;
+};
 
 
 
