@@ -172,6 +172,7 @@ interface DockLayoutAttributes extends TDockLayoutAttributes {}
 export type TEditableTextBaseAttributes = Override<TextBaseAttributes, {
     autocapitalizationType?: "none" | "words" | "sentences" | "allcharacters";
     autocorrect?: string | boolean;
+    autofillType?: string;
     editable?: string | boolean;
     hint?: string;
     keyboardType?: "number" | "datetime" | "phone" | "url" | "email" | "integer";
@@ -179,6 +180,7 @@ export type TEditableTextBaseAttributes = Override<TextBaseAttributes, {
     maxLines?: string | number;
     onAutocapitalizationTypeChange?: (args: PropertyChangeData) => void;
     onAutocorrectChange?: (args: PropertyChangeData) => void;
+    onAutofillTypeChange?: (args: PropertyChangeData) => void;
     onEditableChange?: (args: PropertyChangeData) => void;
     onHintChange?: (args: PropertyChangeData) => void;
     onKeyboardTypeChange?: (args: PropertyChangeData) => void;
@@ -778,10 +780,10 @@ interface ViewAttributes extends TViewAttributes {}
 
 // ui/core/view-base/index.ts
 export type TViewBaseAttributes = Override<ObservableAttributes, {
+    ['class']?: string;
     alignSelf?: "auto" | "stretch" | "flex-start" | "flex-end" | "center" | "baseline";
     android?: any;
     bindingContext?: string | any;
-    class?: string;
     className?: string;
     col?: number;
     colSpan?: number;
@@ -842,7 +844,9 @@ export type TWebViewAttributes = Override<ViewAttributes, {
     android?: any;
     canGoBack?: boolean;
     canGoForward?: boolean;
+    disableZoom?: string | boolean;
     ios?: any;
+    onDisableZoomChange?: (args: PropertyChangeData) => void;
     onLoadFinished?: (args: LoadEventData) => void;
     onLoadStarted?: (args: WebViewInterfacesLoadEventData) => void;
     src?: string;

@@ -194,6 +194,7 @@ interface DockLayoutAttributes extends TDockLayoutAttributes {}
 type TEditableTextBaseAttributes = Override<TextBaseAttributes, {
     "on:autocapitalizationTypeChange"?: (args: PropertyChangeData) => void;
     "on:autocorrectChange"?: (args: PropertyChangeData) => void;
+    "on:autofillTypeChange"?: (args: PropertyChangeData) => void;
     "on:editableChange"?: (args: PropertyChangeData) => void;
     "on:hintChange"?: (args: PropertyChangeData) => void;
     "on:keyboardTypeChange"?: (args: PropertyChangeData) => void;
@@ -203,6 +204,7 @@ type TEditableTextBaseAttributes = Override<TextBaseAttributes, {
     "on:updateTextTriggerChange"?: (args: PropertyChangeData) => void;
     autocapitalizationType?: "none" | "words" | "sentences" | "allcharacters";
     autocorrect?: string | boolean;
+    autofillType?: string;
     editable?: string | boolean;
     hint?: string;
     keyboardType?: "number" | "datetime" | "phone" | "url" | "email" | "integer";
@@ -210,6 +212,7 @@ type TEditableTextBaseAttributes = Override<TextBaseAttributes, {
     maxLines?: string | number;
     onautocapitalizationTypeChange?: (args: PropertyChangeData) => void;
     onautocorrectChange?: (args: PropertyChangeData) => void;
+    onautofillTypeChange?: (args: PropertyChangeData) => void;
     oneditableChange?: (args: PropertyChangeData) => void;
     onhintChange?: (args: PropertyChangeData) => void;
     onkeyboardTypeChange?: (args: PropertyChangeData) => void;
@@ -932,10 +935,10 @@ type TViewBaseAttributes = Override<ObservableAttributes, {
     "on:classNameChange"?: (args: PropertyChangeData) => void;
     "on:hiddenChange"?: (args: PropertyChangeData) => void;
     "on:idChange"?: (args: PropertyChangeData) => void;
+    ['class']?: string;
     alignSelf?: "auto" | "stretch" | "flex-start" | "flex-end" | "center" | "baseline";
     android?: any;
     bindingContext?: string | any;
-    class?: string;
     className?: string;
     col?: number;
     colSpan?: number;
@@ -994,12 +997,15 @@ interface ViewBaseAttributes extends TViewBaseAttributes {}
 
 // ui/web-view/index.d.ts
 type TWebViewAttributes = Override<ViewAttributes, {
+    "on:disableZoomChange"?: (args: PropertyChangeData) => void;
     "on:loadFinished"?: (args: LoadEventData) => void;
     "on:loadStarted"?: (args: WebViewInterfacesLoadEventData) => void;
     android?: any;
     canGoBack?: boolean;
     canGoForward?: boolean;
+    disableZoom?: string | boolean;
     ios?: any;
+    ondisableZoomChange?: (args: PropertyChangeData) => void;
     onloadFinished?: (args: LoadEventData) => void;
     onloadStarted?: (args: WebViewInterfacesLoadEventData) => void;
     src?: string;
