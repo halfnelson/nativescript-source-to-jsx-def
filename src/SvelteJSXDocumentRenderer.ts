@@ -1,4 +1,4 @@
-import { AttributeClassPropDefinition, IntrinsicElementDefinition, JSXDocument } from './JSXExporter';
+import { AttributeClassDefinition, AttributeClassPropDefinition, IntrinsicElementDefinition, JSXDocument } from './JSXExporter';
 import JSXDocumentRenderer from "./JSXDocumentRenderer";
 
 export class SvelteJSXDocumentRenderer extends JSXDocumentRenderer {
@@ -24,6 +24,14 @@ ${this.renderJSXNamespace(doc.instrinsicElements)}
 }
 }
 `  
+    }
+    renderClass(classDefinition: AttributeClassDefinition): string {
+        // Convert our derived event handler props to svelte like "on:" handlers.
+        // we leave the existing `ontap` ones there for back compat for now
+        var eventProps = classDefinition.props.filter(p => p.meta.derivedFrom.includes("SyntheticEvent:") && p.name.startsWith("on"))
+        var svelteEventProps = eventProps.map(ep => ({...ep, name: `"on:${ep.name.substring(2)}"`}))
+        var classWithEvents = { ...classDefinition, props: classDefinition.props.concat(svelteEventProps)}
+        return super.renderClass(classWithEvents);
     }
 }
 

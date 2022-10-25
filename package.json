@@ -1,6 +1,6 @@
 {
   "name": "nativescript-source-to-jsx-def",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Introspect NativeScript source and plugins to generate JSX definitions for svelte and react",
   "main": "dist/index.js",
   "scripts": {
